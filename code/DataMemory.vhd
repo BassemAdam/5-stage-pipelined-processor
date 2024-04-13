@@ -2,20 +2,26 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity dataMemory is port(
+entity dataMemory is
+    generic(
+        DATA_WIDTH : integer := 32;
+        ADDR_WIDTH : integer := 12
+    );
+    
+    port(
     rst : in std_logic;
     clk : in std_logic;
     memWrite : in std_logic;
     memRead : in std_logic;
-    writeAddress : in unsigned(11 downto 0);
-    readAddress : in unsigned(11 downto 0);
-    writeData : in unsigned(31 downto 0);
-    readData : out unsigned(31 downto 0)
+    writeAddress : in unsigned(ADDR_WIDTH - 1 downto 0);
+    readAddress : in unsigned(ADDR_WIDTH - 1 downto 0);
+    writeData : in unsigned(DATA_WIDTH - 1 downto 0);
+    readData : out unsigned(DATA_WIDTH - 1 downto 0)
 );
 end entity dataMemory;
 
 architecture dataMemory_arch of dataMemory is
-    type memory is array(0 to 4095) of unsigned(31 downto 0);
+    type memory is array(0 to 2 ** ADDR_WIDTH - 1) of unsigned(DATA_WIDTH -1 downto 0);
     signal mem : memory := (others => (others => '0'));
 begin
     process(clk, rst)
