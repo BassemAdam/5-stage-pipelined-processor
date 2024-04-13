@@ -106,9 +106,9 @@ Vm3ff_N4Oh5;7OVcI7KLRU2
 !s100 9O[]ej[eNX_2N^C:UUMD32
 R7
 32
-Z24 !s110 1713044318
+Z24 !s110 1713047027
 !i10b 1
-Z25 !s108 1713044318.000000
+Z25 !s108 1713047027.000000
 Z26 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/controller.vhd|
 Z27 !s107 C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/controller.vhd|
 !i113 1
@@ -118,7 +118,7 @@ Acontrollerarch
 R1
 R2
 R3
-Z28 DEx4 work 10 controller 0 22 m3ff_N4Oh5;7OVcI7KLRU2
+DEx4 work 10 controller 0 22 m3ff_N4Oh5;7OVcI7KLRU2
 l27
 L23
 V9P2aj?>6KF9O1mIm8MZJW3
@@ -134,13 +134,13 @@ R27
 R12
 R13
 Edatamemory
-Z29 w1713031222
+Z28 w1713031222
 R1
 R2
 R3
 R4
-Z30 8C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/DataMemory.vhd
-Z31 FC:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/DataMemory.vhd
+Z29 8C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/DataMemory.vhd
+Z30 FC:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/DataMemory.vhd
 l0
 L5
 V4X8aY:FHE`8e366Lj2z<=0
@@ -150,8 +150,8 @@ R7
 R8
 !i10b 1
 R9
-Z32 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/DataMemory.vhd|
-Z33 !s107 C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/DataMemory.vhd|
+Z31 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/DataMemory.vhd|
+Z32 !s107 C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/DataMemory.vhd|
 !i113 1
 R12
 R13
@@ -169,30 +169,30 @@ R7
 R8
 !i10b 1
 R9
+R31
 R32
-R33
 !i113 1
 R12
 R13
 Efd_buffer
-Z34 w1713039107
+Z33 w1713039107
 R1
 R2
 R3
 R4
-Z35 8C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/FD_Buffer.vhd
-Z36 FC:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/FD_Buffer.vhd
+Z34 8C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/FD_Buffer.vhd
+Z35 FC:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/FD_Buffer.vhd
 l0
 L5
 V`<E@LoA@DlBIzLQ5>aBln1
 !s100 nVfaimg21KQI<Jf7Ii>7:2
 R7
 32
-Z37 !s110 1713044181
+R24
 !i10b 1
-Z38 !s108 1713044181.000000
-Z39 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/FD_Buffer.vhd|
-Z40 !s107 C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/FD_Buffer.vhd|
+R25
+Z36 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/FD_Buffer.vhd|
+Z37 !s107 C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/FD_Buffer.vhd|
 !i113 1
 R12
 R13
@@ -207,33 +207,33 @@ V8EE:jVTZHUHEK:ofmRd?h3
 !s100 AB1Y765MdbRg<ne6^[Xd:3
 R7
 32
-R37
+R24
 !i10b 1
-R38
-R39
-R40
+R25
+R36
+R37
 !i113 1
 R12
 R13
 Einstrcache
-Z41 w1713030905
+Z38 w1713030905
 R1
 R2
 R3
 R4
-Z42 8C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/InstrCache.vhd
-Z43 FC:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/InstrCache.vhd
+Z39 8C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/InstrCache.vhd
+Z40 FC:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/InstrCache.vhd
 l0
 L4
 VPO08YhabdET;3PY@5gDdj0
 !s100 Ol7F2DB1:=CR9WQW]SGF31
 R7
 32
-Z44 !s110 1713031230
+Z41 !s110 1713031230
 !i10b 1
 R9
-Z45 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/InstrCache.vhd|
-Z46 !s107 C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/InstrCache.vhd|
+Z42 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/InstrCache.vhd|
+Z43 !s107 C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/InstrCache.vhd|
 !i113 1
 R12
 R13
@@ -248,33 +248,33 @@ V:]?AoXW3gGhcnZP?6D3II1
 !s100 4T7?=H@l8PM8CVU^k=`mN3
 R7
 32
-R44
+R41
 !i10b 1
 R9
-R45
-R46
+R42
+R43
 !i113 1
 R12
 R13
 Emux_2x1
-Z47 w1713030684
+Z44 w1713030684
 R1
 R2
 R3
 R4
-Z48 8C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/MUX_2x1.vhd
-Z49 FC:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/MUX_2x1.vhd
+Z45 8C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/MUX_2x1.vhd
+Z46 FC:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/MUX_2x1.vhd
 l0
 L4
 V=m8:E3:GXU5k=RToZIF;B0
 !s100 4jAd;8MgS=KELoinD8R603
 R7
 32
-R44
+R41
 !i10b 1
-Z50 !s108 1713031230.000000
-Z51 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/MUX_2x1.vhd|
-Z52 !s107 C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/MUX_2x1.vhd|
+Z47 !s108 1713031230.000000
+Z48 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/MUX_2x1.vhd|
+Z49 !s107 C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/MUX_2x1.vhd|
 !i113 1
 R12
 R13
@@ -289,33 +289,33 @@ VMUVihD<LA=BoN892;=gcG2
 !s100 Ie`Zz@0Lh9KRT^GKYa`Uj0
 R7
 32
-R44
+R41
 !i10b 1
-R50
-R51
-R52
+R47
+R48
+R49
 !i113 1
 R12
 R13
 Emux_4x1
-Z53 w1713030701
+Z50 w1713030701
 R1
 R2
 R3
 R4
-Z54 8C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/MUX_4x1.vhd
-Z55 FC:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/MUX_4x1.vhd
+Z51 8C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/MUX_4x1.vhd
+Z52 FC:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/MUX_4x1.vhd
 l0
 L6
 Vl^7Zb^[Rk?7@7GnVc<i9[1
 !s100 O8=YM4STgDACS6;OG=CZ?2
 R7
 32
-R44
+R41
 !i10b 1
-R50
-Z56 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/MUX_4x1.vhd|
-Z57 !s107 C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/MUX_4x1.vhd|
+R47
+Z53 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/MUX_4x1.vhd|
+Z54 !s107 C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/MUX_4x1.vhd|
 !i113 1
 R12
 R13
@@ -330,33 +330,33 @@ V;hGz[CQWJgGLj=:n6H2ai0
 !s100 596^a3Womzo[h4DYaNe0W2
 R7
 32
-R44
+R41
 !i10b 1
-R50
-R56
-R57
+R47
+R53
+R54
 !i113 1
 R12
 R13
 Enbuffer
-Z58 w1713041279
+Z55 w1713041279
 R1
 R2
 R3
 R4
-Z59 8C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/nBuffer.vhd
-Z60 FC:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/nBuffer.vhd
+Z56 8C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/nBuffer.vhd
+Z57 FC:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/nBuffer.vhd
 l0
 L5
 VARDZSS3TRD^>nFOc]Xm443
 !s100 A[8j_0;kHBiKli?F60alL2
 R7
 32
-R37
+R24
 !i10b 1
-R38
-Z61 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/nBuffer.vhd|
-Z62 !s107 C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/nBuffer.vhd|
+R25
+Z58 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/nBuffer.vhd|
+Z59 !s107 C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/nBuffer.vhd|
 !i113 1
 R12
 R13
@@ -371,22 +371,63 @@ VE2^V67?k6J`oI<4cE=TJf2
 !s100 Q5OV7oLGOjB:;1@;aYmL91
 R7
 32
-R37
+R24
 !i10b 1
-R38
-R61
-R62
+R25
+R58
+R59
 !i113 1
 R12
 R13
-Esp
-Z63 w1713017281
+Eprocessor
+Z60 w1713047047
 R1
 R2
 R3
 R4
-Z64 8C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/SP.vhd
-Z65 FC:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/SP.vhd
+Z61 8C:\Users\Lenovo\Desktop\Arch Project\-5-stage-pipelined-processor\code\processor.vhd
+Z62 FC:\Users\Lenovo\Desktop\Arch Project\-5-stage-pipelined-processor\code\processor.vhd
+l0
+L5
+Vk[_f9:M8a[NoegdoKiJA^0
+!s100 WB42i?>NNZ1X]BQYR?M7N2
+R7
+32
+Z63 !s110 1713047055
+!i10b 1
+Z64 !s108 1713047054.000000
+Z65 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:\Users\Lenovo\Desktop\Arch Project\-5-stage-pipelined-processor\code\processor.vhd|
+Z66 !s107 C:\Users\Lenovo\Desktop\Arch Project\-5-stage-pipelined-processor\code\processor.vhd|
+!i113 1
+R12
+R13
+Aprocessorarch
+R1
+R2
+R3
+Z67 DEx4 work 9 processor 0 22 k[_f9:M8a[NoegdoKiJA^0
+l192
+L20
+V>aYSI4I:kiOEhnFQm6J8K1
+!s100 7Xb@HE;e3eOnZSU<mTU3R0
+R7
+32
+R63
+!i10b 1
+R64
+R65
+R66
+!i113 1
+R12
+R13
+Esp
+Z68 w1713017281
+R1
+R2
+R3
+R4
+Z69 8C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/SP.vhd
+Z70 FC:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/SP.vhd
 l0
 L6
 V4YSJ>?_?S;U7m?YaGn<N=2
@@ -396,8 +437,8 @@ R7
 R8
 !i10b 1
 R9
-Z66 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/SP.vhd|
-Z67 !s107 C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/SP.vhd|
+Z71 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/SP.vhd|
+Z72 !s107 C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/SP.vhd|
 !i113 1
 R12
 R13
@@ -415,8 +456,8 @@ R7
 R8
 !i10b 1
 R9
-R66
-R67
+R71
+R72
 !i113 1
 R12
 R13

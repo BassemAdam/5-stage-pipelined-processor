@@ -2,10 +2,13 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 entity MUX_2x1 is
+    generic(
+        N : integer := 8
+    );
     port(
-        I0, I1 : in std_logic_vector(7 downto 0);
+        I0, I1 : in std_logic_vector(N-1 downto 0);
         S : in std_logic;
-        O : out std_logic_vector(7 downto 0)
+        O : out std_logic_vector(N-1 downto 0)
     );
 end entity MUX_2x1;
 

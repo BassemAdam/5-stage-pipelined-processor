@@ -4,10 +4,13 @@ use IEEE.numeric_std.all;
 
 
 entity MUX_4x1 is
+    generic(
+        N : integer := 8
+    );
     port(
-        I0, I1, I2, I3 : in std_logic_vector(7 downto 0);
+        I0, I1, I2, I3 : in std_logic_vector(N - 1  downto 0);
         S : in std_logic_vector(1 downto 0);
-        O : out std_logic_vector(7 downto 0)
+        O : out std_logic_vector(N - 1  downto 0)
     );
 end entity MUX_4x1;
 

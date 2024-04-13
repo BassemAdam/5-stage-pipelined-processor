@@ -1,4 +1,22 @@
-C:/Users/Ali/Desktop/-5-stage-pipelined-processor/code/RegisterFile.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Users/Ali/Desktop/-5-stage-pipelined-processor/code/RegisterFile.vhd
+{C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/nBuffer.vhd} {1 {vcom -work work -2002 -explicit -stats=none {C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/nBuffer.vhd}
+Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  5 2016
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling entity nBuffer
+-- Compiling architecture mBufferArch of nBuffer
+
+} {} {}} {C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/controller.vhd} {1 {vcom -work work -2002 -explicit -stats=none {C:/Users/Lenovo/Desktop/Arch Project/-5-stage-pipelined-processor/code/controller.vhd}
+Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  5 2016
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling entity controller
+-- Compiling architecture controllerArch of controller
+
+} {} {}} C:/Users/Ali/Desktop/-5-stage-pipelined-processor/code/RegisterFile.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Users/Ali/Desktop/-5-stage-pipelined-processor/code/RegisterFile.vhd
 Model Technology ModelSim - Intel FPGA Edition vcom 10.5b Compiler 2016.10 Oct  5 2016
 -- Loading package STANDARD
 -- Loading package TEXTIO
