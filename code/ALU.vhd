@@ -11,14 +11,15 @@ entity ALU is
     );
 end entity ALU;
 
-architecture  of ALU is
+architecture ALUArch  of ALU is
+    signal intermediate: std_logic_vector(31 downto 0);
     begin
         with ALUControl select
-            Result <=
+            intermediate <=
             --ADD
-                A + B when "000",
+                std_logic_vector(unsigned(A) + unsigned(B)) when "000",
             --SUB    
-                A - B when "001",
+                std_logic_vector(unsigned(A) - unsigned(B)) when "001",
             --AND
                 A and B when "010",
             --OR    
@@ -28,8 +29,11 @@ architecture  of ALU is
             --NOT A    
                 not A when "101",
             --CMP     
-                A - B when "110",
-                (others => '0') when others;
-        Zero <= '1' when Result = (others => '0') else '0';
+            std_logic_vector(unsigned(A) - unsigned(B)) when "110",
+          
+            --Other    
+                (others => '0') when others;        
+        Zero <= '1' when intermediate=std_logic_vector(to_unsigned(0, Result'length)) else '0';
+        Result <= intermediate;
 
-end architecture ALU;
+end architecture ALUArch;
