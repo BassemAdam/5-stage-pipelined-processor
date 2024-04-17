@@ -1,269 +1,318 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity processor is
-    port (
-        clk : in std_logic;
-        reset : in std_logic;
-        INT_In : in std_logic;  -- interrupt signal
-        exception : out std_logic;  -- exception signal
-        IN_PORT : in std_logic_vector(7 downto 0);
-        OUT_PORT : out std_logic_vector(7 downto 0)
-    );
-
-    
-
-
-end entity processor;
-
-architecture processorArch of processor is
-
-    ------------------------------------SIGNALS------------------------------------
-    signal instruction : std_logic_vector(15 downto 0);
-    signal opCode : std_logic_vector(6 downto 0);
-    signal Rsrc1 : std_logic_vector(2 downto 0);
-    signal Rsrc2 : std_logic_vector(2 downto 0);
-    signal Rdest : std_logic_vector(2 downto 0);
-    signal hasImm : std_logic;
-    signal isBranch : std_logic;
-    signal Rsrc1_data : std_logic_vector(31 downto 0);
-    signal Rsrc2_data : std_logic_vector(31 downto 0);
-    signal ALUResult : std_logic_vector(31 downto 0);
-    signal Zero : std_logic;
-    signal WBdata : std_logic_vector(31 downto 0);
-    signal writeEnable : std_logic;
-    signal cin : std_logic;
-    signal ovf : std_logic;
-    signal flags : std_logic_vector(3 downto 0);
-    signal pointer : std_logic_vector(11 downto 0);
-    signal push : std_logic;
-    signal pop : std_logic;
-    signal pc_c : std_logic_vector(31 downto 0);
-    signal pcBranch : std_logic_vector(31 downto 0);
-    signal branch : std_logic;
-    signal enable : std_logic;
-    signal ALUControl : std_logic_vector(2 downto 0);
-------------------------------------SIGNALS END-----------------------------------
-
-------------------------------------COMPONENTS------------------------------------
-    component ALU is
-        port(
-            A, B: in std_logic_vector(31 downto 0);
-            ALUControl: in std_logic_vector(2 downto 0);
-            Result: out std_logic_vector(31 downto 0);
-            Zero: out std_logic
-        );
-    end component;
-
-    component RegisterFile is
-        GENERIC (
-            w : INTEGER := 3;
-            n : INTEGER := 32
-        );
-        PORT (
-            clk, rst : IN STD_LOGIC;
-            Rsrc1_address, Rsrc2_address : IN STD_LOGIC_VECTOR(w-1 DOWNTO 0);
-            Rdest : IN STD_LOGIC_VECTOR(w-1 DOWNTO 0);
-            WBdata : IN STD_LOGIC_VECTOR(n-1 DOWNTO 0);
-            writeEnable : IN STD_LOGIC;
-            Rsrc1_data, Rsrc2_data : OUT STD_LOGIC_VECTOR(n-1 DOWNTO 0)
-        );
-    end component;
-
-    component DataMemory is
-        generic(
-        DATA_WIDTH : integer := 32;
-        ADDR_WIDTH : integer := 12
-        );
-    
-        port(
-        rst : in std_logic;
-        clk : in std_logic;
-        memWrite : in std_logic;
-        memRead : in std_logic;
-        writeAddress : in unsigned(ADDR_WIDTH - 1 downto 0);
-        readAddress : in unsigned(ADDR_WIDTH - 1 downto 0);
-        writeData : in unsigned(DATA_WIDTH - 1 downto 0);
-        readData : out unsigned(DATA_WIDTH - 1 downto 0)
-        );
-    end component;
-
-    component InstrCache IS
-    GENERIC (
-        n : INTEGER := 16; -- number of bits per instruction
-        m : INTEGER := 12; -- height of the cache
-        k : INTEGER := 32 -- pc size
-    );
-    PORT (
-        clk : IN STD_LOGIC;
-        rst : IN STD_LOGIC;
-        pc : IN STD_LOGIC_VECTOR(k - 1 DOWNTO 0);
-        data : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
-    );
-    END component;
-
-    component controller is 
-    generic(
-        INST_WIDTH: integer := 16
-    );
-    port(
-        clk: in std_logic;
-        rst: in std_logic;
-        instruction: in std_logic_vector(INST_WIDTH -1 downto 0);
-        opCode: out std_logic_vector(6 downto 0);
-        Rsrc1: out std_logic_vector(2 downto 0);
-        Rsrc2: out std_logic_vector(2 downto 0);
-        Rdest: out std_logic_vector(2 downto 0);
-        hasImm: out std_logic;
-        isBranch: out std_logic
-       
-    );
-    end component;
-
-    component conditionCodeRegister is
-        port (
-            rst : in std_logic;
-            cin : in std_logic;
-            ovf : in std_logic;
-            opResult : in std_logic_vector(31 downto 0);
-            flags : out std_logic_vector(3 downto 0)
-        );
-    end component;
-
-    component MUX_2x1 is
-        generic(
-            N : integer := 8
-        );
-        port(
-            I0, I1 : in std_logic_vector(N-1 downto 0);
-            S : in std_logic;
-            O : out std_logic_vector(N-1 downto 0)
-        );
-    end component;
-
-    component MUX_4x1 is
-        generic(
-            N : integer := 8
-        );
-        port(
-            I0, I1, I2, I3 : in std_logic_vector(N - 1  downto 0);
-            S : in std_logic_vector(1 downto 0);
-            O : out std_logic_vector(N - 1  downto 0)
-        );
-    end component;
-
-    component PC is 
-    GENERIC (
-        N : INTEGER := 32
-    );
+ENTITY processor IS
     PORT (
         clk : IN STD_LOGIC;
         reset : IN STD_LOGIC;
-        branch : IN STD_LOGIC;
-        enable : IN STD_LOGIC;
-        pcBranch : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
-        pc : OUT STD_LOGIC_VECTOR(N - 1 DOWNTO 0)
+        INT_In : IN STD_LOGIC; -- interrupt signal
+        exception : OUT STD_LOGIC; -- exception signal
+        IN_PORT : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+        OUT_PORT : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
     );
-    END component;
+END ENTITY processor;
 
-    component SP is 
-    generic(
-        WIDTH: integer := 12
+ARCHITECTURE processorArch OF processor IS
+    ------------------------------------COMPONENTS------------------------------------
+    COMPONENT PC IS
+        GENERIC (
+            N : INTEGER := 32
+        );
+        PORT (
+            clk : IN STD_LOGIC;
+            reset : IN STD_LOGIC;
+            branch : IN STD_LOGIC;
+            enable : IN STD_LOGIC;
+            pcBranch : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+            pc : OUT STD_LOGIC_VECTOR(N - 1 DOWNTO 0)
+        );
+    END COMPONENT;
+
+    COMPONENT InstrCache IS
+        GENERIC (
+            n : INTEGER := 16; -- number of bits per instruction
+            m : INTEGER := 12; -- height of the cache
+            k : INTEGER := 32 -- pc size
+        );
+        PORT (
+            clk : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
+            pc : IN STD_LOGIC_VECTOR(k - 1 DOWNTO 0);
+            data : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
+        );
+    END COMPONENT;
+    
+    COMPONENT FD_Buffer IS
+        PORT (
+            clk : IN STD_LOGIC;
+            reset : IN STD_LOGIC;
+            WE : IN STD_LOGIC;
+            --16 bits from instruction memory
+            Intruction : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+
+            OpCode : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            Src1 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            Src2 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            dst : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            FnNum : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
+        );
+    END COMPONENT FD_Buffer;
+
+    COMPONENT RegisterFile IS
+    GENERIC (
+        w : INTEGER := 3;
+        n : INTEGER := 32
     );
-    port(
-    reset: in std_logic;
-    push: in std_logic;
-    pop: in std_logic;
-    pointer: out std_logic_vector(WIDTH - 1 downto 0)
+    PORT (
+        clk, rst : IN STD_LOGIC;
+        Rsrc1_address, Rsrc2_address : IN STD_LOGIC_VECTOR(w - 1 DOWNTO 0);
+        Rdest : IN STD_LOGIC_VECTOR(w - 1 DOWNTO 0);
+        WBdata : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
+        writeEnable : IN STD_LOGIC;
+        Rsrc1_data, Rsrc2_data : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
     );
-    end component;
+    END COMPONENT;
 
-    component nBuffer is 
-    generic (
-        N : positive := 16 --instruction width
+    COMPONENT DE_Buffer IS
+        PORT (
+            clk, reset, WE : IN STD_LOGIC;
+            Rsrc1_Val_in, Rsrc2_Val_in, Dst_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            aluSelectors_in : IN STD_LOGIC_VECTOR(10 DOWNTO 0); -- 11 instruction alu
+            Rsrc1_Val_out, Rsrc2_Val_out, Dst_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            aluSelectors_out : OUT STD_LOGIC_VECTOR(10 DOWNTO 0)
+        );
+    END COMPONENT;
+
+    COMPONENT ALU IS
+        PORT (
+            A, B : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            ALUControl : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            Result : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            Zero : OUT STD_LOGIC
+        );
+    END COMPONENT;
+
+    COMPONENT EM_Buffer is
+        port (   
+            clk, reset, WE : in  std_logic;
+            ALU_COUT : in std_logic;
+            Dst_in : in  std_logic_vector(31 downto 0);
+            ALU_OutValue_in : in  std_logic_vector(31 downto 0);
+            ALU_COUT_OUT : out std_logic;
+            ALU_OutValue_out, Dst_out : out std_logic_vector(31 downto 0)
+        );
+    end COMPONENT EM_Buffer;
+
+    COMPONENT DataMemory IS
+        GENERIC (
+            DATA_WIDTH : INTEGER := 32;
+            ADDR_WIDTH : INTEGER := 12
+        );
+
+        PORT (
+            rst : IN STD_LOGIC;
+            clk : IN STD_LOGIC;
+            memWrite : IN STD_LOGIC;
+            memRead : IN STD_LOGIC;
+            writeAddress : IN unsigned(ADDR_WIDTH - 1 DOWNTO 0);
+            readAddress : IN unsigned(ADDR_WIDTH - 1 DOWNTO 0);
+            writeData : IN unsigned(DATA_WIDTH - 1 DOWNTO 0);
+            readData : OUT unsigned(DATA_WIDTH - 1 DOWNTO 0)
+        );
+    END COMPONENT;
+
+    COMPONENT WB_Buffer is
+        port (   
+            clk, reset, WE : in  std_logic;
+            ALU_COUT : in std_logic;
+            Dst_in : in  std_logic_vector(31 downto 0);
+            ALU_OutValue_in : in  std_logic_vector(31 downto 0);
+            ALU_COUT_OUT : out std_logic;
+            ALU_OutValue_out, Dst_out : out std_logic_vector(31 downto 0)
+        );
+    end COMPONENT WB_Buffer;
+
+    COMPONENT controller IS
+        GENERIC (
+            INST_WIDTH : INTEGER := 16
+        );
+        PORT (
+            clk : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
+            instruction : IN STD_LOGIC_VECTOR(INST_WIDTH - 1 DOWNTO 0);
+            opCode : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+            Rsrc1 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            Rsrc2 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            Rdest : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            hasImm : OUT STD_LOGIC;
+            isBranch : OUT STD_LOGIC
+
+        );
+    END COMPONENT;
+
+    COMPONENT conditionCodeRegister IS
+        PORT (
+            rst : IN STD_LOGIC;
+            cin : IN STD_LOGIC;
+            ovf : IN STD_LOGIC;
+            opResult : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            flags : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
+        );
+    END COMPONENT;
+
+    COMPONENT MUX_2x1 IS
+        GENERIC (
+            N : INTEGER := 8
+        );
+        PORT (
+            I0, I1 : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+            S : IN STD_LOGIC;
+            O : OUT STD_LOGIC_VECTOR(N - 1 DOWNTO 0)
+        );
+    END COMPONENT;
+
+    COMPONENT MUX_4x1 IS
+        GENERIC (
+            N : INTEGER := 8
+        );
+        PORT (
+            I0, I1, I2, I3 : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+            S : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+            O : OUT STD_LOGIC_VECTOR(N - 1 DOWNTO 0)
+        );
+    END COMPONENT;
+
+    COMPONENT SP IS
+        GENERIC (
+            WIDTH : INTEGER := 12
+        );
+        PORT (
+            reset : IN STD_LOGIC;
+            push : IN STD_LOGIC;
+            pop : IN STD_LOGIC;
+            pointer : OUT STD_LOGIC_VECTOR(WIDTH - 1 DOWNTO 0)
+        );
+    END COMPONENT;
+
+    COMPONENT nBuffer IS
+        GENERIC (
+            N : POSITIVE := 16 --instruction width
+        );
+        PORT (
+            clk : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
+            din : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+            dout : OUT STD_LOGIC_VECTOR(N - 1 DOWNTO 0)
+        );
+    END COMPONENT;
+
+    ------------------------------------COMPONENTS END-----------------------------------
+
+    ------------------------------------SIGNALS------------------------------------
+    SIGNAL instruction : STD_LOGIC_VECTOR(15 DOWNTO 0);
+    SIGNAL opCode : STD_LOGIC_VECTOR(6 DOWNTO 0);
+    SIGNAL Rsrc1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL Rsrc2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL Rdest : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL hasImm : STD_LOGIC;
+    SIGNAL isBranch : STD_LOGIC;
+    SIGNAL Rsrc1_data : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL Rsrc2_data : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL ALUResult : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL Zero : STD_LOGIC;
+    SIGNAL WBdata : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL writeEnable : STD_LOGIC;
+    SIGNAL cin : STD_LOGIC;
+    SIGNAL ovf : STD_LOGIC;
+    SIGNAL flags : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    SIGNAL pointer : STD_LOGIC_VECTOR(11 DOWNTO 0);
+    SIGNAL push : STD_LOGIC;
+    SIGNAL pop : STD_LOGIC;
+    SIGNAL pc_c : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL pcBranch : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL branch : STD_LOGIC;
+    SIGNAL enable : STD_LOGIC;
+    SIGNAL ALUControl : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    ------------------------------------SIGNALS END-----------------------------------
+
+BEGIN
+    ------------------------------------PORTS------------------------------------
+    -- map instruction cache
+    instrCache1 : InstrCache PORT MAP(
+        clk => clk,
+        rst => reset,
+        pc => pc_c,
+        data => instruction
     );
-    port (
-        clk : in std_logic;
-        rst : in std_logic;
-        din : in std_logic_vector(N-1 downto 0);
-        dout : out std_logic_vector(N-1 downto 0)
+
+    -- map controller
+    controller1 : controller PORT MAP(
+        clk => clk,
+        rst => reset,
+        instruction => instruction,
+        opCode => opCode,
+        Rsrc1 => Rsrc1,
+        Rsrc2 => Rsrc2,
+        Rdest => Rdest,
+        hasImm => hasImm,
+        isBranch => isBranch
     );
-    end component;
-------------------------------------COMPONENTS END-----------------------------------
-    begin
-        -- map instruction cache
-        instrCache1: InstrCache port map(
-            clk => clk,
-            rst => reset,
-            pc => pc_c,
-            data => instruction
-        );
 
-        -- map controller
-        controller1: controller port map(
-            clk => clk,
-            rst => reset,
-            instruction => instruction,
-            opCode => opCode,
-            Rsrc1 => Rsrc1,
-            Rsrc2 => Rsrc2,
-            Rdest => Rdest,
-            hasImm => hasImm,
-            isBranch => isBranch
-        );
+    -- map register file
+    registerFile1 : RegisterFile PORT MAP(
+        clk => clk,
+        rst => reset,
+        Rsrc1_address => Rsrc1,
+        Rsrc2_address => Rsrc2,
+        Rdest => Rdest,
+        WBdata => WBdata,
+        writeEnable => writeEnable,
+        Rsrc1_data => Rsrc1_data,
+        Rsrc2_data => Rsrc2_data
+    );
 
-        -- map register file
-        registerFile1: RegisterFile port map(
-            clk => clk,
-            rst => reset,
-            Rsrc1_address => Rsrc1,
-            Rsrc2_address => Rsrc2,
-            Rdest => Rdest,
-            WBdata => WBdata,
-            writeEnable => writeEnable,
-            Rsrc1_data => Rsrc1_data,
-            Rsrc2_data => Rsrc2_data
-        );
+    -- map ALU
+    alu1 : ALU PORT MAP(
+        A => Rsrc1_data,
+        B => Rsrc2_data,
+        ALUControl => ALUControl,
+        Result => ALUResult,
+        Zero => Zero
+    );
 
-        -- map ALU
-        alu1: ALU port map(
-            A => Rsrc1_data,
-            B => Rsrc2_data,
-            ALUControl => ALUControl,
-            Result => ALUResult,
-            Zero => Zero
-        );
+    -- map condition code register
+    conditionCodeRegister1 : conditionCodeRegister PORT MAP(
+        rst => reset,
+        cin => cin,
+        ovf => ovf,
+        opResult => ALUResult,
+        flags => flags
+    );
 
-        -- map condition code register
-        conditionCodeRegister1: conditionCodeRegister port map(
-            rst => reset,
-            cin => cin,
-            ovf => ovf,
-            opResult => ALUResult,
-            flags => flags
-        );
+    -- map SP
+    sp1 : SP PORT MAP(
+        reset => reset,
+        push => push,
+        pop => pop,
+        pointer => pointer
+    );
 
-        -- map SP
-        sp1: SP port map(
-            reset => reset,
-            push => push,
-            pop => pop,
-            pointer => pointer
-        );
+    -- map PC
+    pc1 : PC PORT MAP(
+        clk => clk,
+        reset => reset,
+        branch => branch,
+        enable => enable,
+        pcBranch => pcBranch,
+        pc => pc_c
+    );
+    ------------------------------------PORTS END----------------------------------
 
-        -- map PC
-        pc1:PC port map(
-            clk => clk,
-            reset => reset,
-            branch => branch,
-            enable => enable,
-            pcBranch => pcBranch,
-            pc => pc_c
-        );
+    ------------------------------------PROCESS------------------------------------
 
-        -- map data memory
+    ----------------------------------END PROCESS----------------------------------
 
+    -- map data memory
 
-
-    end architecture processorArch;        
+END ARCHITECTURE processorArch;
