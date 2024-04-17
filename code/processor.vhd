@@ -210,30 +210,30 @@ ARCHITECTURE processorArch OF processor IS
     ------------------------------------COMPONENTS END-----------------------------------
 
     ------------------------------------SIGNALS------------------------------------
-    SIGNAL instruction : STD_LOGIC_VECTOR(15 DOWNTO 0);
-    SIGNAL opCode : STD_LOGIC_VECTOR(6 DOWNTO 0);
-    SIGNAL Rsrc1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-    SIGNAL Rsrc2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-    SIGNAL Rdest : STD_LOGIC_VECTOR(2 DOWNTO 0);
-    SIGNAL hasImm : STD_LOGIC;
-    SIGNAL isBranch : STD_LOGIC;
-    SIGNAL Rsrc1_data : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    SIGNAL Rsrc2_data : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    SIGNAL ALUResult : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    SIGNAL Zero : STD_LOGIC;
-    SIGNAL WBdata : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    SIGNAL writeEnable : STD_LOGIC;
-    SIGNAL cin : STD_LOGIC;
-    SIGNAL ovf : STD_LOGIC;
-    SIGNAL flags : STD_LOGIC_VECTOR(3 DOWNTO 0);
-    SIGNAL pointer : STD_LOGIC_VECTOR(11 DOWNTO 0);
-    SIGNAL push : STD_LOGIC;
-    SIGNAL pop : STD_LOGIC;
-    SIGNAL pc_c : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    SIGNAL pcBranch : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    SIGNAL branch : STD_LOGIC;
-    SIGNAL enable : STD_LOGIC;
-    SIGNAL ALUControl : STD_LOGIC_VECTOR(2 DOWNTO 0);
+        SIGNAL instruction : STD_LOGIC_VECTOR(15 DOWNTO 0);
+        SIGNAL opCode : STD_LOGIC_VECTOR(6 DOWNTO 0);
+        SIGNAL Rsrc1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+        SIGNAL Rsrc2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+        SIGNAL Rdest : STD_LOGIC_VECTOR(2 DOWNTO 0);
+        SIGNAL hasImm : STD_LOGIC;
+        SIGNAL isBranch : STD_LOGIC;
+        SIGNAL Rsrc1_data : STD_LOGIC_VECTOR(31 DOWNTO 0);
+        SIGNAL Rsrc2_data : STD_LOGIC_VECTOR(31 DOWNTO 0);
+        SIGNAL ALUResult : STD_LOGIC_VECTOR(31 DOWNTO 0);
+        SIGNAL Zero : STD_LOGIC;
+        SIGNAL WBdata : STD_LOGIC_VECTOR(31 DOWNTO 0);
+        SIGNAL writeEnable : STD_LOGIC;
+        SIGNAL cin : STD_LOGIC;
+        SIGNAL ovf : STD_LOGIC;
+        SIGNAL flags : STD_LOGIC_VECTOR(3 DOWNTO 0);
+        SIGNAL pointer : STD_LOGIC_VECTOR(11 DOWNTO 0);
+        SIGNAL push : STD_LOGIC;
+        SIGNAL pop : STD_LOGIC;
+        SIGNAL pc_c : STD_LOGIC_VECTOR(31 DOWNTO 0);
+        SIGNAL pcBranch : STD_LOGIC_VECTOR(31 DOWNTO 0);
+        SIGNAL branch : STD_LOGIC;
+        SIGNAL enable : STD_LOGIC;
+        SIGNAL ALUControl : STD_LOGIC_VECTOR(2 DOWNTO 0);
     ------------------------------------SIGNALS END-----------------------------------
 
 BEGIN
