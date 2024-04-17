@@ -18,6 +18,8 @@ entity processor is
 end entity processor;
 
 architecture processorArch of processor is
+
+    ------------------------------------SIGNALS------------------------------------
     signal instruction : std_logic_vector(15 downto 0);
     signal opCode : std_logic_vector(6 downto 0);
     signal Rsrc1 : std_logic_vector(2 downto 0);
@@ -42,9 +44,9 @@ architecture processorArch of processor is
     signal branch : std_logic;
     signal enable : std_logic;
     signal ALUControl : std_logic_vector(2 downto 0);
+------------------------------------SIGNALS END-----------------------------------
 
-
-
+------------------------------------COMPONENTS------------------------------------
     component ALU is
         port(
             A, B: in std_logic_vector(31 downto 0);
@@ -188,7 +190,7 @@ architecture processorArch of processor is
         dout : out std_logic_vector(N-1 downto 0)
     );
     end component;
-
+------------------------------------COMPONENTS END-----------------------------------
     begin
         -- map instruction cache
         instrCache1: InstrCache port map(
