@@ -60,36 +60,36 @@ ARCHITECTURE processorArch OF processor IS
     END COMPONENT FD_Buffer;
 
     COMPONENT RegisterFile IS
-    GENERIC (
-        w : INTEGER := 3;
-        n : INTEGER := 32
-    );
-    PORT (
-        clk, rst : IN STD_LOGIC;
-        Rsrc1_address, Rsrc2_address : IN STD_LOGIC_VECTOR(w - 1 DOWNTO 0);
-        Rdest : IN STD_LOGIC_VECTOR(w - 1 DOWNTO 0);
-        WBdata : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
-        writeEnable : IN STD_LOGIC;
-        Rsrc1_data, Rsrc2_data : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
-    );
+        GENERIC (
+            w : INTEGER := 3;
+            n : INTEGER := 32
+        );
+        PORT (
+            clk, rst : IN STD_LOGIC;
+            Rsrc1_address, Rsrc2_address : IN STD_LOGIC_VECTOR(w - 1 DOWNTO 0);
+            Rdest : IN STD_LOGIC_VECTOR(w - 1 DOWNTO 0);
+            WBdata : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
+            writeEnable : IN STD_LOGIC;
+            Rsrc1_data, Rsrc2_data : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
+        );
     END COMPONENT;
 
     COMPONENT controller IS
-    GENERIC (
-        INST_WIDTH : INTEGER := 16
-    );
-    PORT (
-        clk : IN STD_LOGIC;
-        rst : IN STD_LOGIC;
-        instruction : IN STD_LOGIC_VECTOR(INST_WIDTH - 1 DOWNTO 0);
-        opCode : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
-        Rsrc1 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-        Rsrc2 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-        Rdest : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-        hasImm : OUT STD_LOGIC;
-        isBranch : OUT STD_LOGIC
+        GENERIC (
+            INST_WIDTH : INTEGER := 16
+        );
+        PORT (
+            clk : IN STD_LOGIC;
+            rst : IN STD_LOGIC;
+            instruction : IN STD_LOGIC_VECTOR(INST_WIDTH - 1 DOWNTO 0);
+            opCode : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+            Rsrc1 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            Rsrc2 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            Rdest : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            hasImm : OUT STD_LOGIC;
+            isBranch : OUT STD_LOGIC
 
-    );
+        );
     END COMPONENT;
 
     COMPONENT DE_Buffer IS
@@ -105,11 +105,14 @@ ARCHITECTURE processorArch OF processor IS
     END COMPONENT;
 
     COMPONENT ALU IS
-        PORT (
-            A, B : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-            ALUControl : IN STD_LOGIC_VECTOR(6 DOWNTO 0);
-            Result : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            Zero : OUT STD_LOGIC
+        port(
+            A, B: in std_logic_vector(31 downto 0);
+            ALUControl: in std_logic_vector(6 downto 0); -- Changed to 4 bits
+            Result: out std_logic_vector(31 downto 0);
+            Zero: out std_logic;
+            Negative: out std_logic;
+            Carry: out std_logic;
+            Overflow: out std_logic
         );
     END COMPONENT;
 
@@ -232,13 +235,14 @@ ARCHITECTURE processorArch OF processor IS
         SIGNAL Rsrc1_data_Out : STD_LOGIC_VECTOR(31 DOWNTO 0);
         SIGNAL Rsrc2_data_Out : STD_LOGIC_VECTOR(31 DOWNTO 0);
        
-       --Controller signals
-        signal Cont_instruction_In : std_logic_vector(15 downto 0);
-        SIGNAL Rsrc1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-        SIGNAL Rsrc2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-        SIGNAL Rdest : STD_LOGIC_VECTOR(2 DOWNTO 0);
-        SIGNAL ALU_Selectors : STD_LOGIC_VECTOR(6 DOWNTO 0);
-    
+    --    --Controller signals
+    --     signal Cont_instruction_In : std_logic_vector(15 downto 0);
+    --     SIGNAL Rsrc1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    --     SIGNAL Rsrc2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    --     SIGNAL Rdest : STD_LOGIC_VECTOR(2 DOWNTO 0);
+           SIGNAL ALU_Selectors : STD_LOGIC_VECTOR(6 DOWNTO 0);
+           SIGNAL PC_Enable : STD_LOGIC;
+           SIGNAL isBranch : STD_LOGIC;
 
         --DE Buffer signals
         SIGNAL DE_Rsrc1_data_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -246,39 +250,41 @@ ARCHITECTURE processorArch OF processor IS
         SIGNAL DE_dest_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
         SIGNAL DE_AluSelectors_out : STD_LOGIC_VECTOR(6 DOWNTO 0);
 
-        --ALU signals
+    --     --ALU signals
         SIGNAL ALUResult : STD_LOGIC_VECTOR(31 DOWNTO 0);
-       
+        SIGNAL zeroFlag : STD_LOGIC;
+        SIGNAL NegativeFlag : STD_LOGIC;
+        SIGNAL CarryFlag : STD_LOGIC;
+        SIGNAL OverflowFlag : STD_LOGIC;
 
-        --EM Buffer signals 
+    --     --EM Buffer signals 
         SIGNAL EM_ALUResult : STD_LOGIC_VECTOR(31 DOWNTO 0);
         SIGNAL EM_dest_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
 
-        --Data Memory signals
-        SIGNAL writeAddress : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        SIGNAL readAddress : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --     --Data Memory signals
+    --     SIGNAL writeAddress : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --     SIGNAL readAddress : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-        --WB Buffer signals
-        SIGNAL ALU_COUT : STD_LOGIC;
+    --     --WB Buffer signals
+    --     SIGNAL ALU_COUT : STD_LOGIC;
         
-        --Condition Code Register signals
-        SIGNAL cin : STD_LOGIC;
-        SIGNAL ovf : STD_LOGIC;
-        SIGNAL flags : STD_LOGIC_VECTOR(3 DOWNTO 0);
-        --SP signals
-        SIGNAL pointer : STD_LOGIC_VECTOR(11 DOWNTO 0);
-        SIGNAL push : STD_LOGIC;
-        SIGNAL pop : STD_LOGIC;
+    --     --Condition Code Register signals
+    --     SIGNAL cin : STD_LOGIC;
+    --     SIGNAL ovf : STD_LOGIC;
+    --     SIGNAL flags : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    --     --SP signals
+    --     SIGNAL pointer : STD_LOGIC_VECTOR(11 DOWNTO 0);
+    --     SIGNAL push : STD_LOGIC;
+    --     SIGNAL pop : STD_LOGIC;
 
-        --Versatile signals that still not well implemented just added it here to avoid errors from component until we figure out the whole design
-        SIGNAL branch : STD_LOGIC;
-        SIGNAL enable : STD_LOGIC;
-        SIGNAL pcBranch : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        SIGNAL WBdata : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        SIGNAL writeEnable : STD_LOGIC;
-        SIGNAL hasImm : STD_LOGIC;
-        SIGNAL isBranch : STD_LOGIC;
-        SIGNAL Zero : STD_LOGIC;
+    --     --Versatile signals that still not well implemented just added it here to avoid errors from component until we figure out the whole design
+        -- SIGNAL branchEnable : STD_LOGIC;
+
+           SIGNAL pcBranchIn : STD_LOGIC_VECTOR(31 DOWNTO 0);
+           SIGNAL IWBdata_Out : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --     SIGNAL writeEnable : STD_LOGIC;
+    --     SIGNAL hasImm : STD_LOGIC;
+
     
 ------------------------------------SIGNALS END-----------------------------------
 
@@ -289,10 +295,9 @@ BEGIN
         clk => clk,
         --from control signals 
         reset => reset,
-        branch => branch,
-        enable => enable,
-        pcBranch => pcBranch,
-
+        branch => isBranch,
+        enable => PC_Enable,
+        pcBranch => pcBranchIn,
         pc => Ipc_out
     );
 
@@ -332,26 +337,26 @@ BEGIN
         Rsrc1_address => Rsrc1_Out,
         Rsrc2_address => Rsrc2_Out,
         Rdest => Rdest_Out,
-        WBdata => WBdata,
-        writeEnable => writeEnable,
+        WBdata => IWBdata_Out,
+        writeEnable => we, --for now we will make it write enable of the whole processor but it should be connected to the controller
         Rsrc1_data => Rsrc1_data_Out,
         Rsrc2_data => Rsrc2_data_Out
     );
-       -- map controller
-       controller1 : controller PORT MAP(
-        clk => clk,
-        rst => reset,
-       -- instruction => opCode_Out & Rsrc1_Out & Rsrc2_Out & Rdest_Out & FnNum_Out,
-        instruction => Cont_instruction_In,
-        opCode => ALU_Selectors,
-        Rsrc1 => Rsrc1,
-        Rsrc2 => Rsrc2,
-        Rdest => Rdest,
-        hasImm => hasImm,
-        isBranch => isBranch
-    );
+    --    -- map controller
+    --    controller1 : controller PORT MAP(
+    --     clk => clk,
+    --     rst => reset,
+    --    -- instruction => opCode_Out & Rsrc1_Out & Rsrc2_Out & Rdest_Out & FnNum_Out,
+    --     instruction => Cont_instruction_In,
+    --     opCode => ALU_Selectors,
+    --     Rsrc1 => Rsrc1,
+    --     Rsrc2 => Rsrc2,
+    --     Rdest => Rdest,
+    --     hasImm => hasImm,
+    --     isBranch => isBranch
+    -- );
 
-    --map DE buffer with RegistersFiles & Controller
+    -- --map DE buffer with RegistersFiles & Controller
     deBuffer1 : DE_Buffer PORT MAP(
         clk => clk,
         reset => reset,
@@ -359,7 +364,7 @@ BEGIN
         Rsrc1_Val_in => Rsrc1_data_Out,
         Rsrc2_Val_in => Rsrc2_data_Out,
         Dst_in => Rdest_Out,
-        aluSelectors_in => ALU_Selectors,
+        aluSelectors_in => ALU_Selectors, --we should make this logic in the controller
         Rsrc1_Val_out => DE_Rsrc1_data_out,
         Rsrc2_Val_out => DE_Rsrc2_data_out,
         Dst_out => DE_dest_out,
@@ -368,28 +373,32 @@ BEGIN
     
  
 
-    -- map ALU with DE buffer
+    -- -- map ALU with DE buffer
     alu1 : ALU PORT MAP(
         A => DE_Rsrc1_data_out,
         B => DE_Rsrc2_data_out,
         ALUControl => DE_AluSelectors_out,
-        Result => ALUResult,
-        Zero => Zero
-    );
-    
-    -- map EM buffer with ALU
-    emBuffer1 : EM_Buffer PORT MAP(
-        clk => clk,
-        reset => reset,
-        WE => we,
-        ALU_COUT => Zero,
-        Dst_in => DE_dest_out,
-        ALU_OutValue_in => ALUResult,
-        ALU_COUT_OUT => Zero,
-        ALU_OutValue_out => EM_ALUResult,
-        Dst_out => EM_dest_out
-    );
 
+        Result => ALUResult,
+        Zero => zeroFlag,
+        Negative => NegativeFlag,
+        Carry => CarryFlag,
+        Overflow => OverflowFlag
+        
+    );
+    -- -- map EM buffer with ALU
+    -- emBuffer1 : EM_Buffer PORT MAP(
+    --     clk => clk,
+    --     reset => reset,
+    --     WE => we,
+    --     ALU_COUT => zeroFlag,
+    --     Dst_in => DE_dest_out,
+    --     ALU_OutValue_in => ALUResult,
+    --     ALU_COUT_OUT => zeroFlag,
+    --     ALU_OutValue_out => EM_ALUResult,
+    --     Dst_out => EM_dest_out
+    -- );
+--shitttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
     -- -- map DataMemory with EM buffer
     -- dataMemory1 : DataMemory PORT MAP(
     --     rst => reset,
@@ -432,12 +441,12 @@ BEGIN
 
     ------------------------------------PROCESS------------------------------------
     -- Perform the concatenation in a process
-    process(clk)
-    begin
-        if rising_edge(clk) then
-            Cont_instruction_In <= opCode_Out & Rsrc1_Out & Rsrc2_Out & Rdest_Out & FnNum_Out;
-        end if;
-    end process;
+    -- process(clk)
+    -- begin
+    --     if rising_edge(clk) then
+    --         Cont_instruction_In <= opCode_Out & Rsrc1_Out & Rsrc2_Out & Rdest_Out & FnNum_Out;
+    --     end if;
+    -- end process;
 
     -- process(clk, reset)
     -- begin

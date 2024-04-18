@@ -2,5 +2,5 @@
 // instance=/processor/instrCache1/ram
 // format=mti addressradix=h dataradix=s version=1.0 wordsperline=1
 0: 0000110010100000
-1: UUUUUUUUUUUUUUUU
-2: UUUUUUUUUUUUUUUU
+1: 0010110010100000
+2: 0100110010100000
