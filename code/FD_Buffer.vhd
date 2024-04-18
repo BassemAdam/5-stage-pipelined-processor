@@ -36,9 +36,9 @@ BEGIN
         ELSIF rising_edge(clk) AND WE = '1' THEN
             
             OpCode <= Intruction(15 DOWNTO 13);
-            Src1 <= Intruction(12 DOWNTO 10);
-            Src2 <= Intruction(9 DOWNTO 7);
-            dst <= Intruction(6 DOWNTO 4);
+            dst <= Intruction(12 DOWNTO 10); 
+            Src1 <= Intruction(9 DOWNTO 7);
+            Src2 <= Intruction(6 DOWNTO 4);  
             FnNum <= Intruction(3 DOWNTO 0);
         END IF;
     END PROCESS;

@@ -1,0 +1,6 @@
+// memory data file (do not edit the following line - required for mem load use)
+// instance=/processor/instrCache1/ram
+// format=mti addressradix=h dataradix=s version=1.0 wordsperline=1
+0: 0000110010100000
+1: UUUUUUUUUUUUUUUU
+2: UUUUUUUUUUUUUUUU

@@ -15,7 +15,7 @@ ENTITY InstrCache IS
     );
 END InstrCache;
 ARCHITECTURE Behavioral OF InstrCache IS
-    TYPE ram_type IS ARRAY (0 TO 2 ** m - 1) OF STD_LOGIC_VECTOR(m - 1 DOWNTO 0);
+    TYPE ram_type IS ARRAY (0 TO 2 ** m - 1) OF STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
     SIGNAL ram : ram_type;
     begin
         process (clk, rst)
