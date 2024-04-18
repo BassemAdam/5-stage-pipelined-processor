@@ -5,7 +5,7 @@ USE IEEE.numeric_std.ALL;
 ENTITY processor IS
     PORT (
         clk : IN STD_LOGIC;
-        reset : IN STD_LOGIC;
+        reset,we : IN STD_LOGIC;
         INT_In : IN STD_LOGIC; -- interrupt signal
         exception : OUT STD_LOGIC; -- exception signal
         IN_PORT : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -14,7 +14,7 @@ ENTITY processor IS
 END ENTITY processor;
 
 ARCHITECTURE processorArch OF processor IS
-    ------------------------------------COMPONENTS------------------------------------
+------------------------------------COMPONENTS------------------------------------
     COMPONENT PC IS
         GENERIC (
             N : INTEGER := 32
@@ -74,20 +74,40 @@ ARCHITECTURE processorArch OF processor IS
     );
     END COMPONENT;
 
+    COMPONENT controller IS
+    GENERIC (
+        INST_WIDTH : INTEGER := 16
+    );
+    PORT (
+        clk : IN STD_LOGIC;
+        rst : IN STD_LOGIC;
+        instruction : IN STD_LOGIC_VECTOR(INST_WIDTH - 1 DOWNTO 0);
+        opCode : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+        Rsrc1 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+        Rsrc2 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+        Rdest : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+        hasImm : OUT STD_LOGIC;
+        isBranch : OUT STD_LOGIC
+
+    );
+    END COMPONENT;
+
     COMPONENT DE_Buffer IS
-        PORT (
-            clk, reset, WE : IN STD_LOGIC;
-            Rsrc1_Val_in, Rsrc2_Val_in, Dst_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-            aluSelectors_in : IN STD_LOGIC_VECTOR(10 DOWNTO 0); -- 11 instruction alu
-            Rsrc1_Val_out, Rsrc2_Val_out, Dst_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            aluSelectors_out : OUT STD_LOGIC_VECTOR(10 DOWNTO 0)
+        port (   
+            clk, reset, WE : in  std_logic;
+            Rsrc1_Val_in, Rsrc2_Val_in : in  std_logic_vector(31 downto 0);
+            Dst_in : in  std_logic_vector(2 downto 0); -- Adjusted length to 3
+            aluSelectors_in : in  std_logic_vector(6 downto 0); 
+            Rsrc1_Val_out, Rsrc2_Val_out : out std_logic_vector(31 downto 0);
+            Dst_out : out std_logic_vector(2 downto 0);
+            aluSelectors_out : out std_logic_vector(6 downto 0)
         );
     END COMPONENT;
 
     COMPONENT ALU IS
         PORT (
             A, B : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-            ALUControl : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            ALUControl : IN STD_LOGIC_VECTOR(6 DOWNTO 0);
             Result : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             Zero : OUT STD_LOGIC
         );
@@ -97,10 +117,11 @@ ARCHITECTURE processorArch OF processor IS
         port (   
             clk, reset, WE : in  std_logic;
             ALU_COUT : in std_logic;
-            Dst_in : in  std_logic_vector(31 downto 0);
+            Dst_in : in  std_logic_vector(2 downto 0);
             ALU_OutValue_in : in  std_logic_vector(31 downto 0);
             ALU_COUT_OUT : out std_logic;
-            ALU_OutValue_out, Dst_out : out std_logic_vector(31 downto 0)
+            ALU_OutValue_out : out std_logic_vector(31 downto 0);
+            Dst_out : out std_logic_vector(2 downto 0)
         );
     end COMPONENT EM_Buffer;
 
@@ -133,23 +154,7 @@ ARCHITECTURE processorArch OF processor IS
         );
     end COMPONENT WB_Buffer;
 
-    COMPONENT controller IS
-        GENERIC (
-            INST_WIDTH : INTEGER := 16
-        );
-        PORT (
-            clk : IN STD_LOGIC;
-            rst : IN STD_LOGIC;
-            instruction : IN STD_LOGIC_VECTOR(INST_WIDTH - 1 DOWNTO 0);
-            opCode : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
-            Rsrc1 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-            Rsrc2 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-            Rdest : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-            hasImm : OUT STD_LOGIC;
-            isBranch : OUT STD_LOGIC
-
-        );
-    END COMPONENT;
+    
 
     COMPONENT conditionCodeRegister IS
         PORT (
@@ -210,48 +215,135 @@ ARCHITECTURE processorArch OF processor IS
     ------------------------------------COMPONENTS END-----------------------------------
 
     ------------------------------------SIGNALS------------------------------------
-        SIGNAL instruction : STD_LOGIC_VECTOR(15 DOWNTO 0);
-        SIGNAL opCode : STD_LOGIC_VECTOR(6 DOWNTO 0);
+        --PC signals
+        SIGNAL Ipc_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
+     
+        --Instruction Cache signals
+        SIGNAL instruction_Out_Cache : STD_LOGIC_VECTOR(15 DOWNTO 0);   
+
+        --FD Buffer signals
+        SIGNAL opCode_Out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+        SIGNAL Rsrc1_Out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+        SIGNAL Rsrc2_Out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+        SIGNAL Rdest_Out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+        SIGNAL FnNum_Out : STD_LOGIC_VECTOR(3 DOWNTO 0);
+
+        --Register File signals
+        SIGNAL Rsrc1_data_Out : STD_LOGIC_VECTOR(31 DOWNTO 0);
+        SIGNAL Rsrc2_data_Out : STD_LOGIC_VECTOR(31 DOWNTO 0);
+       
+       --Controller signals
+        signal Cont_instruction_In : std_logic_vector(15 downto 0);
         SIGNAL Rsrc1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
         SIGNAL Rsrc2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
         SIGNAL Rdest : STD_LOGIC_VECTOR(2 DOWNTO 0);
-        SIGNAL hasImm : STD_LOGIC;
-        SIGNAL isBranch : STD_LOGIC;
-        SIGNAL Rsrc1_data : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        SIGNAL Rsrc2_data : STD_LOGIC_VECTOR(31 DOWNTO 0);
+        SIGNAL ALU_Selectors : STD_LOGIC_VECTOR(6 DOWNTO 0);
+    
+
+        --DE Buffer signals
+        SIGNAL DE_Rsrc1_data_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
+        SIGNAL DE_Rsrc2_data_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
+        SIGNAL DE_dest_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+        SIGNAL DE_AluSelectors_out : STD_LOGIC_VECTOR(6 DOWNTO 0);
+
+        --ALU signals
         SIGNAL ALUResult : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        SIGNAL Zero : STD_LOGIC;
-        SIGNAL WBdata : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        SIGNAL writeEnable : STD_LOGIC;
+       
+
+        --EM Buffer signals 
+        SIGNAL EM_ALUResult : STD_LOGIC_VECTOR(31 DOWNTO 0);
+        SIGNAL EM_dest_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+
+        --Data Memory signals
+        SIGNAL writeAddress : STD_LOGIC_VECTOR(31 DOWNTO 0);
+        SIGNAL readAddress : STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+        --WB Buffer signals
+        SIGNAL ALU_COUT : STD_LOGIC;
+        
+        --Condition Code Register signals
         SIGNAL cin : STD_LOGIC;
         SIGNAL ovf : STD_LOGIC;
         SIGNAL flags : STD_LOGIC_VECTOR(3 DOWNTO 0);
+        --SP signals
         SIGNAL pointer : STD_LOGIC_VECTOR(11 DOWNTO 0);
         SIGNAL push : STD_LOGIC;
         SIGNAL pop : STD_LOGIC;
-        SIGNAL pc_c : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        SIGNAL pcBranch : STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+        --Versatile signals that still not well implemented just added it here to avoid errors from component until we figure out the whole design
         SIGNAL branch : STD_LOGIC;
         SIGNAL enable : STD_LOGIC;
-        SIGNAL ALUControl : STD_LOGIC_VECTOR(2 DOWNTO 0);
-    ------------------------------------SIGNALS END-----------------------------------
+        SIGNAL pcBranch : STD_LOGIC_VECTOR(31 DOWNTO 0);
+        SIGNAL WBdata : STD_LOGIC_VECTOR(31 DOWNTO 0);
+        SIGNAL writeEnable : STD_LOGIC;
+        SIGNAL hasImm : STD_LOGIC;
+        SIGNAL isBranch : STD_LOGIC;
+        SIGNAL Zero : STD_LOGIC;
+    
+------------------------------------SIGNALS END-----------------------------------
 
 BEGIN
-    ------------------------------------PORTS------------------------------------
-    -- map instruction cache
+------------------------------------PORTS------------------------------------
+     -- map PC
+     pc1 : PC PORT MAP(
+        clk => clk,
+        --from control signals 
+        reset => reset,
+        branch => branch,
+        enable => enable,
+        pcBranch => pcBranch,
+
+        pc => Ipc_out
+    );
+
+     -- map SP
+    --  sp1 : SP PORT MAP(
+    --     reset => reset,
+    --     push => push,
+    --     pop => pop,
+    --     pointer => pointer
+    -- );
+    
+    -- map instruction cache with pc
     instrCache1 : InstrCache PORT MAP(
         clk => clk,
         rst => reset,
-        pc => pc_c,
-        data => instruction
+        pc => Ipc_out,
+        data => instruction_Out_Cache
     );
-
-    -- map controller
-    controller1 : controller PORT MAP(
+    
+    -- map FD buffer with instruction cache
+    fdBuffer1 : FD_Buffer PORT MAP(
+        clk => clk,
+        reset => reset,
+        WE => we,
+        Intruction => instruction_Out_Cache,
+        OpCode => opCode_Out,
+        Src1 => Rsrc1_Out,
+        Src2 => Rsrc2_Out,
+        dst => Rdest_Out,
+        FnNum => FnNum_Out
+    );
+    
+    --map RegistersFiles with FD buffer
+    registerFile1 : RegisterFile PORT MAP(
         clk => clk,
         rst => reset,
-        instruction => instruction,
-        opCode => opCode,
+        Rsrc1_address => Rsrc1_Out,
+        Rsrc2_address => Rsrc2_Out,
+        Rdest => Rdest_Out,
+        WBdata => WBdata,
+        writeEnable => writeEnable,
+        Rsrc1_data => Rsrc1_data_Out,
+        Rsrc2_data => Rsrc2_data_Out
+    );
+       -- map controller
+       controller1 : controller PORT MAP(
+        clk => clk,
+        rst => reset,
+       -- instruction => opCode_Out & Rsrc1_Out & Rsrc2_Out & Rdest_Out & FnNum_Out,
+        instruction => Cont_instruction_In,
+        opCode => ALU_Selectors,
         Rsrc1 => Rsrc1,
         Rsrc2 => Rsrc2,
         Rdest => Rdest,
@@ -259,58 +351,103 @@ BEGIN
         isBranch => isBranch
     );
 
-    -- map register file
-    registerFile1 : RegisterFile PORT MAP(
+    --map DE buffer with RegistersFiles & Controller
+    deBuffer1 : DE_Buffer PORT MAP(
         clk => clk,
-        rst => reset,
-        Rsrc1_address => Rsrc1,
-        Rsrc2_address => Rsrc2,
-        Rdest => Rdest,
-        WBdata => WBdata,
-        writeEnable => writeEnable,
-        Rsrc1_data => Rsrc1_data,
-        Rsrc2_data => Rsrc2_data
+        reset => reset,
+        WE => we,
+        Rsrc1_Val_in => Rsrc1_data_Out,
+        Rsrc2_Val_in => Rsrc2_data_Out,
+        Dst_in => Rdest_Out,
+        aluSelectors_in => ALU_Selectors,
+        Rsrc1_Val_out => DE_Rsrc1_data_out,
+        Rsrc2_Val_out => DE_Rsrc2_data_out,
+        Dst_out => DE_dest_out,
+        aluSelectors_out => DE_AluSelectors_out
     );
+    
+ 
 
-    -- map ALU
+    -- map ALU with DE buffer
     alu1 : ALU PORT MAP(
-        A => Rsrc1_data,
-        B => Rsrc2_data,
-        ALUControl => ALUControl,
+        A => DE_Rsrc1_data_out,
+        B => DE_Rsrc2_data_out,
+        ALUControl => DE_AluSelectors_out,
         Result => ALUResult,
         Zero => Zero
     );
-
-    -- map condition code register
-    conditionCodeRegister1 : conditionCodeRegister PORT MAP(
-        rst => reset,
-        cin => cin,
-        ovf => ovf,
-        opResult => ALUResult,
-        flags => flags
-    );
-
-    -- map SP
-    sp1 : SP PORT MAP(
-        reset => reset,
-        push => push,
-        pop => pop,
-        pointer => pointer
-    );
-
-    -- map PC
-    pc1 : PC PORT MAP(
+    
+    -- map EM buffer with ALU
+    emBuffer1 : EM_Buffer PORT MAP(
         clk => clk,
         reset => reset,
-        branch => branch,
-        enable => enable,
-        pcBranch => pcBranch,
-        pc => pc_c
+        WE => we,
+        ALU_COUT => Zero,
+        Dst_in => DE_dest_out,
+        ALU_OutValue_in => ALUResult,
+        ALU_COUT_OUT => Zero,
+        ALU_OutValue_out => EM_ALUResult,
+        Dst_out => EM_dest_out
     );
-    ------------------------------------PORTS END----------------------------------
+
+    -- -- map DataMemory with EM buffer
+    -- dataMemory1 : DataMemory PORT MAP(
+    --     rst => reset,
+    --     clk => clk,
+    --     memWrite => we,
+    --     memRead => we,
+    --     writeAddress => Rsrc1_data,
+    --     readAddress => Rsrc2_data,
+    --     writeData => ALUResult,
+    --     readData => WBdata
+    -- );
+
+    -- -- map WB buffer with DataMemory
+    -- wbBuffer1 : WB_Buffer PORT MAP(
+    --     clk => clk,
+    --     reset => reset,
+    --     WE => we,
+    --     ALU_COUT => Zero,
+    --     Dst_in => Rdest,
+    --     ALU_OutValue_in => ALUResult,
+    --     ALU_COUT_OUT => Zero,
+    --     ALU_OutValue_out => ALUResult,
+    --     Dst_out => Rdest
+    -- );
+
+    
+
+    -- -- map condition code register
+    -- conditionCodeRegister1 : conditionCodeRegister PORT MAP(
+    --     rst => reset,
+    --     cin => cin,
+    --     ovf => ovf,
+    --     opResult => ALUResult,
+    --     flags => flags
+    -- );
+   
+------------------------------------PORTS END----------------------------------
+
+
 
     ------------------------------------PROCESS------------------------------------
+    -- Perform the concatenation in a process
+    process(clk)
+    begin
+        if rising_edge(clk) then
+            Cont_instruction_In <= opCode_Out & Rsrc1_Out & Rsrc2_Out & Rdest_Out & FnNum_Out;
+        end if;
+    end process;
 
+    -- process(clk, reset)
+    -- begin
+    
+    --     if (we = '1') then
+    --         Instruction_Address <= pc_out;
+    --         Intruction <= data;
+    --     end if;
+    
+    -- end process;
     ----------------------------------END PROCESS----------------------------------
 
     -- map data memory

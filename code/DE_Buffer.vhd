@@ -5,10 +5,12 @@ use ieee.numeric_std.all;
 entity DE_Buffer is
     port (   
         clk, reset, WE : in  std_logic;
-        Rsrc1_Val_in, Rsrc2_Val_in, Dst_in : in  std_logic_vector(31 downto 0);
-        aluSelectors_in : in  std_logic_vector(10 downto 0); -- 11 instruction alu
-        Rsrc1_Val_out, Rsrc2_Val_out, Dst_out : out std_logic_vector(31 downto 0);
-        aluSelectors_out : out std_logic_vector(10 downto 0)
+        Rsrc1_Val_in, Rsrc2_Val_in : in  std_logic_vector(31 downto 0);
+        Dst_in : in  std_logic_vector(2 downto 0); -- Adjusted length to 3
+        aluSelectors_in : in  std_logic_vector(6 downto 0); 
+        Rsrc1_Val_out, Rsrc2_Val_out : out std_logic_vector(31 downto 0);
+        Dst_out : out std_logic_vector(2 downto 0);
+        aluSelectors_out : out std_logic_vector(6 downto 0)
     );
 end entity DE_Buffer;
 
