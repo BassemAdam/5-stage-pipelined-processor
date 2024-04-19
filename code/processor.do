@@ -1,6 +1,6 @@
 vcom -work work -2002 -explicit -stats=none processor.vhd
 vsim -gui work.processor
-mem load -i {C:/cApps/1.Work_Study/University/CompArch/Project/Phase1/Project Files/-5-stage-pipelined-processor/code/instrCache.mem} /processor/instrCache1/ram
+mem load -i {C:/Users/Ali/Desktop/-5-stage-pipelined-processor/code/instrCache.mem} /processor/instrCache1/ram
 add wave -position insertpoint  \
 sim:/processor/clk
 force -freeze sim:/processor/clk 0 0, 1 {50 ps} -r 100
@@ -34,7 +34,7 @@ force -freeze sim:/processor/we 1 0
 force -freeze sim:/processor/PC_Enable 1 0
 force -freeze sim:/processor/reset 0 0
 run
-mem load -i {C:/cApps/1.Work_Study/University/CompArch/Project/Phase1/Project Files/-5-stage-pipelined-processor/code/registers.mem} /processor/registerFile1/q_registers
+mem load -i {C:/Users/Ali/Desktop/-5-stage-pipelined-processor/code/registers.mem} /processor/registerFile1/q_registers
 add wave -position insertpoint  \
 sim:/processor/ALUResult \
 sim:/processor/zeroFlag \

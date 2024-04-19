@@ -33,7 +33,7 @@ BEGIN
             FnNum <= (OTHERS => '0');
 
       
-        ELSIF rising_edge(clk) AND WE = '1' THEN
+        ELSIF falling_edge(clk) AND WE = '1' THEN
             
             OpCode <= Intruction(15 DOWNTO 13);
             dst <= Intruction(12 DOWNTO 10); 
