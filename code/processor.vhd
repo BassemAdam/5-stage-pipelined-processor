@@ -119,14 +119,12 @@ ARCHITECTURE processorArch OF processor IS
     COMPONENT EM_Buffer is
         port (   
             clk, reset, WE : in  std_logic;
-            ALU_COUT : in std_logic;
             Dst_in : in  std_logic_vector(2 downto 0);
             ALU_OutValue_in : in  std_logic_vector(31 downto 0);
-            ALU_COUT_OUT : out std_logic;
             ALU_OutValue_out : out std_logic_vector(31 downto 0);
             Dst_out : out std_logic_vector(2 downto 0)
         );
-    end COMPONENT EM_Buffer;
+    end COMPONENT;
 
     COMPONENT DataMemory IS
         GENERIC (
@@ -149,15 +147,12 @@ ARCHITECTURE processorArch OF processor IS
     COMPONENT WB_Buffer is
         port (   
             clk, reset, WE : in  std_logic;
-            ALU_COUT : in std_logic;
-            Dst_in : in  std_logic_vector(31 downto 0);
-            ALU_OutValue_in : in  std_logic_vector(31 downto 0);
-            ALU_COUT_OUT : out std_logic;
-            ALU_OutValue_out, Dst_out : out std_logic_vector(31 downto 0)
+            Dst_in : in  std_logic_vector(2 downto 0);
+            ALU_OutValue_in : in  std_logic_vector(31 downto 0);  
+            ALU_OutValue_out : out std_logic_vector(31 downto 0);
+            Dst_out : out std_logic_vector(2 downto 0)
         );
     end COMPONENT WB_Buffer;
-
-    
 
     COMPONENT conditionCodeRegister IS
         PORT (
@@ -265,8 +260,9 @@ ARCHITECTURE processorArch OF processor IS
     --     SIGNAL writeAddress : STD_LOGIC_VECTOR(31 DOWNTO 0);
     --     SIGNAL readAddress : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-    --     --WB Buffer signals
-    --     SIGNAL ALU_COUT : STD_LOGIC;
+        --WB Buffer signals
+        SIGNAL WB_Rdest_Out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+        SIGNAL WB_ALUResult_Out : STD_LOGIC_VECTOR(31 DOWNTO 0);
         
     --     --Condition Code Register signals
     --     SIGNAL cin : STD_LOGIC;
@@ -336,8 +332,8 @@ BEGIN
         rst => reset,
         Rsrc1_address => Rsrc1_Out,
         Rsrc2_address => Rsrc2_Out,
-        Rdest => Rdest_Out,
-        WBdata => IWBdata_Out,
+        Rdest => WB_Rdest_Out,
+        WBdata => WB_ALUResult_Out,
         writeEnable => we, --for now we will make it write enable of the whole processor but it should be connected to the controller
         Rsrc1_data => Rsrc1_data_Out,
         Rsrc2_data => Rsrc2_data_Out
@@ -386,18 +382,16 @@ BEGIN
         Overflow => OverflowFlag
         
     );
-    -- -- map EM buffer with ALU
-    -- emBuffer1 : EM_Buffer PORT MAP(
-    --     clk => clk,
-    --     reset => reset,
-    --     WE => we,
-    --     ALU_COUT => zeroFlag,
-    --     Dst_in => DE_dest_out,
-    --     ALU_OutValue_in => ALUResult,
-    --     ALU_COUT_OUT => zeroFlag,
-    --     ALU_OutValue_out => EM_ALUResult,
-    --     Dst_out => EM_dest_out
-    -- );
+    -- map EM buffer with ALU
+    emBuffer1 : EM_Buffer PORT MAP(
+        clk => clk,
+        reset => reset,
+        WE => we,
+        Dst_in => DE_dest_out,
+        ALU_OutValue_in => ALUResult,
+        ALU_OutValue_out => EM_ALUResult,
+        Dst_out => EM_dest_out
+    );
 --shitttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
     -- -- map DataMemory with EM buffer
     -- dataMemory1 : DataMemory PORT MAP(
@@ -411,18 +405,16 @@ BEGIN
     --     readData => WBdata
     -- );
 
-    -- -- map WB buffer with DataMemory
-    -- wbBuffer1 : WB_Buffer PORT MAP(
-    --     clk => clk,
-    --     reset => reset,
-    --     WE => we,
-    --     ALU_COUT => Zero,
-    --     Dst_in => Rdest,
-    --     ALU_OutValue_in => ALUResult,
-    --     ALU_COUT_OUT => Zero,
-    --     ALU_OutValue_out => ALUResult,
-    --     Dst_out => Rdest
-    -- );
+    -- map WB buffer with DataMemory
+    wbBuffer1 : WB_Buffer PORT MAP(
+        clk => clk,
+        reset => reset,
+        WE => we,
+        Dst_in => EM_dest_out,
+        ALU_OutValue_in => EM_ALUResult,
+        ALU_OutValue_out => WB_ALUResult_Out,
+        Dst_out => WB_Rdest_Out
+    );
 
     
 

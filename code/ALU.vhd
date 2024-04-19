@@ -15,7 +15,8 @@ entity ALU is
 end entity ALU;
 
 architecture ALUArch  of ALU is
-    signal intermediate: std_logic_vector(32 downto 0);
+    signal intermediate: std_logic_vector(31 downto 0); -- will need to hanlde error and warning 
+    --* Warning: C:/cApps/1.Work_Study/University/CompArch/Project/Phase1/Project Files/-5-stage-pipelined-processor/code/ALU.vhd(31): (vcom-1272) Length of expected is 33; length of actual is 32.
     signal A_sign, B_sign, Result_sign: std_logic;
 begin
     A_sign <= A(31);
@@ -24,7 +25,7 @@ begin
     with ALUControl select
         intermediate <=
         --NOT
-            not A when "0010000",
+           not A when "0010000",
         --NEG
             std_logic_vector(0 - unsigned(A)) when "0010001",
         --INC
@@ -49,8 +50,8 @@ begin
             std_logic_vector(unsigned(A) - unsigned(B)) when "0011011",
         --Default
             (others => '0') when others;
-        Carry <= intermediate(32); -- Carry is the 33rd bit
-        Negative <= '0' when ALUControl /= "0010011" and ALUControl /= "0010111" else intermediate(32);
+        Carry <= intermediate(31); -- Carry is the 33rd bit
+        Negative <= '0' when ALUControl /= "0010011" and ALUControl /= "0010111" else intermediate(31);
         Overflow <= '1' when (ALUControl = "0010010" and A_sign /= Result_sign) or -- INC
         (ALUControl = "0010011" and A_sign /= Result_sign) or -- DEC
         (ALUControl = "0010110" and A_sign = B_sign and A_sign /= Result_sign) or -- ADD

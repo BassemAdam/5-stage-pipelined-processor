@@ -32,7 +32,17 @@ sim:/processor/DE_dest_out \
 sim:/processor/DE_AluSelectors_out
 force -freeze sim:/processor/we 1 0
 force -freeze sim:/processor/PC_Enable 1 0
-run
 force -freeze sim:/processor/reset 0 0
 run
 mem load -i {C:/cApps/1.Work_Study/University/CompArch/Project/Phase1/Project Files/-5-stage-pipelined-processor/code/registers.mem} /processor/registerFile1/q_registers
+add wave -position insertpoint  \
+sim:/processor/ALUResult \
+sim:/processor/zeroFlag \
+sim:/processor/NegativeFlag \
+sim:/processor/CarryFlag \
+sim:/processor/OverflowFlag \
+sim:/processor/EM_ALUResult \
+sim:/processor/EM_dest_out
+add wave -position insertpoint  \
+sim:/processor/WB_Rdest_Out \
+sim:/processor/WB_ALUResult_Out
