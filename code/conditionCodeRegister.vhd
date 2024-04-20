@@ -9,6 +9,7 @@ entity conditionCodeRegister is
         cin : in std_logic;
         ovf : in std_logic;
         opResult : in std_logic_vector(31 downto 0);
+        
         flags : out std_logic_vector(3 downto 0)
     );
 end entity conditionCodeRegister;

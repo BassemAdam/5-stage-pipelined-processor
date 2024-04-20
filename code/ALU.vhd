@@ -1,74 +1,83 @@
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
-USE IEEE.numeric_std.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
 
-ENTITY ALU IS
-    PORT (
-        A, B : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-        ALUControl : IN STD_LOGIC_VECTOR(6 DOWNTO 0); -- Changed to 4 bits
-        Result : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-        Zero : OUT STD_LOGIC;
-        Negative : OUT STD_LOGIC;
-        Carry : OUT STD_LOGIC;
-        Overflow : OUT STD_LOGIC
+entity ALU is
+    port (
+        A, B       : in std_logic_vector(31 downto 0);
+        ALUControl : in std_logic_vector(3 downto 0); -- Changed to 4 bits
+
+        Result    : out std_logic_vector(31 downto 0);
+        ALU_flags : out std_logic_vector(0 to 3)
     );
-END ENTITY ALU;
+end entity ALU;
 
-ARCHITECTURE ALUArch OF ALU IS
+architecture ALUArch of ALU is
 
-    SIGNAL intermediate : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    SIGNAL A_sign, B_sign, Result_sign : STD_LOGIC;
+    signal intermediate                : std_logic_vector(31 downto 0);
+    signal A_sign, B_sign, Result_sign : std_logic;
 
-BEGIN
-    A_sign <= A(31);
-    B_sign <= B(31);
+    signal Zero     : std_logic;
+    signal Negative : std_logic;
+    signal Carry    : std_logic;
+    signal Overflow : std_logic;
+
+begin
+    A_sign      <= A(31);
+    B_sign      <= B(31);
     Result_sign <= intermediate(31);
-    WITH ALUControl SELECT
-        intermediate <=
-        -- NOT
-        NOT A WHEN "0010000",
-        --NEG
-        STD_LOGIC_VECTOR(0 - unsigned(A)) WHEN "0010001",
-        --MOV
-        A WHEN "0010100",
-        --SWAP NOT COMPLETED
-        B WHEN "0010101",
-        --AND
-        A AND B WHEN "0011000",
-        --OR
-        A OR B WHEN "0011001",
-        --XOR
-        A XOR B WHEN "0011010",
-        -- INC
-        STD_LOGIC_VECTOR(signed(A) + 1) WHEN "0010010",
-        -- DEC
-        STD_LOGIC_VECTOR(signed(A) - 1) WHEN "0010011",
-        -- ADD
-        STD_LOGIC_VECTOR(signed(A) + signed(B)) WHEN "0010110",
-        -- SUB
-        STD_LOGIC_VECTOR(signed(A) - signed(B)) WHEN "0010111",
-        -- CMP
-        STD_LOGIC_VECTOR(signed(A) - signed(B)) WHEN "0011011",
-        -- other operations...
-        (OTHERS => '0') WHEN OTHERS;
+    with ALUControl select
+    intermediate <=
+    -- NOT
+    not A when "0000",
+    --NEG
+    std_logic_vector(0 - unsigned(A)) when "0001",
+    --MOV
+    A when "0100",
+    --SWAP NOT COMPLETED
+    B when "0101",
+    --AND
+    A and B when "1000",
+    --OR
+    A or B when "1001",
+    --XOR
+    A xor B when "1010",
+    -- INC
+    std_logic_vector(signed(A) + 1) when "0010",
+    -- DEC
+    std_logic_vector(signed(A) - 1) when "0011",
+    -- ADD
+    std_logic_vector(signed(A) + signed(B)) when "0110",
+    -- SUB
+    std_logic_vector(signed(A) - signed(B)) when "0111",
+    -- CMP
+    std_logic_vector(signed(A) - signed(B)) when "1011",
+    -- other operations...
+    (others => '0') when others;
 
-    Carry <= '1' WHEN (ALUControl = "0010110" AND A_sign = '1' AND B_sign = '1') OR -- ADD
-        (ALUControl = "0010010" AND A_sign /= Result_sign) OR -- INC
-        (ALUControl = "0010011" AND A = X"00000000") OR -- DEC
-        (ALUControl = "0010111" AND signed(A) > signed(B)) ELSE -- SUB
-        '0';
+    Carry <=
+    '1' when (ALUControl = "0110" and A_sign = '1' and B_sign = '1') or -- ADD
+    (ALUControl = "0010" and A_sign /= Result_sign) or                  -- INC
+    (ALUControl = "0011" and A = X"00000000") or                        -- DEC
+    (ALUControl = "0111" and signed(A) > signed(B)) else                -- SUB
+    '0';
 
     Negative <= Result_sign;
 
-    Overflow <= '1' WHEN (ALUControl = "0010010" AND A_sign /= Result_sign) OR -- INC
-        (ALUControl = "0010011" AND A_sign /= Result_sign) OR -- DEC
-        (ALUControl = "0010110" AND A_sign = B_sign AND A_sign /= Result_sign) OR -- ADD
-        (ALUControl = "0010111" AND A_sign /= B_sign AND B_sign = Result_sign) OR -- SUB
-        (ALUControl = "0011011" AND A_sign /= B_sign AND A_sign = Result_sign) ELSE -- CMP
-        '0';
+    Overflow <=
+    '1' when (ALUControl = "0010" and A_sign /= Result_sign) or              -- INC
+    (ALUControl = "0011" and A_sign /= Result_sign) or                       -- DEC
+    (ALUControl = "0110" and A_sign = B_sign and A_sign /= Result_sign) or   -- ADD
+    (ALUControl = "0111" and A_sign /= B_sign and B_sign = Result_sign) or   -- SUB
+    (ALUControl = "1011" and A_sign /= B_sign and A_sign = Result_sign) else -- CMP
+    '0';
 
-    Zero <= '1' WHEN intermediate = STD_LOGIC_VECTOR(to_signed(0, Result'length)) ELSE
-        '0';
+    Zero <= '1' when intermediate = std_logic_vector(to_signed(0, Result'length)) else
+    '0';
 
-    Result <= intermediate;
-END ARCHITECTURE ALUArch;
+    ALU_flags(0) <= Zero;
+    ALU_flags(1) <= Negative;
+    ALU_flags(2) <= Carry;
+    ALU_flags(3) <= Overflow;
+    Result    <= intermediate;
+end architecture ALUArch;

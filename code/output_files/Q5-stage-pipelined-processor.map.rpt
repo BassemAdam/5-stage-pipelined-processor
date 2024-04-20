@@ -1,0 +1,437 @@
+Analysis & Synthesis report for Q5-stage-pipelined-processor
+Sat Apr 20 05:09:02 2024
+Quartus Prime Version 22.1std.2 Build 922 07/20/2023 SC Lite Edition
+
+
+---------------------
+; Table of Contents ;
+---------------------
+  1. Legal Notice
+  2. Analysis & Synthesis Summary
+  3. Analysis & Synthesis Settings
+  4. Parallel Compilation
+  5. Analysis & Synthesis Source Files Read
+  6. Analysis & Synthesis Resource Usage Summary
+  7. Analysis & Synthesis Resource Utilization by Entity
+  8. General Register Statistics
+  9. Parameter Settings for User Entity Instance: PC:pc1
+ 10. Parameter Settings for User Entity Instance: InstrCache:instrCache1
+ 11. Parameter Settings for User Entity Instance: RegisterFile:registerFile1
+ 12. Port Connectivity Checks: "ALU:alu1"
+ 13. Port Connectivity Checks: "FD_Buffer:fdBuffer1"
+ 14. Post-Synthesis Netlist Statistics for Top Partition
+ 15. Elapsed Time Per Partition
+ 16. Analysis & Synthesis Messages
+
+
+
+----------------
+; Legal Notice ;
+----------------
+Copyright (C) 2023  Intel Corporation. All rights reserved.
+Your use of Intel Corporation's design tools, logic functions 
+and other software and tools, and any partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Intel Program License 
+Subscription Agreement, the Intel Quartus Prime License Agreement,
+the Intel FPGA IP License Agreement, or other applicable license
+agreement, including, without limitation, that your use is for
+the sole purpose of programming logic devices manufactured by
+Intel and sold by Intel or its authorized distributors.  Please
+refer to the applicable agreement for further details, at
+https://fpgasoftware.intel.com/eula.
+
+
+
++----------------------------------------------------------------------------------+
+; Analysis & Synthesis Summary                                                     ;
++---------------------------------+------------------------------------------------+
+; Analysis & Synthesis Status     ; Successful - Sat Apr 20 05:09:02 2024          ;
+; Quartus Prime Version           ; 22.1std.2 Build 922 07/20/2023 SC Lite Edition ;
+; Revision Name                   ; Q5-stage-pipelined-processor                   ;
+; Top-level Entity Name           ; processor                                      ;
+; Family                          ; Cyclone V                                      ;
+; Logic utilization (in ALMs)     ; N/A                                            ;
+; Total registers                 ; 0                                              ;
+; Total pins                      ; 21                                             ;
+; Total virtual pins              ; 0                                              ;
+; Total block memory bits         ; 0                                              ;
+; Total DSP Blocks                ; 0                                              ;
+; Total HSSI RX PCSs              ; 0                                              ;
+; Total HSSI PMA RX Deserializers ; 0                                              ;
+; Total HSSI TX PCSs              ; 0                                              ;
+; Total HSSI PMA TX Serializers   ; 0                                              ;
+; Total PLLs                      ; 0                                              ;
+; Total DLLs                      ; 0                                              ;
++---------------------------------+------------------------------------------------+
+
+
++-------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Settings                                                                                                       ;
++---------------------------------------------------------------------------------+--------------------+------------------------------+
+; Option                                                                          ; Setting            ; Default Value                ;
++---------------------------------------------------------------------------------+--------------------+------------------------------+
+; Device                                                                          ; 5CGXFC7C7F23C8     ;                              ;
+; Top-level entity name                                                           ; processor          ; Q5-stage-pipelined-processor ;
+; Family name                                                                     ; Cyclone V          ; Cyclone V                    ;
+; Use smart compilation                                                           ; Off                ; Off                          ;
+; Enable parallel Assembler and Timing Analyzer during compilation                ; On                 ; On                           ;
+; Enable compact report table                                                     ; Off                ; Off                          ;
+; Restructure Multiplexers                                                        ; Auto               ; Auto                         ;
+; MLAB Add Timing Constraints For Mixed-Port Feed-Through Mode Setting Don't Care ; Off                ; Off                          ;
+; Create Debugging Nodes for IP Cores                                             ; Off                ; Off                          ;
+; Preserve fewer node names                                                       ; On                 ; On                           ;
+; Intel FPGA IP Evaluation Mode                                                   ; Enable             ; Enable                       ;
+; Verilog Version                                                                 ; Verilog_2001       ; Verilog_2001                 ;
+; VHDL Version                                                                    ; VHDL_1993          ; VHDL_1993                    ;
+; State Machine Processing                                                        ; Auto               ; Auto                         ;
+; Safe State Machine                                                              ; Off                ; Off                          ;
+; Extract Verilog State Machines                                                  ; On                 ; On                           ;
+; Extract VHDL State Machines                                                     ; On                 ; On                           ;
+; Ignore Verilog initial constructs                                               ; Off                ; Off                          ;
+; Iteration limit for constant Verilog loops                                      ; 5000               ; 5000                         ;
+; Iteration limit for non-constant Verilog loops                                  ; 250                ; 250                          ;
+; Add Pass-Through Logic to Inferred RAMs                                         ; On                 ; On                           ;
+; Infer RAMs from Raw Logic                                                       ; On                 ; On                           ;
+; Parallel Synthesis                                                              ; On                 ; On                           ;
+; DSP Block Balancing                                                             ; Auto               ; Auto                         ;
+; NOT Gate Push-Back                                                              ; On                 ; On                           ;
+; Power-Up Don't Care                                                             ; On                 ; On                           ;
+; Remove Redundant Logic Cells                                                    ; Off                ; Off                          ;
+; Remove Duplicate Registers                                                      ; On                 ; On                           ;
+; Ignore CARRY Buffers                                                            ; Off                ; Off                          ;
+; Ignore CASCADE Buffers                                                          ; Off                ; Off                          ;
+; Ignore GLOBAL Buffers                                                           ; Off                ; Off                          ;
+; Ignore ROW GLOBAL Buffers                                                       ; Off                ; Off                          ;
+; Ignore LCELL Buffers                                                            ; Off                ; Off                          ;
+; Ignore SOFT Buffers                                                             ; On                 ; On                           ;
+; Limit AHDL Integers to 32 Bits                                                  ; Off                ; Off                          ;
+; Optimization Technique                                                          ; Balanced           ; Balanced                     ;
+; Carry Chain Length                                                              ; 70                 ; 70                           ;
+; Auto Carry Chains                                                               ; On                 ; On                           ;
+; Auto Open-Drain Pins                                                            ; On                 ; On                           ;
+; Perform WYSIWYG Primitive Resynthesis                                           ; Off                ; Off                          ;
+; Auto ROM Replacement                                                            ; On                 ; On                           ;
+; Auto RAM Replacement                                                            ; On                 ; On                           ;
+; Auto DSP Block Replacement                                                      ; On                 ; On                           ;
+; Auto Shift Register Replacement                                                 ; Auto               ; Auto                         ;
+; Allow Shift Register Merging across Hierarchies                                 ; Auto               ; Auto                         ;
+; Auto Clock Enable Replacement                                                   ; On                 ; On                           ;
+; Strict RAM Replacement                                                          ; Off                ; Off                          ;
+; Allow Synchronous Control Signals                                               ; On                 ; On                           ;
+; Force Use of Synchronous Clear Signals                                          ; Off                ; Off                          ;
+; Auto Resource Sharing                                                           ; Off                ; Off                          ;
+; Allow Any RAM Size For Recognition                                              ; Off                ; Off                          ;
+; Allow Any ROM Size For Recognition                                              ; Off                ; Off                          ;
+; Allow Any Shift Register Size For Recognition                                   ; Off                ; Off                          ;
+; Use LogicLock Constraints during Resource Balancing                             ; On                 ; On                           ;
+; Ignore translate_off and synthesis_off directives                               ; Off                ; Off                          ;
+; Timing-Driven Synthesis                                                         ; On                 ; On                           ;
+; Report Parameter Settings                                                       ; On                 ; On                           ;
+; Report Source Assignments                                                       ; On                 ; On                           ;
+; Report Connectivity Checks                                                      ; On                 ; On                           ;
+; Ignore Maximum Fan-Out Assignments                                              ; Off                ; Off                          ;
+; Synchronization Register Chain Length                                           ; 3                  ; 3                            ;
+; Power Optimization During Synthesis                                             ; Normal compilation ; Normal compilation           ;
+; HDL message level                                                               ; Level2             ; Level2                       ;
+; Suppress Register Optimization Related Messages                                 ; Off                ; Off                          ;
+; Number of Removed Registers Reported in Synthesis Report                        ; 5000               ; 5000                         ;
+; Number of Swept Nodes Reported in Synthesis Report                              ; 5000               ; 5000                         ;
+; Number of Inverted Registers Reported in Synthesis Report                       ; 100                ; 100                          ;
+; Clock MUX Protection                                                            ; On                 ; On                           ;
+; Auto Gated Clock Conversion                                                     ; Off                ; Off                          ;
+; Block Design Naming                                                             ; Auto               ; Auto                         ;
+; SDC constraint protection                                                       ; Off                ; Off                          ;
+; Synthesis Effort                                                                ; Auto               ; Auto                         ;
+; Shift Register Replacement - Allow Asynchronous Clear Signal                    ; On                 ; On                           ;
+; Pre-Mapping Resynthesis Optimization                                            ; Off                ; Off                          ;
+; Analysis & Synthesis Message Level                                              ; Medium             ; Medium                       ;
+; Disable Register Merging Across Hierarchies                                     ; Auto               ; Auto                         ;
+; Resource Aware Inference For Block RAM                                          ; On                 ; On                           ;
+; Automatic Parallel Synthesis                                                    ; On                 ; On                           ;
+; Partial Reconfiguration Bitstream ID                                            ; Off                ; Off                          ;
++---------------------------------------------------------------------------------+--------------------+------------------------------+
+
+
++------------------------------------------+
+; Parallel Compilation                     ;
++----------------------------+-------------+
+; Processors                 ; Number      ;
++----------------------------+-------------+
+; Number detected on machine ; 12          ;
+; Maximum allowed            ; 6           ;
+;                            ;             ;
+; Average used               ; 1.00        ;
+; Maximum used               ; 1           ;
+;                            ;             ;
+; Usage by Processor         ; % Time Used ;
+;     Processor 1            ; 100.0%      ;
++----------------------------+-------------+
+
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Source Files Read                                                                                                                                                                                           ;
++----------------------------------+-----------------+-----------------------+-------------------------------------------------------------------------------------------------------------------------------------------+---------+
+; File Name with User-Entered Path ; Used in Netlist ; File Type             ; File Name with Absolute Path                                                                                                              ; Library ;
++----------------------------------+-----------------+-----------------------+-------------------------------------------------------------------------------------------------------------------------------------------+---------+
+; WB_Buffer.vhd                    ; yes             ; User VHDL File        ; C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/WB_Buffer.vhd    ;         ;
+; RegisterFile.vhd                 ; yes             ; User VHDL File        ; C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/RegisterFile.vhd ;         ;
+; processor.vhd                    ; yes             ; User VHDL File        ; C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd    ;         ;
+; PC.vhd                           ; yes             ; User VHDL File        ; C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/PC.vhd           ;         ;
+; InstrCache.vhd                   ; yes             ; User VHDL File        ; C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/InstrCache.vhd   ;         ;
+; FD_Buffer.vhd                    ; yes             ; User VHDL File        ; C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/FD_Buffer.vhd    ;         ;
+; DE_Buffer.vhd                    ; yes             ; User VHDL File        ; C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/DE_Buffer.vhd    ;         ;
+; ALU.vhd                          ; yes             ; User VHDL File        ; C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/ALU.vhd          ;         ;
+; em_buffer.vhd                    ; yes             ; Auto-Found VHDL File  ; C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/em_buffer.vhd    ;         ;
++----------------------------------+-----------------+-----------------------+-------------------------------------------------------------------------------------------------------------------------------------------+---------+
+
+
++-----------------------------------------------------+
+; Analysis & Synthesis Resource Usage Summary         ;
++---------------------------------------------+-------+
+; Resource                                    ; Usage ;
++---------------------------------------------+-------+
+; Estimate of Logic utilization (ALMs needed) ; 0     ;
+;                                             ;       ;
+; Combinational ALUT usage for logic          ; 0     ;
+;     -- 7 input functions                    ; 0     ;
+;     -- 6 input functions                    ; 0     ;
+;     -- 5 input functions                    ; 0     ;
+;     -- 4 input functions                    ; 0     ;
+;     -- <=3 input functions                  ; 0     ;
+;                                             ;       ;
+; Dedicated logic registers                   ; 0     ;
+;                                             ;       ;
+; I/O pins                                    ; 21    ;
+;                                             ;       ;
+; Total DSP Blocks                            ; 0     ;
+;                                             ;       ;
+; Maximum fan-out node                        ; clk   ;
+; Maximum fan-out                             ; 1     ;
+; Total fan-out                               ; 21    ;
+; Average fan-out                             ; 0.50  ;
++---------------------------------------------+-------+
+
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Resource Utilization by Entity                                                                                                                                    ;
++----------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+---------------------+-------------+--------------+
+; Compilation Hierarchy Node ; Combinational ALUTs ; Dedicated Logic Registers ; Block Memory Bits ; DSP Blocks ; Pins ; Virtual Pins ; Full Hierarchy Name ; Entity Name ; Library Name ;
++----------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+---------------------+-------------+--------------+
+; |processor                 ; 0 (0)               ; 0 (0)                     ; 0                 ; 0          ; 21   ; 0            ; |processor          ; processor   ; work         ;
++----------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+---------------------+-------------+--------------+
+Note: For table entries with two numbers listed, the numbers in parentheses indicate the number of resources of the given type used by the specific entity alone. The numbers listed outside of parentheses indicate the total resources of the given type used by the specific entity and all of its sub-entities in the hierarchy.
+
+
++------------------------------------------------------+
+; General Register Statistics                          ;
++----------------------------------------------+-------+
+; Statistic                                    ; Value ;
++----------------------------------------------+-------+
+; Total registers                              ; 0     ;
+; Number of registers using Synchronous Clear  ; 0     ;
+; Number of registers using Synchronous Load   ; 0     ;
+; Number of registers using Asynchronous Clear ; 0     ;
+; Number of registers using Asynchronous Load  ; 0     ;
+; Number of registers using Clock Enable       ; 0     ;
+; Number of registers using Preset             ; 0     ;
++----------------------------------------------+-------+
+
+
++-----------------------------------------------------+
+; Parameter Settings for User Entity Instance: PC:pc1 ;
++----------------+-------+----------------------------+
+; Parameter Name ; Value ; Type                       ;
++----------------+-------+----------------------------+
+; n              ; 32    ; Signed Integer             ;
++----------------+-------+----------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++---------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: InstrCache:instrCache1 ;
++----------------+-------+--------------------------------------------+
+; Parameter Name ; Value ; Type                                       ;
++----------------+-------+--------------------------------------------+
+; n              ; 16    ; Signed Integer                             ;
+; m              ; 12    ; Signed Integer                             ;
+; k              ; 32    ; Signed Integer                             ;
++----------------+-------+--------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++-------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: RegisterFile:registerFile1 ;
++----------------+-------+------------------------------------------------+
+; Parameter Name ; Value ; Type                                           ;
++----------------+-------+------------------------------------------------+
+; w              ; 3     ; Signed Integer                                 ;
+; n              ; 32    ; Signed Integer                                 ;
++----------------+-------+------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++--------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "ALU:alu1"                                                                               ;
++----------+--------+----------+-------------------------------------------------------------------------------------+
+; Port     ; Type   ; Severity ; Details                                                                             ;
++----------+--------+----------+-------------------------------------------------------------------------------------+
+; zero     ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; negative ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; carry    ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; overflow ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
++----------+--------+----------+-------------------------------------------------------------------------------------+
+
+
++------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "FD_Buffer:fdBuffer1"                                                                  ;
++--------+--------+----------+-------------------------------------------------------------------------------------+
+; Port   ; Type   ; Severity ; Details                                                                             ;
++--------+--------+----------+-------------------------------------------------------------------------------------+
+; opcode ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; fnnum  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
++--------+--------+----------+-------------------------------------------------------------------------------------+
+
+
++-----------------------------------------------------+
+; Post-Synthesis Netlist Statistics for Top Partition ;
++-----------------------+-----------------------------+
+; Type                  ; Count                       ;
++-----------------------+-----------------------------+
+; arriav_lcell_comb     ; 1                           ;
+;     normal            ; 1                           ;
+;         0 data inputs ; 1                           ;
+; boundary_port         ; 21                          ;
+;                       ;                             ;
+; Max LUT depth         ; 0.00                        ;
+; Average LUT depth     ; 0.00                        ;
++-----------------------+-----------------------------+
+
+
++-------------------------------+
+; Elapsed Time Per Partition    ;
++----------------+--------------+
+; Partition Name ; Elapsed Time ;
++----------------+--------------+
+; Top            ; 00:00:00     ;
++----------------+--------------+
+
+
++-------------------------------+
+; Analysis & Synthesis Messages ;
++-------------------------------+
+Info: *******************************************************************
+Info: Running Quartus Prime Analysis & Synthesis
+    Info: Version 22.1std.2 Build 922 07/20/2023 SC Lite Edition
+    Info: Processing started: Sat Apr 20 05:08:37 2024
+Info: Command: quartus_map --read_settings_files=on --write_settings_files=off Q5-stage-pipelined-processor -c Q5-stage-pipelined-processor
+Warning (18236): Number of processors has not been specified which may cause overloading on shared machines.  Set the global assignment NUM_PARALLEL_PROCESSORS in your QSF to an appropriate value for best performance.
+Info (20030): Parallel compilation is enabled and will use 6 of the 6 processors detected
+Info (12021): Found 2 design units, including 1 entities, in source file wb_buffer.vhd
+    Info (12022): Found design unit 1: WB_Buffer-WB_Buffer_Arch File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/WB_Buffer.vhd Line: 17
+    Info (12023): Found entity 1: WB_Buffer File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/WB_Buffer.vhd Line: 5
+Info (12021): Found 2 design units, including 1 entities, in source file sp.vhd
+    Info (12022): Found design unit 1: SP-SPArch File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/SP.vhd Line: 18
+    Info (12023): Found entity 1: SP File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/SP.vhd Line: 6
+Info (12021): Found 2 design units, including 1 entities, in source file registerfile.vhd
+    Info (12022): Found design unit 1: RegisterFile-Behavioral File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/RegisterFile.vhd Line: 19
+    Info (12023): Found entity 1: RegisterFile File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/RegisterFile.vhd Line: 4
+Info (12021): Found 2 design units, including 1 entities, in source file processor.vhd
+    Info (12022): Found design unit 1: processor-processorArch File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 16
+    Info (12023): Found entity 1: processor File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 5
+Info (12021): Found 2 design units, including 1 entities, in source file pc.vhd
+    Info (12022): Found design unit 1: PC-PC_ARCH File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/PC.vhd Line: 18
+    Info (12023): Found entity 1: PC File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/PC.vhd Line: 4
+Info (12021): Found 2 design units, including 1 entities, in source file nbuffer.vhd
+    Info (12022): Found design unit 1: nBuffer-mBufferArch File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/nBuffer.vhd Line: 18
+    Info (12023): Found entity 1: nBuffer File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/nBuffer.vhd Line: 5
+Info (12021): Found 2 design units, including 1 entities, in source file mux_4x1.vhd
+    Info (12022): Found design unit 1: MUX_4x1-MUX41Arch File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/MUX_4x1.vhd Line: 17
+    Info (12023): Found entity 1: MUX_4x1 File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/MUX_4x1.vhd Line: 6
+Info (12021): Found 2 design units, including 1 entities, in source file mux_2x1.vhd
+    Info (12022): Found design unit 1: MUX_2x1-MUX21Arch File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/MUX_2x1.vhd Line: 15
+    Info (12023): Found entity 1: MUX_2x1 File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/MUX_2x1.vhd Line: 4
+Info (12021): Found 2 design units, including 1 entities, in source file instrcache.vhd
+    Info (12022): Found design unit 1: InstrCache-Behavioral File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/InstrCache.vhd Line: 17
+    Info (12023): Found entity 1: InstrCache File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/InstrCache.vhd Line: 4
+Info (12021): Found 2 design units, including 1 entities, in source file fd_buffer.vhd
+    Info (12022): Found design unit 1: FD_Buffer-Behavioral File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/FD_Buffer.vhd Line: 22
+    Info (12023): Found entity 1: FD_Buffer File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/FD_Buffer.vhd Line: 6
+Info (12021): Found 2 design units, including 1 entities, in source file de_buffer.vhd
+    Info (12022): Found design unit 1: DE_Buffer-DE_Buffer_Arch File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/DE_Buffer.vhd Line: 17
+    Info (12023): Found entity 1: DE_Buffer File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/DE_Buffer.vhd Line: 5
+Info (12021): Found 2 design units, including 1 entities, in source file datamemory.vhd
+    Info (12022): Found design unit 1: dataMemory-DataMemory_arch File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/DataMemory.vhd Line: 23
+    Info (12023): Found entity 1: DataMemory File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/DataMemory.vhd Line: 5
+Info (12021): Found 2 design units, including 1 entities, in source file controller.vhd
+    Info (12022): Found design unit 1: controller-controllerArch2 File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/controller.vhd Line: 154
+    Info (12023): Found entity 1: controller File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/controller.vhd Line: 5
+Info (12021): Found 2 design units, including 1 entities, in source file conditioncoderegister.vhd
+    Info (12022): Found design unit 1: conditionCodeRegister-conditionCodeRegisterArch File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/conditionCodeRegister.vhd Line: 16
+    Info (12023): Found entity 1: conditionCodeRegister File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/conditionCodeRegister.vhd Line: 6
+Info (12021): Found 2 design units, including 1 entities, in source file alu.vhd
+    Info (12022): Found design unit 1: ALU-ALUArch File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/ALU.vhd Line: 17
+    Info (12023): Found entity 1: ALU File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/ALU.vhd Line: 5
+Info (12127): Elaborating entity "processor" for the top level hierarchy
+Warning (10541): VHDL Signal Declaration warning at processor.vhd(10): used implicit default value for signal "exception" because signal was never assigned a value or an explicit default value. Use of implicit default value may introduce unintended design optimizations. File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 10
+Warning (10541): VHDL Signal Declaration warning at processor.vhd(12): used implicit default value for signal "OUT_PORT" because signal was never assigned a value or an explicit default value. Use of implicit default value may introduce unintended design optimizations. File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 12
+Warning (10036): Verilog HDL or VHDL warning at processor.vhd(223): object "opCode_Out" assigned a value but never read File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 223
+Warning (10036): Verilog HDL or VHDL warning at processor.vhd(227): object "FnNum_Out" assigned a value but never read File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 227
+Warning (10541): VHDL Signal Declaration warning at processor.vhd(238): used implicit default value for signal "ALU_Selectors" because signal was never assigned a value or an explicit default value. Use of implicit default value may introduce unintended design optimizations. File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 238
+Warning (10541): VHDL Signal Declaration warning at processor.vhd(239): used implicit default value for signal "PC_Enable" because signal was never assigned a value or an explicit default value. Use of implicit default value may introduce unintended design optimizations. File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 239
+Warning (10541): VHDL Signal Declaration warning at processor.vhd(240): used implicit default value for signal "isBranch" because signal was never assigned a value or an explicit default value. Use of implicit default value may introduce unintended design optimizations. File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 240
+Warning (10036): Verilog HDL or VHDL warning at processor.vhd(250): object "zeroFlag" assigned a value but never read File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 250
+Warning (10036): Verilog HDL or VHDL warning at processor.vhd(251): object "NegativeFlag" assigned a value but never read File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 251
+Warning (10036): Verilog HDL or VHDL warning at processor.vhd(252): object "CarryFlag" assigned a value but never read File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 252
+Warning (10036): Verilog HDL or VHDL warning at processor.vhd(253): object "OverflowFlag" assigned a value but never read File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 253
+Warning (10541): VHDL Signal Declaration warning at processor.vhd(279): used implicit default value for signal "pcBranchIn" because signal was never assigned a value or an explicit default value. Use of implicit default value may introduce unintended design optimizations. File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 279
+Info (12128): Elaborating entity "PC" for hierarchy "PC:pc1" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 290
+Info (12128): Elaborating entity "InstrCache" for hierarchy "InstrCache:instrCache1" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 309
+Warning (10541): VHDL Signal Declaration warning at InstrCache.vhd(19): used implicit default value for signal "ram" because signal was never assigned a value or an explicit default value. Use of implicit default value may introduce unintended design optimizations. File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/InstrCache.vhd Line: 19
+Info (12128): Elaborating entity "FD_Buffer" for hierarchy "FD_Buffer:fdBuffer1" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 317
+Warning (10492): VHDL Process Statement warning at FD_Buffer.vhd(36): signal "WE" is read inside the Process Statement but isn't in the Process Statement's sensitivity list File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/FD_Buffer.vhd Line: 36
+Info (12128): Elaborating entity "RegisterFile" for hierarchy "RegisterFile:registerFile1" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 330
+Info (12128): Elaborating entity "DE_Buffer" for hierarchy "DE_Buffer:deBuffer1" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 356
+Info (12128): Elaborating entity "ALU" for hierarchy "ALU:alu1" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 373
+Warning (12125): Using design file em_buffer.vhd, which is not specified as a design file for the current project, but contains definitions for 2 design units and 1 entities in project
+    Info (12022): Found design unit 1: EM_Buffer-EM_Buffer_Arch File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/em_buffer.vhd Line: 15
+    Info (12023): Found entity 1: EM_Buffer File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/em_buffer.vhd Line: 5
+Info (12128): Elaborating entity "EM_Buffer" for hierarchy "EM_Buffer:emBuffer1" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 386
+Info (12128): Elaborating entity "WB_Buffer" for hierarchy "WB_Buffer:wbBuffer1" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 409
+Warning (13024): Output pins are stuck at VCC or GND
+    Warning (13410): Pin "exception" is stuck at GND File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 10
+    Warning (13410): Pin "OUT_PORT[0]" is stuck at GND File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 12
+    Warning (13410): Pin "OUT_PORT[1]" is stuck at GND File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 12
+    Warning (13410): Pin "OUT_PORT[2]" is stuck at GND File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 12
+    Warning (13410): Pin "OUT_PORT[3]" is stuck at GND File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 12
+    Warning (13410): Pin "OUT_PORT[4]" is stuck at GND File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 12
+    Warning (13410): Pin "OUT_PORT[5]" is stuck at GND File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 12
+    Warning (13410): Pin "OUT_PORT[6]" is stuck at GND File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 12
+    Warning (13410): Pin "OUT_PORT[7]" is stuck at GND File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 12
+Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
+    Info (16011): Adding 0 node(s), including 0 DDIO, 0 PLL, 0 transceiver and 0 LCELL
+Warning (21074): Design contains 12 input pin(s) that do not drive logic
+    Warning (15610): No output dependent on input pin "clk" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 7
+    Warning (15610): No output dependent on input pin "reset" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 8
+    Warning (15610): No output dependent on input pin "we" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 8
+    Warning (15610): No output dependent on input pin "INT_In" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 9
+    Warning (15610): No output dependent on input pin "IN_PORT[0]" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 11
+    Warning (15610): No output dependent on input pin "IN_PORT[1]" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 11
+    Warning (15610): No output dependent on input pin "IN_PORT[2]" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 11
+    Warning (15610): No output dependent on input pin "IN_PORT[3]" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 11
+    Warning (15610): No output dependent on input pin "IN_PORT[4]" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 11
+    Warning (15610): No output dependent on input pin "IN_PORT[5]" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 11
+    Warning (15610): No output dependent on input pin "IN_PORT[6]" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 11
+    Warning (15610): No output dependent on input pin "IN_PORT[7]" File: C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/processor.vhd Line: 11
+Info (21057): Implemented 21 device resources after synthesis - the final resource count might be different
+    Info (21058): Implemented 12 input pins
+    Info (21059): Implemented 9 output pins
+Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 39 warnings
+    Info: Peak virtual memory: 4863 megabytes
+    Info: Processing ended: Sat Apr 20 05:09:02 2024
+    Info: Elapsed time: 00:00:25
+    Info: Total CPU time (on all processors): 00:00:30
+
+

@@ -7,6 +7,11 @@ entity EM_Buffer is
         clk, reset, WE : in  std_logic;
         Dst_in : in  std_logic_vector(2 downto 0);
         ALU_OutValue_in : in  std_logic_vector(31 downto 0);
+        EM_we_reg_in : in std_logic;
+        EM_AluOrMem_in : in std_logic;
+        
+        EM_AluOrMem_out : out std_logic;
+        EM_we_reg_out : out std_logic;
         ALU_OutValue_out : out std_logic_vector(31 downto 0);
         Dst_out : out std_logic_vector(2 downto 0)
     );
@@ -17,10 +22,14 @@ begin
     process(clk, reset)
     begin
         if reset = '1' then
+            EM_we_reg_out <= '0';
+            EM_AluOrMem_out <= '0';
             ALU_OutValue_out <= (others => '0');
             Dst_out <= (others => '0');
         elsif falling_edge(clk) then
             if WE = '1' then
+                EM_AluOrMem_out <= EM_AluOrMem_in;
+                EM_we_reg_out <= EM_we_reg_in;
                 ALU_OutValue_out <= ALU_OutValue_in;
                 Dst_out <= Dst_in;
             end if;

@@ -1,6 +1,7 @@
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.numeric_std.ALL;
+
 ENTITY PC IS
     GENERIC (
         N : INTEGER := 32
@@ -11,13 +12,17 @@ ENTITY PC IS
         branch : IN STD_LOGIC;
         enable : IN STD_LOGIC;
         pcBranch : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+
         pc : OUT STD_LOGIC_VECTOR(N - 1 DOWNTO 0)
     );
 END ENTITY PC;
 
 ARCHITECTURE PC_ARCH OF PC IS
+
     SIGNAL pcNext : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+
 BEGIN
+
     PROCESS (reset, clk)
     BEGIN
         IF reset = '1' THEN
@@ -30,5 +35,7 @@ BEGIN
             END IF;
         END IF;
     END PROCESS;
+
     pc <= pcNext;
+
 END ARCHITECTURE PC_ARCH;

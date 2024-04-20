@@ -1,6 +1,7 @@
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.numeric_std.ALL;
+
 ENTITY RegisterFile IS
     GENERIC (
         w : INTEGER := 3;
@@ -12,6 +13,7 @@ ENTITY RegisterFile IS
         Rdest : IN STD_LOGIC_VECTOR(w-1 DOWNTO 0);
         WBdata : IN STD_LOGIC_VECTOR(n-1 DOWNTO 0);
         writeEnable : IN STD_LOGIC;
+
         Rsrc1_data, Rsrc2_data : OUT STD_LOGIC_VECTOR(n-1 DOWNTO 0)
     );
 END ENTITY RegisterFile;
@@ -32,6 +34,8 @@ BEGIN
             END IF;
         END IF;
     END PROCESS;
+    
     Rsrc1_data <= q_registers(TO_INTEGER(unsigned(Rsrc1_address)));
     Rsrc2_data <= q_registers(TO_INTEGER(unsigned(Rsrc2_address)));
+
 END ARCHITECTURE Behavioral;

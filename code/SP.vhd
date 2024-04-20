@@ -16,8 +16,11 @@ entity SP is
 end SP;
 
 architecture SPArch of SP is
+
     signal sp: unsigned(WIDTH -1 downto 0);
+
 begin
+
     process(reset, push, pop)
     begin
         if reset = '1' then
@@ -30,4 +33,5 @@ begin
     end process;
 
     pointer <= std_logic_vector(sp);
+    
 end SPArch;
