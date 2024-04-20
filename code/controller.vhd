@@ -271,7 +271,7 @@ begin
                         when "0001" =>                   -- SUBI
                             ctr_ALU_sel <= "0111";           -- subtraction
                         when "0010" =>                   -- LDM
-                            ctr_ALU_sel <= "0100";           -- move
+                            ctr_ALU_sel <= "0101";           -- mov B
                         when others =>
                             ctr_ALU_sel <= "0100";-- move
                     end case;

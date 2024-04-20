@@ -10,12 +10,17 @@ ENTITY FD_Buffer IS
         WE : IN STD_LOGIC;
         --16 bits from instruction memory
         Intruction : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-
+        
+        FD_isImm_IN : IN STD_LOGIC;
+        FD_immediate_in : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+ 
         OpCode : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
         Src1 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
         Src2 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
         dst : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-        FnNum : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
+        FnNum : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+        FD_isImm_out : OUT STD_LOGIC;
+        FD_immediate_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
     );
 END ENTITY FD_Buffer;
 
@@ -38,8 +43,12 @@ BEGIN
             OpCode <= Intruction(15 DOWNTO 13);
             dst <= Intruction(12 DOWNTO 10); 
             Src1 <= Intruction(9 DOWNTO 7);
+            if FD_isImm_IN = '1' then
+                FD_immediate_out <= FD_immediate_in;
+            end if ;
             Src2 <= Intruction(6 DOWNTO 4);  
             FnNum <= Intruction(3 DOWNTO 0);
+            FD_isImm_out <= FD_isImm_IN;
         END IF;
     END PROCESS;
 

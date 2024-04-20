@@ -1,8 +1,7 @@
 # the "vcom -refresh" comand should compile all files (Nouh)
 vcom -work work -2002 -refresh
-vcom -work work -2002 -explicit -stats=none processor.vhd
+# vcom -work work -2002 -explicit -stats=none processor.vhd
 vsim -gui work.processor
-#-mem load -i {C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/instrCache.mem} /processor/instrCache1/ram
 # with the "mem load -infile <path in work dir> <memory instance>" comand we don't need the path from the C: dir (Nouh)
 mem load -infile {instrCache.mem} instrCache1
 add wave -position insertpoint  \
@@ -24,8 +23,6 @@ sim:/processor/Rsrc2_Out \
 sim:/processor/Rdest_Out \
 sim:/processor/FnNum_Out \
 sim:/processor/PC_Enable
-force -freeze sim:/processor/reset 1 0
-run
 add wave -position insertpoint  \
 sim:/processor/Rsrc1_data_Out \
 sim:/processor/Rsrc2_data_Out \
@@ -37,9 +34,10 @@ sim:/processor/DE_dest_out \
 sim:/processor/DE_AluSelectors_out
 force -freeze sim:/processor/we 1 0
 force -freeze sim:/processor/PC_Enable 1 0
+force -freeze sim:/processor/reset 1 0
+run
 force -freeze sim:/processor/reset 0 0
 run
-#-mem load -i {C:/Users/musta/Desktop/CU/Year 3/Spring/CMPS301 - Computer Architecture/Project CMP301/-5-stage-pipelined-processor/code/registers.mem} /processor/registerFile1/q_registers
 mem load -infile {registers.mem} /processor/registerFile1/q_registers
 add wave -position insertpoint  \
 sim:/processor/ALUResult \
@@ -54,4 +52,3 @@ sim:/processor/WB_Rdest_Out \
 sim:/processor/WB_ALUResult_Out
 run
 run
-#-force -freeze sim:/processor/ALU_Selectors 0010110 0

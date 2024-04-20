@@ -13,6 +13,9 @@ ENTITY PC IS
         enable : IN STD_LOGIC;
         pcBranch : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
 
+        isImmFromInstr : IN STD_LOGIC;
+        correctedPc : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+
         pc : OUT STD_LOGIC_VECTOR(N - 1 DOWNTO 0)
     );
 END ENTITY PC;
@@ -20,15 +23,19 @@ END ENTITY PC;
 ARCHITECTURE PC_ARCH OF PC IS
 
     SIGNAL pcNext : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+    SIGNAL lastCorrectedPc : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
 
 BEGIN
-
-    PROCESS (reset, clk)
+    
+    PROCESS (reset, clk, correctedPc)
     BEGIN
         IF reset = '1' THEN
             pcNext <= (OTHERS => '0');
         ELSIF falling_edge(clk) THEN
-            IF branch = '1' THEN
+            IF isImmFromInstr ='1' AND correctedPc /= lastCorrectedPc THEN
+                pcNext <= correctedPc;
+                lastCorrectedPc <= correctedPc;
+            ELSIF branch = '1' THEN
                 pcNext <= pcBranch;
             ELSIF enable = '1' THEN
                 pcNext <= STD_LOGIC_VECTOR(unsigned(pcNext) + 1);

@@ -13,7 +13,10 @@ ENTITY InstrCache IS
         rst : IN STD_LOGIC;
         pc : IN STD_LOGIC_VECTOR(k - 1 DOWNTO 0);
 
-        data : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
+        data : BUFFER STD_LOGIC_VECTOR(n - 1 DOWNTO 0); --so that i can read and write to
+        immediate_out : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
+        IsImmediate : Out STD_LOGIC;
+        correctedPc : OUT STD_LOGIC_VECTOR(k - 1 DOWNTO 0)
     );
 END InstrCache;
 
@@ -25,10 +28,18 @@ ARCHITECTURE Behavioral OF InstrCache IS
     begin
 
         process (clk, rst)
+            variable temp_data : std_logic_vector(n - 1 downto 0);
         begin
             if rising_edge(clk) then
                 if to_integer(unsigned(pc)) < 2 ** m then
-                    data <= ram(to_integer(unsigned(pc)));
+                    temp_data := ram(to_integer(unsigned(pc)));
+                    data <= temp_data;
+                    IsImmediate <= '0';
+                    IF temp_data(15 DOWNTO 13) = "010" THEN
+                        immediate_out <= ram(to_integer(unsigned(pc)) + 1);
+                        IsImmediate <= '1';
+                        correctedPc <= std_logic_vector(unsigned(pc) + 2);
+                      END IF;
                 end if;
             end if;
         end process;
