@@ -190,13 +190,13 @@ begin
                     hasImm <= '0';
             end case;
 
-            case ctr_opCode_in is
-                when "000" =>
+            case ctr_opCode_in & ctr_fnNum_in is
+                when "000----" | "0011011" | "0100011" | "0110001" | "011001-" | "011101-" | "100----" | "101----" | "110----" | "111----" =>
                     writeEnable_reg <= '0';
                 when others =>
                     writeEnable_reg <= '1';
             end case;
-
+            
             case ctr_opCode_in is
                 when "010" =>
                     writeEnable_mem <= '1';
