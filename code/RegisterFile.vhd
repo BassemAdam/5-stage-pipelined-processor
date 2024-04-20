@@ -26,7 +26,7 @@ BEGIN
     BEGIN
         IF rst = '1' THEN
             q_registers <= (OTHERS => (OTHERS => '0'));
-        ELSIF falling_edge(clk) THEN
+        ELSIF rising_edge(clk) THEN
             IF writeEnable = '1' THEN
                 q_registers(TO_INTEGER(unsigned(Rdest))) <= WBdata;
             END IF;

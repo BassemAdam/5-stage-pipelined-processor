@@ -23,7 +23,7 @@ begin
             Rsrc2_Val_out <= (others => '0');
             Dst_out <= (others => '0');
             aluSelectors_out <= (others => '0');
-        elsif rising_edge(clk) then
+        elsif falling_edge(clk) then
             if WE = '1' then
                 Rsrc1_Val_out <= Rsrc1_Val_in;
                 Rsrc2_Val_out <= Rsrc2_Val_in;

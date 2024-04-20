@@ -21,7 +21,7 @@ begin
         if reset = '1' then
             ALU_OutValue_out <= (others => '0');
             Dst_out <= (others => '0');
-        elsif rising_edge(clk) then
+        elsif falling_edge(clk) then
             if WE = '1' then
                 ALU_OutValue_out <= ALU_OutValue_in;
                 Dst_out <= Dst_in;
