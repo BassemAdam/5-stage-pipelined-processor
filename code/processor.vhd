@@ -230,14 +230,14 @@ ARCHITECTURE processorArch OF processor IS
         SIGNAL Rsrc1_data_Out : STD_LOGIC_VECTOR(31 DOWNTO 0);
         SIGNAL Rsrc2_data_Out : STD_LOGIC_VECTOR(31 DOWNTO 0);
        
-    --    --Controller signals
-    --     signal Cont_instruction_In : std_logic_vector(15 downto 0);
-    --     SIGNAL Rsrc1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-    --     SIGNAL Rsrc2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-    --     SIGNAL Rdest : STD_LOGIC_VECTOR(2 DOWNTO 0);
-           SIGNAL ALU_Selectors : STD_LOGIC_VECTOR(6 DOWNTO 0);
-           SIGNAL PC_Enable : STD_LOGIC;
-           SIGNAL isBranch : STD_LOGIC;
+       --Controller signals
+        signal Cont_instruction_In : std_logic_vector(15 downto 0);
+        SIGNAL Rsrc1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+        SIGNAL Rsrc2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+        SIGNAL Rdest : STD_LOGIC_VECTOR(2 DOWNTO 0);
+        SIGNAL ALU_Selectors : STD_LOGIC_VECTOR(6 DOWNTO 0);
+        SIGNAL PC_Enable : STD_LOGIC;
+        SIGNAL isBranch : STD_LOGIC;
 
         --DE Buffer signals
         SIGNAL DE_Rsrc1_data_out : STD_LOGIC_VECTOR(31 DOWNTO 0);

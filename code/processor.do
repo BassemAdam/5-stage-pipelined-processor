@@ -46,3 +46,6 @@ sim:/processor/EM_dest_out
 add wave -position insertpoint  \
 sim:/processor/WB_Rdest_Out \
 sim:/processor/WB_ALUResult_Out
+run
+run
+force -freeze sim:/processor/ALU_Selectors 0010110 0
