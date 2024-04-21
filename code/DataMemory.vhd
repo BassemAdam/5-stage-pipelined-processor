@@ -4,7 +4,7 @@ use IEEE.numeric_std.all;
 
 entity DataMemory is
     generic(
-        DATA_WIDTH : integer := 32;
+        DATA_WIDTH : integer := 16;
         ADDR_WIDTH : integer := 12
     );
     
@@ -30,7 +30,8 @@ begin
             mem <= (others => (others => '0'));
         elsif rising_edge(clk) then
             if memWrite = '1' then
-                mem(to_integer(writeAddress)) <= writeData;
+                mem(to_integer(writeAddress)) <= writeData(15 downto 0);
+                mem(to_integer(writeAddress) + 1) <= writeData(31 downto 16);
             end if;
             if memRead = '1' then
                 readData <= mem(to_integer(readAddress));
