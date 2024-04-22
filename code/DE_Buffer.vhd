@@ -7,19 +7,23 @@ entity DE_Buffer is
         clk, reset, WE  : in std_logic;
         Rsrc1_Val_in    : in std_logic_vector(31 downto 0);
         Rsrc2_Val_in    : in std_logic_vector(31 downto 0);
-        Dst_in          : in std_logic_vector(2 downto 0); -- Adjusted length to 3
+        Dst_in          : in std_logic_vector(2 downto 0);
+        Dst_in_2        : in std_logic_vector(2 downto 0);
         aluSelectors_in : in std_logic_vector(3 downto 0);
         DE_we_reg_in    : in std_logic;
+        DE_we_reg_in_2 : in std_logic;
         DE_AluOrMem_in  : in std_logic;
         De_immediate_IN : in std_logic_vector(15 downto 0);
         DE_isImm_IN    : in std_logic;
 
         DE_isImm_OUT    : out std_logic;
         DE_we_reg_out    : out std_logic;
+        DE_we_reg_out_2    : out std_logic;
         DE_AluOrMem_out  : out std_logic;
         Rsrc1_Val_out    : out std_logic_vector(31 downto 0);
         Rsrc2_Val_out    : out std_logic_vector(31 downto 0);
         Dst_out          : out std_logic_vector(2 downto 0);
+        Dst_out_2        : out std_logic_vector(2 downto 0);
         aluSelectors_out : out std_logic_vector(3 downto 0)
     );
 end entity DE_Buffer;
@@ -35,10 +39,12 @@ begin
             Rsrc1_Val_out    <= (others => '0');
             Rsrc2_Val_out    <= (others => '0');
             Dst_out          <= (others => '0');
+            Dst_out_2        <= (others => '0');
             aluSelectors_out <= (others => '0');
         elsif falling_edge(clk) then
             if WE = '1' then
                 DE_we_reg_out    <= DE_we_reg_in;
+                DE_we_reg_out_2    <= DE_we_reg_in_2;
                 DE_AluOrMem_out  <= DE_AluOrMem_in;
                 Rsrc1_Val_out    <= Rsrc1_Val_in;
                 DE_isImm_OUT    <= DE_isImm_IN;
@@ -49,6 +55,7 @@ begin
                 end if;
                 Rsrc2_Val_out <= Rsrc2_Val_out_var;
                 Dst_out          <= Dst_in;
+                Dst_out_2        <= Dst_in_2;
                 aluSelectors_out <= aluSelectors_in;
             end if;
         end if;

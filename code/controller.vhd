@@ -11,6 +11,7 @@ entity controller is
         rst           : in std_logic;
         ctr_opCode_in : in std_logic_vector(2 downto 0);
         ctr_Rdest_in  : in std_logic_vector(2 downto 0);
+        ctr_Rdest2_in : in std_logic_vector(2 downto 0);
         ctr_Rsrc1_in  : in std_logic_vector(2 downto 0);
         ctr_Rsrc2_in  : in std_logic_vector(2 downto 0);
         ctr_fnNum_in  : in std_logic_vector(3 downto 0);
@@ -20,8 +21,10 @@ entity controller is
         ctr_Rsrc1_out   : out std_logic_vector(2 downto 0);
         ctr_Rsrc2_out   : out std_logic_vector(2 downto 0);
         ctr_Rdest_out   : out std_logic_vector(2 downto 0);
+        ctr_Rdest2_out  : out std_logic_vector(2 downto 0);
         hasImm          : out std_logic;
         writeEnable_reg : out std_logic;
+        writeEnable_reg2: out std_logic;
         writeEnable_mem : out std_logic;
         ALUorMem        : out std_logic;
         --predictor: OUT STD_LOGIC;
@@ -46,113 +49,6 @@ entity controller is
 
     );
 end entity controller;
-
--- ARCHITECTURE controllerArch OF controller IS
-
--- BEGIN
---     -- reset
---     controller_opCode_out <= (OTHERS => '0') WHEN rst = '1' ELSE
---         controller_opCode_in;
-
---     IF rst = '1' THEN
---         hasImm <= (OTHERS => '0');
---         writeEnable_reg <= '0';
---         writeEnable_mem <= '0';
---         ALUorMem <= '0';
---         -- predictor <= '0';
---         -- protect <= '0';
---         -- free <= '0';
---         -- isJZ <= '0';
---         -- isJMP <= '0';
---         -- flushIF_ID <= '0';
---         -- flushID_EX <= '0';
---         -- flushEX_MEM <= '0';
---         -- flushMEM_WB <= '0';
---         stall <= '0';
---         int <= '0';
---         isSwap <= '0';
---         PCIncType <= (OTHERS => '0');
---         -- CallorInt <= '0';
---         -- push <= '0';
---         -- pop <= '0';
-
---     ELSE
---         IF controller_opCode_in = "000" THEN -- ALU
---             hasImm <= '0';
---             writeEnable_reg <= '0';
---             writeEnable_mem <= '0';
---             ALUorMem <= '0';
---             m
---             -- predictor <= '0';
---             -- protect <= '0';
---             -- free <= '0';
---             -- isJZ <= '0';
---             -- isJMP <= '0';
---             -- flushIF_ID <= '0';
---             -- flushID_EX <= '0';
---             -- flushEX_MEM <= '0';
---             -- flushMEM_WB <= '0';
---             stall <= '0';
---             int <= '0';
---             isSwap <= '0';
---             PCIncType <= "00";
---             -- CallorInt <= '0';
---             -- push <= '0';
---             -- pop <= '0';
---         ELSIF controller_opCode_in = "001" THEN --ALU instructions
---             hasImm <= '0';
---             writeEnable_reg <= '1';
---             writeEnable_mem <= '0';
---             ALUorMem <= '0';
---             -- predictor <= '0';
---             -- protect <= '0';
---             -- free <= '0';
---             -- isJZ <= '0';
---             -- isJMP <= '0';
---             -- flushIF_ID <= '0';
---             -- flushID_EX <= '0';
---             -- flushEX_MEM <= '0';
---             -- flushMEM_WB <= '0';
---             stall <= '0';
---             int <= '0';
---             isSwap <= '0';
---             PCIncType <= "00";
---             -- CallorInt <= '0';
---             -- push <= '0';
---             -- pop <= '0';
---             WITH ctr_fnNum_in SELECT ctr_flags_en <=
---                 "1111" WHEN "0010" | "0011" | "0110" | "0111",
---                 "1100" WHEN "0000" | "0001" | "1000" | "1001" | "1010" | "1011",
---                 "0000" WHEN OTHERS;
-
---         ELSIF controller_opCode_in = "010" THEN -- Immediate
---             hasImm <= '0';
---             writeEnable_reg <= '1';
---             writeEnable_mem <= '0';
---             ALUorMem <= '0';
---             -- predictor <= '0';
---             -- protect <= '0';
---             -- free <= '0';
---             -- isJZ <= '0';
---             -- isJMP <= '0';
---             -- flushIF_ID <= '0';
---             -- flushID_EX <= '0';
---             -- flushEX_MEM <= '0';
---             -- flushMEM_WB <= '0';
---             stall <= '0';
---             int <= '0';
---             isSwap <= '0';
---             PCIncType <= "00";
---             -- CallorInt <= '0';
---             -- push <= '
-
---             WITH ctr_fnNum_in SELECT ctr_flags_en <=
---                 "1111" WHEN "0000" | "0001",
---                 "0000" WHEN OTHERS;
-
---         END IF;
---     END IF;
--- END ARCHITECTURE controllerArch;
 architecture controllerArch2 of controller is
 
 begin
@@ -164,6 +60,7 @@ begin
         if rst = '1' then
             hasImm          <= '0';
             writeEnable_reg <= '0';
+            writeEnable_reg2<= '0';
             writeEnable_mem <= '0';
             ALUorMem        <= '0';
             -- predictor <= '0';
@@ -191,12 +88,17 @@ begin
             end case;
 
             case ctr_opCode_in & ctr_fnNum_in is
-                when "000----" | "0011011" | "0100011" | "0110001" | "011001-" | "011101-" | "100----" | "101----" | "110----" | "111----" =>
+                when "0011011" | "0100011" | "0110001" | "011001-" | "011101-" | "100----" | "101----" | "110----" | "111----" |"0000000" =>
                     writeEnable_reg <= '0';
                 when others =>
                     writeEnable_reg <= '1';
             end case;
-            
+            case ctr_opCode_in & ctr_fnNum_in is
+                when "0011111" =>
+                    writeEnable_reg2 <= '1';
+                when others =>
+                    writeEnable_reg2 <= '0';
+            end case;
             case ctr_opCode_in is
                 when "010" =>
                     writeEnable_mem <= '1';

@@ -18,6 +18,7 @@ ENTITY FD_Buffer IS
         Src1 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
         Src2 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
         dst : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+        dst2 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
         FnNum : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
         FD_isImm_out : OUT STD_LOGIC;
         FD_immediate_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
@@ -35,6 +36,7 @@ BEGIN
             Src1 <= (OTHERS => '0');
             Src2 <= (OTHERS => '0');
             dst <= (OTHERS => '0');
+            dst2 <= (OTHERS => '0');
             FnNum <= (OTHERS => '0');
 
       
@@ -42,6 +44,7 @@ BEGIN
             
             OpCode <= Intruction(15 DOWNTO 13);
             dst <= Intruction(12 DOWNTO 10); 
+            dst2 <= Intruction(9 DOWNTO 7);
             Src1 <= Intruction(9 DOWNTO 7);
             if FD_isImm_IN = '1' then
                 FD_immediate_out <= FD_immediate_in;

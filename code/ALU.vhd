@@ -8,6 +8,7 @@ entity ALU is
         ALUControl : in std_logic_vector(3 downto 0); -- Changed to 4 bits
 
         Result    : out std_logic_vector(31 downto 0);
+        Result_2  : out std_logic_vector(31 downto 0); -- Added for SWAP
         ALU_flags : out std_logic_vector(0 to 3)
     );
 end entity ALU;
@@ -34,8 +35,10 @@ begin
     std_logic_vector(0 - unsigned(A)) when "0001",
     --MOV
     A when "0100",
-    --SWAP NOT COMPLETED
+    --MOV B used in LDM Functionality
     B when "0101",
+
+    A when "1111", -- SWAP
     --AND
     A and B when "1000",
     --OR
@@ -54,7 +57,11 @@ begin
     std_logic_vector(signed(A) - signed(B)) when "1011",
     -- other operations...
     (others => '0') when others;
-
+    WITH ALUControl SELECT
+    Result_2 <=
+    B when "1111",
+    (others => '0') when others;
+    
     Carry <=
     '1' when (ALUControl = "0110" and A_sign = '1' and B_sign = '1') or -- ADD
     (ALUControl = "0010" and A_sign /= Result_sign) or                  -- INC
