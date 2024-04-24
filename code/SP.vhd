@@ -5,7 +5,7 @@ use IEEE.numeric_std.all;
 --stack pointer that starts from address 2^12-1 and decrements by 2
 entity SP is
     generic(
-        WIDTH: integer := 12
+        WIDTH: integer := 32
     );
     port(
     reset: in std_logic;
