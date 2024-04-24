@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity processor is
+entity Processor is
     port (
         clk       : in std_logic;
         reset, we : in std_logic;
@@ -12,9 +12,9 @@ entity processor is
         exception : out std_logic; -- exception signal
         OUT_PORT  : out std_logic_vector(7 downto 0)
     );
-end entity processor;
+end entity Processor;
 
-architecture processorArch of processor is
+architecture ProcessorArch of Processor is
 
     ------------------------------------COMPONENTS------------------------------------
     component PC is
@@ -693,4 +693,4 @@ begin
     -- end process;
     ----------------------------------END PROCESS----------------------------------
 
-end architecture processorArch;
+end architecture ProcessorArch;

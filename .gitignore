@@ -15,8 +15,10 @@ code/*.hdb
 code/*.sig
 code/*.kpt
 code/*.summary
-code/work
 code/transcript
-code/db
 code/simulation
 code/test
+code/db
+code/incremental_db
+code/output_files
+code/work

@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity WB_Buffer is
+entity MW_Buffer is
     port (
         clk, reset, WE : in std_logic;
         --ALU_COUT : in std_logic;
@@ -23,9 +23,9 @@ entity WB_Buffer is
         Dst_out      : out std_logic_vector(2 downto 0);
         Dst_out_2      : out std_logic_vector(2 downto 0)
     );
-end entity WB_Buffer;
+end entity MW_Buffer;
 
-architecture WB_Buffer_Arch of WB_Buffer is
+architecture MW_Buffer_Arch of MW_Buffer is
 begin
     process (clk, reset)
     begin
@@ -51,4 +51,4 @@ begin
             end if;
         end if;
     end process;
-end architecture WB_Buffer_Arch;
+end architecture MW_Buffer_Arch;

@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity controller is
+entity Controller is
     generic (
         INST_WIDTH : integer := 16
     );
@@ -48,8 +48,8 @@ entity controller is
         --pop : OUT STD_LOGIC;
 
     );
-end entity controller;
-architecture controllerArch2 of controller is
+end entity Controller;
+architecture ControllerArch2 of Controller is
 
 begin
     -- reset
@@ -184,4 +184,4 @@ begin
         end if;
 
     end process;
-end architecture controllerArch2;
+end architecture ControllerArch2;
