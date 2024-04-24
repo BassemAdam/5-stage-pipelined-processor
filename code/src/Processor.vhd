@@ -171,12 +171,12 @@ architecture ProcessorArch of Processor is
 
     component ALU is
         port (
-            A, B       : in std_logic_vector(31 downto 0);
-            ALUControl : in std_logic_vector(3 downto 0); -- Changed to 4 bits
+            A, B : in std_logic_vector(31 downto 0);
+            sel  : in std_logic_vector(3 downto 0); -- Changed to 4 bits
 
-            Result    : out std_logic_vector(31 downto 0);
-            Result_2  : out std_logic_vector(31 downto 0);
-            ALU_flags : out std_logic_vector(0 to 3)
+            Result1 : out std_logic_vector(31 downto 0);
+            Result2 : out std_logic_vector(31 downto 0); -- Added for SWAP
+            flags   : out std_logic_vector(0 to 3)
         );
     end component;
 
@@ -346,8 +346,8 @@ architecture ProcessorArch of Processor is
     --DE Buffer signals end
 
     --ALU signals
-    signal ALUResult   : std_logic_vector(31 downto 0);
-    signal ALUResult_2 : std_logic_vector(31 downto 0);
+    signal ALU_Result1 : std_logic_vector(31 downto 0);
+    signal ALU_Result2 : std_logic_vector(31 downto 0);
     signal ALU_flags   : std_logic_vector(0 to 3);
     --ALU signals end
 
@@ -531,13 +531,13 @@ begin
 
     -- map ALU with DE buffer
     alu1 : ALU port map(
-        A          => DE_Rsrc1_data_out,
-        B          => DE_Rsrc2_data_out,
-        ALUControl => DE_AluSelectors_out,
+        A   => DE_Rsrc1_data_out,
+        B   => DE_Rsrc2_data_out,
+        sel => DE_AluSelectors_out,
 
-        Result    => ALUResult,
-        Result_2  => ALUResult_2,
-        ALU_flags => ALU_flags
+        Result1 => ALU_Result1,
+        Result2 => ALU_Result2,
+        flags   => ALU_flags
     );
     -- map ALU with DE buffer end
 
@@ -548,8 +548,8 @@ begin
         WE                => we,
         Dst_in            => DE_dest_out,
         Dst_in_2          => DE_dest_out_2,
-        ALU_OutValue_in   => ALUResult,
-        ALU_OutValue_in_2 => ALUResult_2,
+        ALU_OutValue_in   => ALU_Result1,
+        ALU_OutValue_in_2 => ALU_Result2,
         EM_we_reg_in      => DE_we_reg_out,
         EM_we_reg_in_2    => DE_we_reg_out_2,
         EM_AluOrMem_in    => DE_AluOrMem_out,
