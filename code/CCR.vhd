@@ -32,12 +32,12 @@ begin
                 flags_out(1) <= flags_in(1);
             end if;
 
-            if flags_en(1) = '1' then
-                flags_out(1) <= flags_in(1);
+            if flags_en(2) = '1' then
+                flags_out(2) <= flags_in(2);
             end if;
 
-            if flags_en(1) = '1' then
-                flags_out(1) <= flags_in(1);
+            if flags_en(3) = '1' then
+                flags_out(3) <= flags_in(3);
             end if;
 
         end if;

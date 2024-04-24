@@ -1,5 +1,5 @@
-# the "vcom -refresh" comand should compile all files (Nouh)
-vcom -work work -2002 -refresh
+# the "project compileall" comand should compile all files (Nouh)
+project compileall
 # vcom -work work -2002 -explicit -stats=none processor.vhd
 vsim -gui work.processor
 # with the "mem load -infile <path in work dir> <memory instance>" comand we don't need the path from the C: dir (Nouh)
