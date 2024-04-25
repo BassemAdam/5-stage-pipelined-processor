@@ -149,12 +149,12 @@ architecture ProcessorArch of Processor is
 
     component ALU is
         port (
-            A, B : in std_logic_vector(31 downto 0);
-            sel  : in std_logic_vector(3 downto 0); -- Changed to 4 bits
+            A, B    : in std_logic_vector(31 downto 0);
+            ALU_sel : in std_logic_vector(3 downto 0); -- Changed to 4 bits
 
-            Result1 : out std_logic_vector(31 downto 0);
-            Result2 : out std_logic_vector(31 downto 0); -- Added for SWAP
-            flags   : out std_logic_vector(0 to 3)
+            ALU_Result1 : out std_logic_vector(31 downto 0);
+            ALU_Result2 : out std_logic_vector(31 downto 0); -- Added for SWAP
+            ALU_flags   : out std_logic_vector(0 to 3)
         );
     end component;
 
@@ -235,30 +235,30 @@ architecture ProcessorArch of Processor is
 
     component CCR is
         port (
-            clk, RES : in std_logic;
-            flags_in : in std_logic_vector (0 to 3);
-            flags_en : in std_logic_vector (0 to 3);
+            clk, RES     : in std_logic;
+            CCR_flags_in : in std_logic_vector (0 to 3);
+            CCR_flags_en : in std_logic_vector (0 to 3);
 
-            flags_out : out std_logic_vector (0 to 3)
+            CCR_flags_out : out std_logic_vector (0 to 3)
         );
     end component CCR;
 
     ------------------------------------COMPONENTS END-----------------------------------
 
     ------------------------------------SIGNALS------------------------------------
-    --PC signals
+    -- PC signals
     signal PC_en : std_logic;
     signal PC_PC : std_logic_vector(31 downto 0);
-    --PC signals end
+    -- PC signals end
 
-    --Instruction Cache signals
+    -- Instruction Cache signals
     signal IC_Inst        : std_logic_vector(15 downto 0);
     signal IC_Imm         : std_logic_vector(15 downto 0);
     signal IC_isImm       : std_logic;
     signal IC_correctedPC : std_logic_vector(31 downto 0);
-    --Instruction Cache signals end
+    -- Instruction Cache signals end
 
-    --FD Buffer signals
+    -- FD Buffer signals
     signal FD_OpCode : std_logic_vector(2 downto 0);
     signal FD_Rsrc1  : std_logic_vector(2 downto 0);
     signal FD_Rsrc2  : std_logic_vector(2 downto 0);
@@ -268,14 +268,14 @@ architecture ProcessorArch of Processor is
 
     signal FD_Imm_out   : std_logic_vector(15 downto 0);
     signal FD_isImm_out : std_logic;
-    --FD Buffer signals end
+    -- FD Buffer signals end
 
-    --Register File signals
+    -- Register File signals
     signal RF_Rdata1 : std_logic_vector(31 downto 0);
     signal RF_Rdata2 : std_logic_vector(31 downto 0);
-    --Register File signals end
+    -- Register File signals end
 
-    --DE Buffer signals
+    -- DE Buffer signals
     signal DE_ALUopd1 : std_logic_vector(31 downto 0);
     signal DE_ALUopd2 : std_logic_vector(31 downto 0);
 
@@ -286,15 +286,15 @@ architecture ProcessorArch of Processor is
     signal DE_Rdst1_out    : std_logic_vector(2 downto 0);
     signal DE_Rdst2_out    : std_logic_vector(2 downto 0);
     signal DE_ALUsel_out   : std_logic_vector(3 downto 0);
-    --DE Buffer signals end
+    -- DE Buffer signals end
 
-    --ALU signals
+    -- ALU signals
     signal ALU_Result1 : std_logic_vector(31 downto 0);
     signal ALU_Result2 : std_logic_vector(31 downto 0);
     signal ALU_flags   : std_logic_vector(0 to 3);
-    --ALU signals end
+    -- ALU signals end
 
-    --EM Buffer signals 
+    -- EM Buffer signals 
     signal EM_ALUorMem_out   : std_logic;
     signal EM_we1_reg_out    : std_logic;
     signal EM_we2_reg_out    : std_logic;
@@ -302,9 +302,9 @@ architecture ProcessorArch of Processor is
     signal EM_Rdst2_out      : std_logic_vector(2 downto 0);
     signal EM_ALUResult1_out : std_logic_vector(31 downto 0);
     signal EM_ALUResult2_out : std_logic_vector(31 downto 0);
-    --EM Buffer signals end
+    -- EM Buffer signals end
 
-    --MW Buffer signals
+    -- MW Buffer signals
     signal MW_value1 : std_logic_vector(31 downto 0);
     signal MW_value2 : std_logic_vector(31 downto 0);
 
@@ -312,11 +312,11 @@ architecture ProcessorArch of Processor is
     signal MW_we2_reg_out : std_logic;
     signal MW_Rdst1_out   : std_logic_vector(2 downto 0);
     signal MW_Rdst2_out   : std_logic_vector(2 downto 0);
-    --MW Buffer signals end
+    -- MW Buffer signals end
 
     -- CCR signals
     signal CCR_flags : std_logic_vector(3 downto 0);
-    --CCR signals end
+    -- CCR signals end
 
     -- Controller Signals (most of the are not connected)
     signal ctr_hasImm   : std_logic;
@@ -326,7 +326,7 @@ architecture ProcessorArch of Processor is
     signal ctr_we2_reg  : std_logic;
     signal ctr_we_mem   : std_logic;
     signal ctr_ALUorMem : std_logic;
-    --Controller signals end
+    -- Controller signals end
 
     ------------------------------------SIGNALS END-----------------------------------
 
@@ -351,7 +351,7 @@ begin
     );
     -- map PC end
 
-    -- map instruction cache with pc
+    -- map instruction cache
     instrCache1 : InstrCache port map(
         clk   => clk,
         RES   => reset,
@@ -363,9 +363,9 @@ begin
         IC_correctedPC => IC_correctedPC
 
     );
-    -- map instruction cache with pc end
+    -- map instruction cacheend
 
-    -- map FD buffer with instruction cache
+    -- map FD buffer
     fdBuffer1 : FD_Buffer port map(
         clk     => clk,
         RES     => reset,
@@ -386,9 +386,9 @@ begin
         FD_isImm_out => FD_isImm_out,
         FD_Imm_out   => FD_Imm_out
     );
-    -- map FD buffer with instruction cache end
+    -- map FD buffer end
 
-    -- map RegistersFiles with FD buffer
+    -- map RegistersFiles
     Regfile : RegisterFile port map(
         clk => clk,
         RES => reset,
@@ -406,9 +406,9 @@ begin
         RF_Rdata1 => RF_Rdata1,
         RF_Rdata2 => RF_Rdata2
     );
-    -- map RegistersFiles with FD buffer end
+    -- map RegistersFiles end
 
-    -- map DE buffer with RegistersFiles & Controller
+    -- map DE buffer
     deBuffer1 : DE_Buffer port map(
         clk          => clk,
         RES          => reset,
@@ -438,21 +438,21 @@ begin
         DE_Rdst2_out    => DE_Rdst2_out,
         DE_ALUsel_out   => DE_ALUsel_out
     );
-    -- map DE buffer with RegistersFiles & Controller end
+    -- map DE buffer end
 
-    -- map ALU with DE buffer
+    -- map ALU
     alu1 : ALU port map(
-        A   => DE_ALUopd1,
-        B   => DE_ALUopd2,
-        sel => DE_ALUsel_out,
+        A       => DE_ALUopd1,
+        B       => DE_ALUopd2,
+        ALU_sel => DE_ALUsel_out,
 
-        Result1 => ALU_Result1,
-        Result2 => ALU_Result2,
-        flags   => ALU_flags
+        ALU_Result1 => ALU_Result1,
+        ALU_Result2 => ALU_Result2,
+        ALU_flags   => ALU_flags
     );
-    -- map ALU with DE buffer end
+    -- map ALU end
 
-    -- map EM buffer with ALU
+    -- map EM buffer
     emBuffer1 : EM_Buffer port map(
         clk => clk,
         RES => reset,
@@ -475,9 +475,9 @@ begin
         EM_ALUResult1_out => EM_ALUResult1_out,
         EM_ALUResult2_out => EM_ALUResult2_out
     );
-    -- map EM buffer with ALU end
+    -- map EM buffer end
 
-    -- map MW buffer with DataMemory
+    -- map MW buffer
     MW_Buffer1 : MW_Buffer port map(
         clk           => clk,
         RES           => reset,
@@ -501,7 +501,7 @@ begin
         MW_Rdst1_out   => MW_Rdst1_out,
         MW_Rdst2_out   => MW_Rdst2_out
     );
-    -- map MW buffer with DataMemory end
+    -- map MW buffer end
 
     -- map controller 
     Ctrl : controller generic map(16)
@@ -523,12 +523,12 @@ begin
 
     -- map CCR
     CCR1 : CCR port map(
-        clk      => clk,
-        RES      => reset,
-        flags_in => ALU_flags,
-        flags_en => DE_flags_en_out,
+        clk          => clk,
+        RES          => reset,
+        CCR_flags_in => ALU_flags,
+        CCR_flags_en => DE_flags_en_out,
 
-        flags_out => CCR_flags
+        CCR_flags_out => CCR_flags
     );
     -- map CCR end
 

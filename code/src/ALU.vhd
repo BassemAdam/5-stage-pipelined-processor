@@ -4,12 +4,12 @@ use IEEE.numeric_std.all;
 
 entity ALU is
     port (
-        A, B : in std_logic_vector(31 downto 0);
-        sel  : in std_logic_vector(3 downto 0); -- Changed to 4 bits
+        A, B    : in std_logic_vector(31 downto 0);
+        ALU_sel : in std_logic_vector(3 downto 0); -- Changed to 4 bits
 
-        Result1 : out std_logic_vector(31 downto 0);
-        Result2 : out std_logic_vector(31 downto 0); -- Added for SWAP
-        flags   : out std_logic_vector(0 to 3)
+        ALU_Result1 : out std_logic_vector(31 downto 0);
+        ALU_Result2 : out std_logic_vector(31 downto 0); -- Added for SWAP
+        ALU_flags   : out std_logic_vector(0 to 3)
     );
 end entity ALU;
 
@@ -28,7 +28,7 @@ begin
     A_sign      <= A(31);
     B_sign      <= B(31);
     Result_sign <= temp(31);
-    with sel select
+    with ALU_sel select
         temp <=
         not A when "0000",                             -- NOT
         std_logic_vector(0 - unsigned(A)) when "0001", -- NEG
@@ -47,8 +47,8 @@ begin
         -- other operations...
         (others => '0') when others;
 
-    with sel select
-        Result2 <=
+    with ALU_sel select
+        ALU_Result2 <=
         B when "1111",
         (others => '0') when others;
 
@@ -56,7 +56,7 @@ begin
         '1' when temp = std_logic_vector(to_signed(0, temp'length)) else
         '0';
 
-    with sel select
+    with ALU_sel select
         Carry <=
         (not temp(31) and (A(31))) when "0010",                                            -- INC
         (not A(31) and (temp(31))) when "0011",                                            -- DEC
@@ -64,31 +64,31 @@ begin
         (not A(31) and (temp(31) or B(31))) or (A(31) and temp(31) and B(31)) when "0111", -- SUB
         '0' when others;
     -- Carry <=
-    --     '1' when (sel = "0110" and A_sign = '1' and B_sign = '1') or -- ADD
-    --     (sel = "0010" and A_sign /= Result_sign) or                  -- INC
-    --     (sel = "0011" and A = X"00000000") or                        -- DEC
-    --     (sel = "0111" and signed(A) > signed(B)) else                -- SUB
+    --     '1' when (ALU_sel = "0110" and A_sign = '1' and B_sign = '1') or -- ADD
+    --     (ALU_sel = "0010" and A_sign /= Result_sign) or                  -- INC
+    --     (ALU_sel = "0011" and A = X"00000000") or                        -- DEC
+    --     (ALU_sel = "0111" and signed(A) > signed(B)) else                -- SUB
     --     '0';
 
     Negative <= Result_sign;
 
-    with sel select
+    with ALU_sel select
         Overflow <=
         (A(31) xnor '0') and (temp(31) xor A(31)) when "0010" | "0011",  -- INC, DEC
         (A(31) xnor B(31)) and (temp(31) xor A(31))when "0110" | "0111", -- ADD, SUB
         '0' when others;
     -- Overflow <=
-    --     '1' when (sel = "0010" and A_sign /= Result_sign) or              -- INC
-    --     (sel = "0011" and A_sign /= Result_sign) or                       -- DEC
-    --     (sel = "0110" and A_sign = B_sign and A_sign /= Result_sign) or   -- ADD
-    --     (sel = "0111" and A_sign /= B_sign and B_sign = Result_sign) or   -- SUB
-    --     (sel = "1011" and A_sign /= B_sign and A_sign = Result_sign) else -- CMP
+    --     '1' when (ALU_sel = "0010" and A_sign /= Result_sign) or              -- INC
+    --     (ALU_sel = "0011" and A_sign /= Result_sign) or                       -- DEC
+    --     (ALU_sel = "0110" and A_sign = B_sign and A_sign /= Result_sign) or   -- ADD
+    --     (ALU_sel = "0111" and A_sign /= B_sign and B_sign = Result_sign) or   -- SUB
+    --     (ALU_sel = "1011" and A_sign /= B_sign and A_sign = Result_sign) else -- CMP
     --     '0';
 
-    flags(0) <= Zero;
-    flags(1) <= Negative;
-    flags(2) <= Carry;
-    flags(3) <= Overflow;
-    Result1  <= temp;
+    ALU_flags(0) <= Zero;
+    ALU_flags(1) <= Negative;
+    ALU_flags(2) <= Carry;
+    ALU_flags(3) <= Overflow;
+    ALU_Result1  <= temp;
 
 end architecture ALUArch;
