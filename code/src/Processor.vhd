@@ -80,15 +80,20 @@ architecture ProcessorArch of Processor is
             n : integer := 32
         );
         port (
-            clk, rst                     : in std_logic;
-            Rsrc1_address, Rsrc2_address : in std_logic_vector(w - 1 downto 0);
-            Rdest                        : in std_logic_vector(w - 1 downto 0);
-            Rdest_2                      : in std_logic_vector(w - 1 downto 0);
-            WBdata                       : in std_logic_vector(n - 1 downto 0);
-            WBdata_2                     : in std_logic_vector(n - 1 downto 0);
-            writeEnable                  : in std_logic;
-            writeEnable_2                : in std_logic;
-            Rsrc1_data, Rsrc2_data       : out std_logic_vector(n - 1 downto 0)
+            clk, RES : in std_logic;
+
+            RE_we1    : in std_logic;
+            RF_we2    : in std_logic;
+            RF_Rdst1  : in std_logic_vector(w - 1 downto 0);
+            RF_Rdst2  : in std_logic_vector(w - 1 downto 0);
+            RF_Wdata1 : in std_logic_vector(n - 1 downto 0);
+            RF_Wdata2 : in std_logic_vector(n - 1 downto 0);
+
+            RF_Rsrc1 : in std_logic_vector(w - 1 downto 0);
+            RF_Rsrc2 : in std_logic_vector(w - 1 downto 0);
+
+            RF_Rdata1 : out std_logic_vector(n - 1 downto 0);
+            RF_Rdata2 : out std_logic_vector(n - 1 downto 0)
         );
     end component;
 
@@ -268,8 +273,8 @@ architecture ProcessorArch of Processor is
     --FD Buffer signals end
 
     --Register File signals
-    signal Rsrc1_data_Out : std_logic_vector(31 downto 0);
-    signal Rsrc2_data_Out : std_logic_vector(31 downto 0);
+    signal RF_Rdata1 : std_logic_vector(31 downto 0);
+    signal RF_Rdata2 : std_logic_vector(31 downto 0);
     --Register File signals end
 
     --DE Buffer signals
@@ -385,19 +390,22 @@ begin
     -- map FD buffer with instruction cache end
 
     -- map RegistersFiles with FD buffer
-    registerFile1 : RegisterFile port map(
-        clk           => clk,
-        rst           => reset,
-        Rsrc1_address => FD_Rsrc1,
-        Rsrc2_address => FD_Rsrc2,
-        Rdest         => MW_Rdst1_out,
-        Rdest_2       => MW_Rdst2_out,
-        WBdata        => MW_value1,
-        WBdata_2      => MW_value2,
-        writeEnable   => MW_we1_reg_out,
-        writeEnable_2 => MW_we2_reg_out,
-        Rsrc1_data    => Rsrc1_data_Out,
-        Rsrc2_data    => Rsrc2_data_Out
+    Regfile : RegisterFile port map(
+        clk => clk,
+        RES => reset,
+
+        RE_we1    => MW_we1_reg_out,
+        RF_we2    => MW_we2_reg_out,
+        RF_Rdst1  => MW_Rdst1_out,
+        RF_Rdst2  => MW_Rdst2_out,
+        RF_Wdata1 => MW_value1,
+        RF_Wdata2 => MW_value2,
+
+        RF_Rsrc1 => FD_Rsrc1,
+        RF_Rsrc2 => FD_Rsrc2,
+
+        RF_Rdata1 => RF_Rdata1,
+        RF_Rdata2 => RF_Rdata2
     );
     -- map RegistersFiles with FD buffer end
 
@@ -406,8 +414,8 @@ begin
         clk          => clk,
         RES          => reset,
         WE           => we,
-        DE_Rsrc1_Val => Rsrc1_data_Out,
-        DE_Rsrc2_Val => Rsrc2_data_Out,
+        DE_Rsrc1_Val => RF_Rdata1,
+        DE_Rsrc2_Val => RF_Rdata2,
         DE_Imm       => FD_Imm_out,
         DE_isImm     => FD_isImm_out,
 

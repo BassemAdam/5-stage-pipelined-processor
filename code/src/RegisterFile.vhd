@@ -1,46 +1,51 @@
-LIBRARY IEEE;
-USE IEEE.STD_LOGIC_1164.ALL;
-USE IEEE.numeric_std.ALL;
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.numeric_std.all;
 
-ENTITY RegisterFile IS
-    GENERIC (
-        w : INTEGER := 3;
-        n : INTEGER := 32
+entity RegisterFile is
+    generic (
+        w : integer := 3;
+        n : integer := 32
     );
-    PORT (
-        clk, rst : IN STD_LOGIC;
-        Rsrc1_address, Rsrc2_address : IN STD_LOGIC_VECTOR(w - 1 DOWNTO 0);
-        Rdest : IN STD_LOGIC_VECTOR(w - 1 DOWNTO 0);
-        Rdest_2 : IN STD_LOGIC_VECTOR(w - 1 DOWNTO 0);
-        WBdata : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
-        WBdata_2 : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
-        writeEnable : IN STD_LOGIC;
-        writeEnable_2 : IN STD_LOGIC;
-        Rsrc1_data, Rsrc2_data : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
+    port (
+        clk, RES : in std_logic;
+
+        RE_we1    : in std_logic;
+        RF_we2    : in std_logic;
+        RF_Rdst1   : in std_logic_vector(w - 1 downto 0);
+        RF_Rdst2   : in std_logic_vector(w - 1 downto 0);
+        RF_Wdata1 : in std_logic_vector(n - 1 downto 0);
+        RF_Wdata2 : in std_logic_vector(n - 1 downto 0);
+
+        RF_Rsrc1 : in std_logic_vector(w - 1 downto 0);
+        RF_Rsrc2 : in std_logic_vector(w - 1 downto 0);
+
+        RF_Rdata1 : out std_logic_vector(n - 1 downto 0);
+        RF_Rdata2 : out std_logic_vector(n - 1 downto 0)
     );
-END ENTITY RegisterFile;
+end entity RegisterFile;
 
-ARCHITECTURE Behavioral OF RegisterFile IS
-    TYPE register_array IS ARRAY (0 TO 2 ** w - 1) OF STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
-    SIGNAL q_registers : register_array;
+architecture Behavioral of RegisterFile is
+    type register_array is array (0 to 2 ** w - 1) of std_logic_vector(n - 1 downto 0);
+    signal q_registers : register_array;
 
-BEGIN
+begin
 
-    PROCESS (clk, rst)
-    BEGIN
-        IF rst = '1' THEN
-            q_registers <= (OTHERS => (OTHERS => '0'));
-        ELSIF rising_edge(clk) THEN
-            IF writeEnable = '1' THEN
-                q_registers(TO_INTEGER(unsigned(Rdest))) <= WBdata;
-            END IF;
-            IF writeEnable_2 = '1' THEN
-                q_registers(TO_INTEGER(unsigned(Rdest_2))) <= WBdata_2;
-            END IF;
-        END IF;
-    END PROCESS;
+    process (clk, RES)
+    begin
+        if RES = '1' then
+            q_registers <= (others => (others => '0'));
+        elsif rising_edge(clk) then
+            if RE_we1 = '1' then
+                q_registers(TO_INTEGER(unsigned(RF_Rdst1))) <= RF_Wdata1;
+            end if;
+            if RF_we2 = '1' then
+                q_registers(TO_INTEGER(unsigned(RF_Rdst2))) <= RF_Wdata2;
+            end if;
+        end if;
+    end process;
 
-    Rsrc1_data <= q_registers(TO_INTEGER(unsigned(Rsrc1_address)));
-    Rsrc2_data <= q_registers(TO_INTEGER(unsigned(Rsrc2_address)));
+    RF_Rdata1 <= q_registers(TO_INTEGER(unsigned(RF_Rsrc1)));
+    RF_Rdata2 <= q_registers(TO_INTEGER(unsigned(RF_Rsrc2)));
 
-END ARCHITECTURE Behavioral;
+end architecture Behavioral;
