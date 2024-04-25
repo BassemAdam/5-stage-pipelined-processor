@@ -97,46 +97,20 @@ architecture ProcessorArch of Processor is
             INST_WIDTH : integer := 16
         );
         port (
-            clk           : in std_logic;
-            rst           : in std_logic;
-            ctr_opCode_in : in std_logic_vector(2 downto 0);
-            ctr_Rdest_in  : in std_logic_vector(2 downto 0);
-            ctr_Rdest2_in : in std_logic_vector(2 downto 0);
-            ctr_Rsrc1_in  : in std_logic_vector(2 downto 0);
-            ctr_Rsrc2_in  : in std_logic_vector(2 downto 0);
-            ctr_fnNum_in  : in std_logic_vector(3 downto 0);
+            clk        : in std_logic;
+            RES        : in std_logic;
+            ctr_opCode : in std_logic_vector(2 downto 0);
+            ctr_Func   : in std_logic_vector(3 downto 0);
 
-            ctr_opCode_out   : out std_logic_vector(2 downto 0);
-            ctr_fnNum_out    : out std_logic_vector(3 downto 0);
-            ctr_Rsrc1_out    : out std_logic_vector(2 downto 0);
-            ctr_Rsrc2_out    : out std_logic_vector(2 downto 0);
-            ctr_Rdest_out    : out std_logic_vector(2 downto 0);
-            ctr_Rdest2_out   : out std_logic_vector(2 downto 0);
-            hasImm           : out std_logic;
-            writeEnable_reg  : out std_logic;
-            writeEnable_reg2 : out std_logic;
-            writeEnable_mem  : out std_logic;
-            ALUorMem         : out std_logic;
-            --predictor: OUT STD_LOGIC;
-            --protect: OUT STD_LOGIC;
-            --free: OUT STD_LOGIC;
-            --isJZ : OUT STD_LOGIC;
-            --isJMP : OUT STD_LOGIC;
-            --flushIF_ID : OUT STD_LOGIC;
-            --flushID_EX : OUT STD_LOGIC;
-            --flushEX_MEM : OUT STD_LOGIC;
-            --flushMEM_WB : OUT STD_LOGIC;
-            stall        : out std_logic;
-            int          : out std_logic;
-            isSwap       : out std_logic;
+            ctr_hasImm   : out std_logic;
+            ctr_ALUsel   : out std_logic_vector(3 downto 0);
             ctr_flags_en : out std_logic_vector(0 to 3);
-            ctr_ALU_sel  : out std_logic_vector(3 downto 0);
-            PCIncType    : out std_logic_vector(1 downto 0)
-            --CallorInt : OUT STD_LOGIC;
+            ctr_we1_reg  : out std_logic;
+            ctr_we2_reg  : out std_logic;
+            ctr_we_mem   : out std_logic;
+            ctr_ALUorMem : out std_logic
 
-            --push : OUT STD_LOGIC;
-            --pop : OUT STD_LOGIC;
-
+            -- Passing through should be none its not a buffer
         );
     end component controller;
 
@@ -270,7 +244,8 @@ architecture ProcessorArch of Processor is
 
     ------------------------------------SIGNALS------------------------------------
     --PC signals
-    signal Ipc_out : std_logic_vector(31 downto 0);
+    signal PC_Enable : std_logic;
+    signal Ipc_out   : std_logic_vector(31 downto 0);
     --PC signals end
 
     --Instruction Cache signals
@@ -303,6 +278,7 @@ architecture ProcessorArch of Processor is
 
     signal DE_we1_reg_out  : std_logic;
     signal DE_we2_reg_out  : std_logic;
+    signal DE_ALUorMem_out : std_logic;
     signal DE_flags_en_out : std_logic_vector (0 to 3);
     signal DE_Rdst1_out    : std_logic_vector(2 downto 0);
     signal DE_Rdst2_out    : std_logic_vector(2 downto 0);
@@ -316,12 +292,13 @@ architecture ProcessorArch of Processor is
     --ALU signals end
 
     --EM Buffer signals 
+    signal EM_ALUorMem_out   : std_logic;
     signal EM_we1_reg_out    : std_logic;
     signal EM_we2_reg_out    : std_logic;
-    signal EM_ALUResult1_out : std_logic_vector(31 downto 0);
-    signal EM_ALUResult2_out : std_logic_vector(31 downto 0);
     signal EM_Rdst1_out      : std_logic_vector(2 downto 0);
     signal EM_Rdst2_out      : std_logic_vector(2 downto 0);
+    signal EM_ALUResult1_out : std_logic_vector(31 downto 0);
+    signal EM_ALUResult2_out : std_logic_vector(31 downto 0);
     --EM Buffer signals end
 
     --MW Buffer signals
@@ -338,51 +315,14 @@ architecture ProcessorArch of Processor is
     signal CCR_flags : std_logic_vector(3 downto 0);
     --CCR signals end
 
-    --SP signals
-    --     SIGNAL pointer : STD_LOGIC_VECTOR(11 DOWNTO 0);
-    --     SIGNAL push : STD_LOGIC;
-    --     SIGNAL pop : STD_LOGIC;
-    --SP signals end
-
-    --Controller signals
-    signal Cont_instruction_In : std_logic_vector(15 downto 0);
-    signal Rsrc1               : std_logic_vector(2 downto 0);
-    signal Rsrc2               : std_logic_vector(2 downto 0);
-    signal Rdest               : std_logic_vector(2 downto 0);
-    signal Rdest_2             : std_logic_vector(2 downto 0);
-    -- signal ALU_Selectors       : std_logic_vector(6 downto 0);
-    signal PC_Enable : std_logic;
-    signal isBranch  : std_logic;
-    --     --Versatile signals that still not well implemented just added it here to avoid errors from component until we figure out the whole design
-    -- SIGNAL branchEnable : STD_LOGIC;
-
-    signal pcBranchIn  : std_logic_vector(31 downto 0);
-    signal IWBdata_Out : std_logic_vector(31 downto 0);
-    --     SIGNAL writeEnable : STD_LOGIC;
-    --     SIGNAL hasImm : STD_LOGIC;
-
     -- Controller Signals (most of the are not connected)
-    signal ctr_opCode_out        : std_logic_vector(2 downto 0);
-    signal ctr_fnNum_out         : std_logic_vector(3 downto 0);
-    signal ctr_Rsrc1_out         : std_logic_vector(2 downto 0);
-    signal ctr_Rsrc2_out         : std_logic_vector(2 downto 0);
-    signal ctr_Rdest_out         : std_logic_vector(2 downto 0);
-    signal ctr_Rdest_out_2       : std_logic_vector(2 downto 0);
-    signal ctr_hasImm            : std_logic;
-    signal ctr_writeEnable_reg   : std_logic;
-    signal ctr_writeEnable_reg_2 : std_logic;
-    signal ctr_writeEnable_mem   : std_logic;
-
-    signal ctr_ALUorMem    : std_logic;
-    signal DE_ALUorMem_out : std_logic;
-    signal EM_ALUorMem_out : std_logic;
-
-    signal ctr_stall     : std_logic;
-    signal ctr_int       : std_logic;
-    signal ctr_isSwap    : std_logic;
-    signal ctr_flags_en  : std_logic_vector(0 to 3);
-    signal ctr_ALU_sel   : std_logic_vector(3 downto 0);
-    signal ctr_PCIncType : std_logic_vector(1 downto 0);
+    signal ctr_hasImm   : std_logic;
+    signal ctr_ALUsel   : std_logic_vector(3 downto 0);
+    signal ctr_flags_en : std_logic_vector(0 to 3);
+    signal ctr_we1_reg  : std_logic;
+    signal ctr_we2_reg  : std_logic;
+    signal ctr_we_mem   : std_logic;
+    signal ctr_ALUorMem : std_logic;
     --Controller signals end
 
     ------------------------------------SIGNALS END-----------------------------------
@@ -395,11 +335,11 @@ begin
     pc1 : PC port map(
         clk => clk,
         --from control signals 
-        RES      => reset,
-        branch   => isBranch,
-        enable   => PC_Enable,
-        pcBranch => pcBranchIn,
-        pc       => Ipc_out,
+        RES    => reset,
+        branch => '0',
+        enable => PC_Enable,
+        pcBranch => (others => '0'),
+        pc     => Ipc_out,
 
         --from instruction cache
         isImmFromInstr => InsCache_IsImmediate_out,
@@ -475,13 +415,13 @@ begin
         DE_ALUopd2 => DE_ALUopd2,
 
         -- Passing through
-        DE_we1_reg_in  => ctr_writeEnable_reg,
-        DE_we2_reg_in  => ctr_writeEnable_reg_2,
+        DE_we1_reg_in  => ctr_we1_reg,
+        DE_we2_reg_in  => ctr_we2_reg,
         DE_ALUorMem_in => ctr_ALUorMem,
         DE_flags_en_in => ctr_flags_en,
         DE_Rdst1_in    => FD_Rdst1,
         DE_Rdst2_in    => FD_Rdst2,
-        DE_ALUsel_in   => ctr_ALU_sel,
+        DE_ALUsel_in   => ctr_ALUsel,
 
         DE_we1_reg_out  => DE_we1_reg_out,
         DE_we2_reg_out  => DE_we2_reg_out,
@@ -559,46 +499,18 @@ begin
     -- map controller 
     Ctrl : controller generic map(16)
     port map(
-        clk           => clk,
-        rst           => reset,
-        ctr_opCode_in => FD_OpCode,
-        ctr_Rdest_in  => FD_Rdst1,
-        ctr_Rdest2_in => FD_Rdst2,
-        ctr_Rsrc1_in  => FD_Rsrc1,
-        ctr_Rsrc2_in  => FD_Rsrc2,
-        ctr_fnNum_in  => FD_Func,
+        clk        => clk,
+        RES        => reset,
+        ctr_opCode => FD_OpCode,
+        ctr_Func   => FD_Func,
 
-        ctr_opCode_out   => ctr_opCode_out,
-        ctr_fnNum_out    => ctr_fnNum_out,
-        ctr_Rsrc1_out    => ctr_Rsrc1_out,
-        ctr_Rsrc2_out    => ctr_Rsrc2_out,
-        ctr_Rdest_out    => ctr_Rdest_out,
-        ctr_Rdest2_out   => ctr_Rdest_out_2,
-        hasImm           => ctr_hasImm,
-        writeEnable_reg  => ctr_writeEnable_reg,
-        writeEnable_reg2 => ctr_writeEnable_reg_2,
-        writeEnable_mem  => ctr_writeEnable_mem,
-        ALUorMem         => ctr_ALUorMem,
-        --predictor: OUT STD_LOGIC;
-        --protect: OUT STD_LOGIC;
-        --free: OUT STD_LOGIC;
-        --isJZ : OUT STD_LOGIC;
-        --isJMP : OUT STD_LOGIC;
-        --flushIF_ID : OUT STD_LOGIC;
-        --flushID_EX : OUT STD_LOGIC;
-        --flushEX_MEM : OUT STD_LOGIC;
-        --flushMEM_WB : OUT STD_LOGIC;
-        stall        => ctr_stall,
-        int          => ctr_int,
-        isSwap       => ctr_isSwap,
+        ctr_hasImm   => ctr_hasImm,
+        ctr_ALUsel   => ctr_ALUsel,
         ctr_flags_en => ctr_flags_en,
-        ctr_ALU_sel  => ctr_ALU_sel,
-        PCIncType    => ctr_PCIncType
-        --CallorInt : OUT STD_LOGIC;
-
-        --push : OUT STD_LOGIC;
-        --pop : OUT STD_LOGIC;
-
+        ctr_we1_reg  => ctr_we1_reg,
+        ctr_we2_reg  => ctr_we2_reg,
+        ctr_we_mem   => ctr_we_mem,
+        ctr_ALUorMem => ctr_ALUorMem
     );
     -- map controller end
 
@@ -613,27 +525,6 @@ begin
     );
     -- map CCR end
 
-    --Trash
-    -- map SP
-    --  sp1 : SP PORT MAP(
-    --     reset => reset,
-    --     push => push,
-    --     pop => pop,
-    --     pointer => pointer
-    -- );
-
-    -- -- map DataMemory with EM buffer
-    -- dataMemory1 : DataMemory PORT MAP(
-    --     rst => reset,
-    --     clk => clk,
-    --     memWrite => we,
-    --     memRead => we,
-    --     writeAddress => Rsrc1_data,
-    --     readAddress => Rsrc2_data,
-    --     writeData => ALUResult,
-    --     readData => WBdata
-    -- );
-    --Trash end
     ------------------------------------PORTS END----------------------------------
     ------------------------------------PROCESS------------------------------------
     -- i added those because we will need them later and for test cases

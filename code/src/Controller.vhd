@@ -7,154 +7,71 @@ entity Controller is
         INST_WIDTH : integer := 16
     );
     port (
-        clk           : in std_logic;
-        rst           : in std_logic;
-        ctr_opCode_in : in std_logic_vector(2 downto 0);
-        ctr_Rdest_in  : in std_logic_vector(2 downto 0);
-        ctr_Rdest2_in : in std_logic_vector(2 downto 0);
-        ctr_Rsrc1_in  : in std_logic_vector(2 downto 0);
-        ctr_Rsrc2_in  : in std_logic_vector(2 downto 0);
-        ctr_fnNum_in  : in std_logic_vector(3 downto 0);
+        clk        : in std_logic;
+        RES        : in std_logic;
+        ctr_opCode : in std_logic_vector(2 downto 0);
+        ctr_Func   : in std_logic_vector(3 downto 0);
 
-        ctr_opCode_out  : out std_logic_vector(2 downto 0);
-        ctr_fnNum_out   : out std_logic_vector(3 downto 0);
-        ctr_Rsrc1_out   : out std_logic_vector(2 downto 0);
-        ctr_Rsrc2_out   : out std_logic_vector(2 downto 0);
-        ctr_Rdest_out   : out std_logic_vector(2 downto 0);
-        ctr_Rdest2_out  : out std_logic_vector(2 downto 0);
-        hasImm          : out std_logic;
-        writeEnable_reg : out std_logic;
-        writeEnable_reg2: out std_logic;
-        writeEnable_mem : out std_logic;
-        ALUorMem        : out std_logic;
-        --predictor: OUT STD_LOGIC;
-        --protect: OUT STD_LOGIC;
-        --free: OUT STD_LOGIC;
-        --isJZ : OUT STD_LOGIC;
-        --isJMP : OUT STD_LOGIC;
-        --flushIF_ID : OUT STD_LOGIC;
-        --flushID_EX : OUT STD_LOGIC;
-        --flushEX_MEM : OUT STD_LOGIC;
-        --flushMEM_WB : OUT STD_LOGIC;
-        stall        : out std_logic;
-        int          : out std_logic;
-        isSwap       : out std_logic;
+        ctr_hasImm   : out std_logic;
+        ctr_ALUsel   : out std_logic_vector(3 downto 0);
         ctr_flags_en : out std_logic_vector(0 to 3);
-        ctr_ALU_sel  : out std_logic_vector(3 downto 0);
-        PCIncType    : out std_logic_vector(1 downto 0)
-        --CallorInt : OUT STD_LOGIC;
+        ctr_we1_reg  : out std_logic;
+        ctr_we2_reg  : out std_logic;
+        ctr_we_mem   : out std_logic;
+        ctr_ALUorMem : out std_logic
 
-        --push : OUT STD_LOGIC;
-        --pop : OUT STD_LOGIC;
-
+        -- Passing through should be none its not a buffer
     );
 end entity Controller;
+
 architecture ControllerArch2 of Controller is
 
 begin
-    -- reset
-    ctr_opCode_out <= (others => '0') when rst = '1' else
-    ctr_opCode_in;
-    process (ctr_opCode_in, ctr_fnNum_in, rst)
+    process (ctr_opCode, ctr_Func, RES)
     begin
-        if rst = '1' then
-            hasImm          <= '0';
-            writeEnable_reg <= '0';
-            writeEnable_reg2<= '0';
-            writeEnable_mem <= '0';
-            ALUorMem        <= '0';
-            -- predictor <= '0';
-            -- protect <= '0';
-            -- free <= '0';
-            -- isJZ <= '0';
-            -- isJMP <= '0';
-            -- flushIF_ID <= '0';
-            -- flushID_EX <= '0';
-            -- flushEX_MEM <= '0';
-            -- flushMEM_WB <= '0';
-            stall     <= '0';
-            int       <= '0';
-            isSwap    <= '0';
-            PCIncType <= (others => '0');
-            -- CallorInt <= '0';
-            -- push <= '0';
-            -- pop <= '0';
-            else
-            case ctr_opCode_in is
+        if RES = '1' then
+            ctr_hasImm   <= '0';
+            ctr_we1_reg  <= '0';
+            ctr_we2_reg  <= '0';
+            ctr_we_mem   <= '0';
+            ctr_ALUorMem <= '0';
+
+        else
+            case ctr_opCode is
                 when "010" =>
-                    hasImm <= '1';
+                    ctr_hasImm <= '1';
                 when others =>
-                    hasImm <= '0';
+                    ctr_hasImm <= '0';
             end case;
 
-            case ctr_opCode_in & ctr_fnNum_in is
+            case ctr_opCode & ctr_Func is
                 when "0011011" | "0100011" | "0110001" | "011001-" | "011101-" | "100----" | "101----" | "110----" | "111----" |"0000000" =>
-                    writeEnable_reg <= '0';
+                    ctr_we1_reg <= '0';
                 when others =>
-                    writeEnable_reg <= '1';
+                    ctr_we1_reg <= '1';
             end case;
-            case ctr_opCode_in & ctr_fnNum_in is
+            case ctr_opCode & ctr_Func is
                 when "0011111" =>
-                    writeEnable_reg2 <= '1';
+                    ctr_we2_reg <= '1';
                 when others =>
-                    writeEnable_reg2 <= '0';
+                    ctr_we2_reg <= '0';
             end case;
-            case ctr_opCode_in is
+            case ctr_opCode is
                 when "010" =>
-                    writeEnable_mem <= '1';
+                    ctr_we_mem <= '1';
                 when others =>
-                    writeEnable_mem <= '0';
+                    ctr_we_mem <= '0';
             end case;
 
-            case ctr_opCode_in & ctr_fnNum_in is
-                when "0101100" =>   -- LDD
-                    ALUorMem <= '1';
+            case ctr_opCode & ctr_Func is
+                when "0101100" => -- LDD
+                    ctr_ALUorMem <= '1';
                 when others =>
-                    ALUorMem <= '0';
+                    ctr_ALUorMem <= '0';
             end case;
 
-            case ctr_opCode_in & ctr_fnNum_in is
-                when "0100101" =>
-                    stall <= '1';
-                when others =>
-                    stall <= '0';
-            end case;
-            -- WITH ctr_opCode_in SELECT hasImm <=
-            --     '1' WHEN "010",
-            --     '0' WHEN OTHERS;
-
-            -- WITH ctr_opCode_in SELECT writeEnable_reg <=
-            --     '0' WHEN "000",
-            --     '1' WHEN OTHERS;
-
-            -- WITH ctr_opCode_in SELECT writeEnable_mem <=
-            --     '1' WHEN "010",
-            --     '0' WHEN OTHERS;
-
-            -- WITH ctr_opCode_in & ctr_fnNum_in SELECT ALUorMem <=
-            -- '1' WHEN "010110",
-            -- '0' WHEN OTHERS;
-
-            -- WITH ctr_opCode_in & ctr_fnNum_in SELECT stall <=
-            -- '1' WHEN "0100101",
-            -- '0' WHEN OTHERS;
-            case ctr_opCode_in & ctr_fnNum_in(3) is
-                when "1111" =>
-                    int <= '1';
-                when others =>
-                    int <= '0';
-            end case;
-
-            case ctr_opCode_in & ctr_fnNum_in is
-                when "0010101" =>
-                    isSwap <= '1';
-                when others =>
-                    isSwap <= '0';
-            end case;
-
-            -- with ctr_opCode_in & ctr_fnNum_in select PCIncType <=,
             --I HAVE NO IDEA HOW TO SET THIS (ALI)
-            case ctr_opCode_in & ctr_fnNum_in is
+            case ctr_opCode & ctr_Func is
                 when "0010010" | "0010011" | "0010110" | "0010111" | "0100000" | "0100001" =>
                     ctr_flags_en <= "1111";
                 when "0010000" | "0010001" | "0011000" | "0011001" | "0011010" | "0011011" =>
@@ -163,24 +80,24 @@ begin
                     ctr_flags_en <= "0000";
             end case;
 
-            case ctr_opCode_in is
-                when "001" =>                -- ALU operation
-                    ctr_ALU_sel <= ctr_fnNum_in; -- same as function num
-                when "010" =>                -- when Immediate operation
-                    case ctr_fnNum_in is
+            case ctr_opCode is
+                when "001" =>           -- ALU operation
+                    ctr_ALUsel <= ctr_Func; -- same as function num
+                when "010" =>           -- when Immediate operation
+                    case ctr_Func is
                         when "0000" | "0011" | "1100" => -- ADDI or LDD or STD
-                            ctr_ALU_sel <= "1000";           -- additon
+                            ctr_ALUsel <= "1000";            -- additon
                         when "0001" =>                   -- SUBI
-                            ctr_ALU_sel <= "0111";           -- subtraction
+                            ctr_ALUsel <= "0111";            -- subtraction
                         when "0010" =>                   -- LDM
-                            ctr_ALU_sel <= "0101";           -- mov B
+                            ctr_ALUsel <= "0101";            -- mov B
                         when others =>
-                            ctr_ALU_sel <= "0100";-- move
+                            ctr_ALUsel <= "0100";-- move
                     end case;
                 when others =>
-                    ctr_ALU_sel <= "0100"; -- move
+                    ctr_ALUsel <= "0100"; -- move
             end case;
-            
+
         end if;
 
     end process;
