@@ -22,15 +22,15 @@ architecture ProcessorArch of Processor is
             N : integer := 32
         );
         port (
-            clk, RES : in std_logic;
-            branch   : in std_logic;
-            enable   : in std_logic;
-            pcBranch : in std_logic_vector(N - 1 downto 0);
+            clk, RES    : in std_logic;
+            PC_en       : in std_logic;
+            PC_branch   : in std_logic;
+            PC_branchPC : in std_logic_vector(N - 1 downto 0);
 
-            isImmFromInstr : in std_logic;
-            correctedPc    : in std_logic_vector(N - 1 downto 0);
+            PC_isImm       : in std_logic;
+            PC_correctedPC : in std_logic_vector(N - 1 downto 0);
 
-            pc : out std_logic_vector(N - 1 downto 0)
+            PC_PC : out std_logic_vector(N - 1 downto 0)
         );
     end component;
 
@@ -41,14 +41,13 @@ architecture ProcessorArch of Processor is
             k : integer := 32  -- pc size
         );
         port (
-            clk : in std_logic;
-            rst : in std_logic;
-            pc  : in std_logic_vector(k - 1 downto 0);
+            clk, RES : in std_logic;
+            IC_PC    : in std_logic_vector(k - 1 downto 0);
 
-            data          : buffer std_logic_vector(n - 1 downto 0); --so that i can read and write to
-            immediate_out : out std_logic_vector(n - 1 downto 0);
-            IsImmediate   : out std_logic;
-            correctedPc   : out std_logic_vector(k - 1 downto 0)
+            IC_isImm       : out std_logic;
+            IC_Imm         : out std_logic_vector(n - 1 downto 0);
+            IC_data        : buffer std_logic_vector(n - 1 downto 0); --so that i can read and write to
+            IC_correctedPC : out std_logic_vector(k - 1 downto 0)
         );
     end component;
 
@@ -249,15 +248,15 @@ architecture ProcessorArch of Processor is
 
     ------------------------------------SIGNALS------------------------------------
     --PC signals
-    signal PC_Enable : std_logic;
-    signal Ipc_out   : std_logic_vector(31 downto 0);
+    signal PC_en : std_logic;
+    signal PC_PC : std_logic_vector(31 downto 0);
     --PC signals end
 
     --Instruction Cache signals
-    signal instruction_Out_Cache    : std_logic_vector(15 downto 0);
-    signal InsCache_immediate_out   : std_logic_vector(15 downto 0);
-    signal InsCache_IsImmediate_out : std_logic;
-    signal InsCache_correctedPc_out : std_logic_vector(31 downto 0);
+    signal IC_Inst        : std_logic_vector(15 downto 0);
+    signal IC_Imm         : std_logic_vector(15 downto 0);
+    signal IC_isImm       : std_logic;
+    signal IC_correctedPC : std_logic_vector(31 downto 0);
     --Instruction Cache signals end
 
     --FD Buffer signals
@@ -340,28 +339,29 @@ begin
     pc1 : PC port map(
         clk => clk,
         --from control signals 
-        RES    => reset,
-        branch => '0',
-        enable => PC_Enable,
-        pcBranch => (others => '0'),
-        pc     => Ipc_out,
+        RES       => reset,
+        PC_branch => '0',
+        PC_en     => PC_en,
+        PC_branchPC => (others => '0'),
 
         --from instruction cache
-        isImmFromInstr => InsCache_IsImmediate_out,
-        correctedPc    => InsCache_correctedPc_out
+        PC_isImm       => IC_isImm,
+        PC_correctedPC => IC_correctedPC,
 
+        PC_PC => PC_PC
     );
     -- map PC end
 
     -- map instruction cache with pc
     instrCache1 : InstrCache port map(
-        clk           => clk,
-        rst           => reset,
-        pc            => Ipc_out,
-        data          => instruction_Out_Cache,
-        immediate_out => InsCache_immediate_out,
-        IsImmediate   => InsCache_IsImmediate_out,
-        correctedPc   => InsCache_correctedPc_out
+        clk   => clk,
+        RES   => reset,
+        IC_PC => PC_PC,
+
+        IC_data        => IC_Inst,
+        IC_Imm         => IC_Imm,
+        IC_isImm       => IC_isImm,
+        IC_correctedPC => IC_correctedPC
 
     );
     -- map instruction cache with pc end
@@ -371,7 +371,7 @@ begin
         clk     => clk,
         RES     => reset,
         WE      => we,
-        FD_Inst => instruction_Out_Cache,
+        FD_Inst => IC_Inst,
 
         FD_OpCode => FD_OpCode,
         FD_Rsrc1  => FD_Rsrc1,
@@ -381,8 +381,8 @@ begin
         FD_Func   => FD_Func,
 
         -- Passing through
-        FD_isImm_in => InsCache_IsImmediate_out,
-        FD_Imm_in   => InsCache_immediate_out,
+        FD_isImm_in => IC_isImm,
+        FD_Imm_in   => IC_Imm,
 
         FD_isImm_out => FD_isImm_out,
         FD_Imm_out   => FD_Imm_out
