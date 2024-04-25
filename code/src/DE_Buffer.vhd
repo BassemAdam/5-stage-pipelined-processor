@@ -4,67 +4,67 @@ use ieee.numeric_std.all;
 
 entity DE_Buffer is
     port (
-        clk, reset, WE  : in std_logic;
-        Rsrc1_Val_in    : in std_logic_vector(31 downto 0);
-        Rsrc2_Val_in    : in std_logic_vector(31 downto 0);
-        Dst_in          : in std_logic_vector(2 downto 0);
-        Dst_in_2        : in std_logic_vector(2 downto 0);
-        aluSelectors_in : in std_logic_vector(3 downto 0);
-        DE_we_reg_in    : in std_logic;
-        DE_we_reg_in_2  : in std_logic;
-        DE_AluOrMem_in  : in std_logic;
-        De_immediate_IN : in std_logic_vector(15 downto 0);
-        DE_isImm_IN     : in std_logic;
-        DE_flags_en_in  : in std_logic_vector (0 to 3);
+        clk, RES, WE : in std_logic;
+        Rsrc1_Val_in : in std_logic_vector(31 downto 0);
+        Rsrc2_Val_in : in std_logic_vector(31 downto 0);
+        DE_Imm       : in std_logic_vector(15 downto 0);
+        DE_isImm     : in std_logic;
 
-        DE_flags_en_out  : out std_logic_vector (0 to 3);
-        DE_isImm_OUT     : out std_logic;
-        DE_we_reg_out    : out std_logic;
-        DE_we_reg_out_2  : out std_logic;
-        DE_AluOrMem_out  : out std_logic;
-        Rsrc1_Val_out    : out std_logic_vector(31 downto 0);
-        Rsrc2_Val_out    : out std_logic_vector(31 downto 0);
-        Dst_out          : out std_logic_vector(2 downto 0);
-        Dst_out_2        : out std_logic_vector(2 downto 0);
-        aluSelectors_out : out std_logic_vector(3 downto 0)
+        DE_ALUopd1 : out std_logic_vector(31 downto 0);
+        DE_ALUopd2 : out std_logic_vector(31 downto 0);
+
+        -- Passing through
+        DE_we1_reg_in   : in std_logic;
+        DE_we1_reg_out  : out std_logic;
+        DE_we2_reg_in   : in std_logic;
+        DE_we2_reg_out  : out std_logic;
+        DE_ALUorMem_in  : in std_logic;
+        DE_ALUorMem_out : out std_logic;
+        DE_flags_en_in  : in std_logic_vector (0 to 3);
+        DE_flags_en_out : out std_logic_vector (0 to 3);
+        DE_dst1_in      : in std_logic_vector(2 downto 0);
+        DE_dst2_in      : in std_logic_vector(2 downto 0);
+        DE_dst1_out     : out std_logic_vector(2 downto 0);
+        DE_dst2_out     : out std_logic_vector(2 downto 0);
+        DE_ALUsel_in    : in std_logic_vector(3 downto 0);
+        DE_ALUsel_out   : out std_logic_vector(3 downto 0)
     );
 end entity DE_Buffer;
 
 architecture DE_Buffer_Arch of DE_Buffer is
 begin
-    process (clk, reset)
-        variable Rsrc2_Val_out_var : std_logic_vector(31 downto 0);
+    process (clk, RES)
+        variable DE_ALUopd2_var : std_logic_vector(31 downto 0);
     begin
-        if reset = '1' then
-            DE_we_reg_out    <= '0';
-            DE_AluOrMem_out  <= '0';
-            DE_flags_en_out  <= (others => '0');
-            Rsrc1_Val_out    <= (others => '0');
-            Rsrc2_Val_out    <= (others => '0');
-            Dst_out          <= (others => '0');
-            Dst_out_2        <= (others => '0');
-            aluSelectors_out <= (others => '0');
+        if RES = '1' then
+            DE_we1_reg_out  <= '0';
+            DE_ALUorMem_out <= '0';
+            DE_flags_en_out <= (others => '0');
+            DE_ALUopd1      <= (others => '0');
+            DE_ALUopd2      <= (others => '0');
+            DE_dst1_out     <= (others => '0');
+            DE_dst2_out     <= (others => '0');
+            DE_ALUsel_out   <= (others => '0');
 
         elsif falling_edge(clk) then
 
             if WE = '1' then
-                DE_we_reg_out   <= DE_we_reg_in;
-                DE_we_reg_out_2 <= DE_we_reg_in_2;
-                DE_AluOrMem_out <= DE_AluOrMem_in;
-                Rsrc1_Val_out   <= Rsrc1_Val_in;
-                DE_isImm_OUT    <= DE_isImm_IN;
+                DE_we1_reg_out  <= DE_we1_reg_in;
+                DE_we2_reg_out  <= DE_we2_reg_in;
+                DE_ALUorMem_out <= DE_ALUorMem_in;
+                DE_ALUopd1      <= Rsrc1_Val_in;
                 DE_flags_en_out <= DE_flags_en_in;
 
-                if DE_isImm_IN = '1' then
-                    Rsrc2_Val_out_var := X"0000" & De_immediate_IN;
+                if DE_isImm = '1' then
+                    DE_ALUopd2_var := X"0000" & DE_Imm;
                 else
-                    Rsrc2_Val_out_var := Rsrc2_Val_in;
+                    DE_ALUopd2_var := Rsrc2_Val_in;
                 end if;
 
-                Rsrc2_Val_out    <= Rsrc2_Val_out_var;
-                Dst_out          <= Dst_in;
-                Dst_out_2        <= Dst_in_2;
-                aluSelectors_out <= aluSelectors_in;
+                DE_ALUopd2    <= DE_ALUopd2_var;
+                DE_dst1_out   <= DE_dst1_in;
+                DE_dst2_out   <= DE_dst2_in;
+                DE_ALUsel_out <= DE_ALUsel_in;
             end if;
         end if;
     end process;

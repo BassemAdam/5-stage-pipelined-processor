@@ -1,48 +1,52 @@
-LIBRARY IEEE;
-USE IEEE.STD_LOGIC_1164.ALL;
-USE IEEE.numeric_std.ALL;
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.numeric_std.all;
 
-ENTITY PC IS
-    GENERIC (
-        N : INTEGER := 32
+entity PC is
+    generic (
+        N : integer := 32
     );
-    PORT (
-        clk : IN STD_LOGIC;
-        reset : IN STD_LOGIC;
-        branch : IN STD_LOGIC;
-        enable : IN STD_LOGIC;
-        pcBranch : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+    port (
+        clk, RES : in std_logic;
+        branch   : in std_logic;
+        enable   : in std_logic;
+        pcBranch : in std_logic_vector(N - 1 downto 0);
 
-        isImmFromInstr : IN STD_LOGIC;
-        correctedPc : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+        isImmFromInstr : in std_logic;
+        correctedPc    : in std_logic_vector(N - 1 downto 0);
 
-        pc : OUT STD_LOGIC_VECTOR(N - 1 DOWNTO 0)
+        pc : out std_logic_vector(N - 1 downto 0)
     );
-END ENTITY PC;
+end entity PC;
 
-ARCHITECTURE PC_ARCH OF PC IS
+architecture PC_ARCH of PC is
 
-    SIGNAL pcNext : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
-    SIGNAL lastCorrectedPc : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+    signal pcNext          : std_logic_vector(N - 1 downto 0);
+    signal lastCorrectedPc : std_logic_vector(N - 1 downto 0);
 
-BEGIN
-    
-    PROCESS (reset, clk, correctedPc)
-    BEGIN
-        IF reset = '1' THEN
-            pcNext <= (OTHERS => '0');
-        ELSIF falling_edge(clk) THEN
-            IF isImmFromInstr ='1' AND correctedPc /= lastCorrectedPc THEN
-                pcNext <= correctedPc;
+begin
+
+    process (RES, clk, correctedPc)
+    begin
+        if RES = '1' then
+            pcNext <= (others => '0');
+
+        elsif falling_edge(clk) then
+
+            if isImmFromInstr = '1' and correctedPc /= lastCorrectedPc then
+                pcNext          <= correctedPc;
                 lastCorrectedPc <= correctedPc;
-            ELSIF branch = '1' THEN
+
+            elsif branch = '1' then
                 pcNext <= pcBranch;
-            ELSIF enable = '1' THEN
-                pcNext <= STD_LOGIC_VECTOR(unsigned(pcNext) + 1);
-            END IF;
-        END IF;
-    END PROCESS;
+
+            elsif enable = '1' then
+                pcNext <= std_logic_vector(unsigned(pcNext) + 1);
+            end if;
+
+        end if;
+    end process;
 
     pc <= pcNext;
 
-END ARCHITECTURE PC_ARCH;
+end architecture PC_ARCH;

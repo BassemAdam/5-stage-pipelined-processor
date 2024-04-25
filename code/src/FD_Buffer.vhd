@@ -1,58 +1,58 @@
-LIBRARY IEEE;
-USE IEEE.STD_LOGIC_1164.ALL;
-USE IEEE.STD_LOGIC_ARITH.ALL;
-USE IEEE.STD_LOGIC_UNSIGNED.ALL;
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.STD_LOGIC_ARITH.all;
+use IEEE.STD_LOGIC_UNSIGNED.all;
 
-ENTITY FD_Buffer IS
-    PORT (
-        clk : IN STD_LOGIC;
-        reset : IN STD_LOGIC;
-        WE : IN STD_LOGIC;
+entity FD_Buffer is
+    port (
+        clk, RES : in std_logic;
+        WE       : in std_logic;
         --16 bits from instruction memory
-        Intruction : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-        
-        FD_isImm_IN : IN STD_LOGIC;
-        FD_immediate_in : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
- 
-        OpCode : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-        Src1 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-        Src2 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-        dst : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-        dst2 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-        FnNum : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-        FD_isImm_out : OUT STD_LOGIC;
-        FD_immediate_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+        Inst : in std_logic_vector(15 downto 0);
+
+        FD_isImm_in : in std_logic;
+        FD_Imm_in   : in std_logic_vector(15 downto 0);
+
+        OpCode : out std_logic_vector(2 downto 0);
+        Src1   : out std_logic_vector(2 downto 0);
+        Src2   : out std_logic_vector(2 downto 0);
+        dst1   : out std_logic_vector(2 downto 0);
+        dst2   : out std_logic_vector(2 downto 0);
+        Func   : out std_logic_vector(3 downto 0);
+
+        FD_isImm_out : out std_logic;
+        FD_Imm_out   : out std_logic_vector(15 downto 0)
     );
-END ENTITY FD_Buffer;
+end entity FD_Buffer;
 
-ARCHITECTURE Behavioral OF FD_Buffer IS
+architecture Behavioral of FD_Buffer is
 
-BEGIN
-    PROCESS (CLK, RESET)
-    BEGIN
-        IF RESET = '1' THEN
-            -- Asynchronous reset
-            OpCode <= (OTHERS => '0');
-            Src1 <= (OTHERS => '0');
-            Src2 <= (OTHERS => '0');
-            dst <= (OTHERS => '0');
-            dst2 <= (OTHERS => '0');
-            FnNum <= (OTHERS => '0');
+begin
+    process (CLK, RES)
+    begin
+        if RES = '1' then
+            -- Asynchronous RES
+            OpCode <= (others => '0');
+            Src1   <= (others => '0');
+            Src2   <= (others => '0');
+            dst1   <= (others => '0');
+            dst2   <= (others => '0');
+            Func   <= (others => '0');
+        elsif falling_edge(clk) and WE = '1' then
 
-      
-        ELSIF falling_edge(clk) AND WE = '1' THEN
-            
-            OpCode <= Intruction(15 DOWNTO 13);
-            dst <= Intruction(12 DOWNTO 10); 
-            dst2 <= Intruction(9 DOWNTO 7);
-            Src1 <= Intruction(9 DOWNTO 7);
-            if FD_isImm_IN = '1' then
-                FD_immediate_out <= FD_immediate_in;
-            end if ;
-            Src2 <= Intruction(6 DOWNTO 4);  
-            FnNum <= Intruction(3 DOWNTO 0);
-            FD_isImm_out <= FD_isImm_IN;
-        END IF;
-    END PROCESS;
+            OpCode <= Inst(15 downto 13);
+            dst1   <= Inst(12 downto 10);
+            dst2   <= Inst(9 downto 7);
+            Src1   <= Inst(9 downto 7);
+            Src2   <= Inst(6 downto 4);
+            Func   <= Inst(3 downto 0);
 
-END ARCHITECTURE Behavioral;
+            if FD_isImm_in = '1' then
+                FD_Imm_out <= FD_Imm_in;
+            end if;
+
+            FD_isImm_out <= FD_isImm_in;
+        end if;
+    end process;
+
+end architecture Behavioral;

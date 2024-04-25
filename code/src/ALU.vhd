@@ -15,8 +15,9 @@ end entity ALU;
 
 architecture ALUArch of ALU is
 
-    signal temp                        : std_logic_vector(31 downto 0);
-    signal A_sign, B_sign, Result_sign : std_logic;
+    signal temp           : std_logic_vector(31 downto 0);
+    signal A_sign, B_sign : std_logic;
+    signal Result_sign    : std_logic;
 
     signal Zero     : std_logic;
     signal Negative : std_logic;

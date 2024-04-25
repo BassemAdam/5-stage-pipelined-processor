@@ -22,8 +22,7 @@ architecture ProcessorArch of Processor is
             N : integer := 32
         );
         port (
-            clk      : in std_logic;
-            reset    : in std_logic;
+            clk, RES : in std_logic;
             branch   : in std_logic;
             enable   : in std_logic;
             pcBranch : in std_logic_vector(N - 1 downto 0);
@@ -55,23 +54,23 @@ architecture ProcessorArch of Processor is
 
     component FD_Buffer is
         port (
-            clk   : in std_logic;
-            reset : in std_logic;
-            WE    : in std_logic;
+            clk, RES : in std_logic;
+            WE       : in std_logic;
             --16 bits from instruction memory
-            Intruction : in std_logic_vector(15 downto 0);
+            Inst : in std_logic_vector(15 downto 0);
 
-            FD_isImm_IN     : in std_logic;
-            FD_immediate_in : in std_logic_vector(15 downto 0);
+            FD_isImm_in : in std_logic;
+            FD_Imm_in   : in std_logic_vector(15 downto 0);
 
-            OpCode           : out std_logic_vector(2 downto 0);
-            Src1             : out std_logic_vector(2 downto 0);
-            Src2             : out std_logic_vector(2 downto 0);
-            dst              : out std_logic_vector(2 downto 0);
-            dst2             : out std_logic_vector(2 downto 0);
-            FnNum            : out std_logic_vector(3 downto 0);
-            FD_isImm_out     : out std_logic;
-            FD_immediate_out : out std_logic_vector(15 downto 0)
+            OpCode : out std_logic_vector(2 downto 0);
+            Src1   : out std_logic_vector(2 downto 0);
+            Src2   : out std_logic_vector(2 downto 0);
+            dst1   : out std_logic_vector(2 downto 0);
+            dst2   : out std_logic_vector(2 downto 0);
+            Func   : out std_logic_vector(3 downto 0);
+
+            FD_isImm_out : out std_logic;
+            FD_Imm_out   : out std_logic_vector(15 downto 0)
         );
     end component FD_Buffer;
 
@@ -143,29 +142,30 @@ architecture ProcessorArch of Processor is
 
     component DE_Buffer is
         port (
-            clk, reset, WE  : in std_logic;
-            Rsrc1_Val_in    : in std_logic_vector(31 downto 0);
-            Rsrc2_Val_in    : in std_logic_vector(31 downto 0);
-            Dst_in          : in std_logic_vector(2 downto 0);
-            Dst_in_2        : in std_logic_vector(2 downto 0);
-            aluSelectors_in : in std_logic_vector(3 downto 0);
-            DE_we_reg_in    : in std_logic;
-            DE_we_reg_in_2  : in std_logic;
-            DE_AluOrMem_in  : in std_logic;
-            De_immediate_IN : in std_logic_vector(15 downto 0);
-            DE_isImm_IN     : in std_logic;
-            DE_flags_en_in  : in std_logic_vector (0 to 3);
+            clk, RES, WE : in std_logic;
+            Rsrc1_Val_in : in std_logic_vector(31 downto 0);
+            Rsrc2_Val_in : in std_logic_vector(31 downto 0);
+            DE_Imm       : in std_logic_vector(15 downto 0);
+            DE_isImm     : in std_logic;
 
-            DE_flags_en_out  : out std_logic_vector (0 to 3);
-            DE_isImm_OUT     : out std_logic;
-            DE_we_reg_out    : out std_logic;
-            DE_we_reg_out_2  : out std_logic;
-            DE_AluOrMem_out  : out std_logic;
-            Rsrc1_Val_out    : out std_logic_vector(31 downto 0);
-            Rsrc2_Val_out    : out std_logic_vector(31 downto 0);
-            Dst_out          : out std_logic_vector(2 downto 0);
-            Dst_out_2        : out std_logic_vector(2 downto 0);
-            aluSelectors_out : out std_logic_vector(3 downto 0)
+            DE_ALUopd1 : out std_logic_vector(31 downto 0);
+            DE_ALUopd2 : out std_logic_vector(31 downto 0);
+
+            -- Passing through
+            DE_we1_reg_in   : in std_logic;
+            DE_we1_reg_out  : out std_logic;
+            DE_we2_reg_in   : in std_logic;
+            DE_we2_reg_out  : out std_logic;
+            DE_ALUorMem_in  : in std_logic;
+            DE_ALUorMem_out : out std_logic;
+            DE_flags_en_in  : in std_logic_vector (0 to 3);
+            DE_flags_en_out : out std_logic_vector (0 to 3);
+            DE_dst1_in      : in std_logic_vector(2 downto 0);
+            DE_dst2_in      : in std_logic_vector(2 downto 0);
+            DE_dst1_out     : out std_logic_vector(2 downto 0);
+            DE_dst2_out     : out std_logic_vector(2 downto 0);
+            DE_ALUsel_in    : in std_logic_vector(3 downto 0);
+            DE_ALUsel_out   : out std_logic_vector(3 downto 0)
         );
     end component;
 
@@ -208,13 +208,12 @@ architecture ProcessorArch of Processor is
         );
 
         port (
-            rst          : in std_logic;
-            clk          : in std_logic;
-            memWrite     : in std_logic;
-            memRead      : in std_logic;
-            writeAddress : in unsigned(ADDR_WIDTH - 1 downto 0);
-            readAddress  : in unsigned(ADDR_WIDTH - 1 downto 0);
-            writeData    : in unsigned(DATA_WIDTH - 1 downto 0);
+            clk, RES  : in std_logic;
+            memWrite  : in std_logic;
+            memRead   : in std_logic;
+            writeAddr : in unsigned(ADDR_WIDTH - 1 downto 0);
+            readAddr  : in unsigned(ADDR_WIDTH - 1 downto 0);
+            writeData : in unsigned(DATA_WIDTH - 1 downto 0);
 
             readData : out unsigned(DATA_WIDTH - 1 downto 0)
         );
@@ -243,30 +242,6 @@ architecture ProcessorArch of Processor is
         );
     end component WB_Buffer;
 
-    component MUX_2x1 is
-        generic (
-            N : integer := 8
-        );
-        port (
-            I0, I1 : in std_logic_vector(N - 1 downto 0);
-            S      : in std_logic;
-
-            O : out std_logic_vector(N - 1 downto 0)
-        );
-    end component;
-
-    component MUX_4x1 is
-        generic (
-            N : integer := 8
-        );
-        port (
-            I0, I1, I2, I3 : in std_logic_vector(N - 1 downto 0);
-            S              : in std_logic_vector(1 downto 0);
-
-            O : out std_logic_vector(N - 1 downto 0)
-        );
-    end component;
-
     component SP is
         generic (
             WIDTH : integer := 12
@@ -277,19 +252,6 @@ architecture ProcessorArch of Processor is
             pop   : in std_logic;
 
             pointer : out std_logic_vector(WIDTH - 1 downto 0)
-        );
-    end component;
-
-    component nBuffer is
-        generic (
-            N : positive := 16 --instruction width
-        );
-        port (
-            clk : in std_logic;
-            rst : in std_logic;
-            din : in std_logic_vector(N - 1 downto 0);
-
-            dout : out std_logic_vector(N - 1 downto 0)
         );
     end component;
 
@@ -318,14 +280,14 @@ architecture ProcessorArch of Processor is
     --Instruction Cache signals end
 
     --FD Buffer signals
-    signal opCode_Out         : std_logic_vector(2 downto 0);
-    signal Rsrc1_Out          : std_logic_vector(2 downto 0);
-    signal Rsrc2_Out          : std_logic_vector(2 downto 0);
-    signal Rdest_Out          : std_logic_vector(2 downto 0);
-    signal Rdest_Out_2        : std_logic_vector(2 downto 0);
-    signal FnNum_Out          : std_logic_vector(3 downto 0);
-    signal I_FD_immediate_out : std_logic_vector(15 downto 0);
-    signal I_FD_IsImm_out     : std_logic;
+    signal FD_OpCode    : std_logic_vector(2 downto 0);
+    signal FD_Src1      : std_logic_vector(2 downto 0);
+    signal FD_Src2      : std_logic_vector(2 downto 0);
+    signal FD_dst1      : std_logic_vector(2 downto 0);
+    signal FD_dst2      : std_logic_vector(2 downto 0);
+    signal Func         : std_logic_vector(3 downto 0);
+    signal FD_Imm_out   : std_logic_vector(15 downto 0);
+    signal FD_isImm_out : std_logic;
     --FD Buffer signals end
 
     --Register File signals
@@ -334,15 +296,14 @@ architecture ProcessorArch of Processor is
     --Register File signals end
 
     --DE Buffer signals
-    signal DE_we_reg_out       : std_logic;
-    signal DE_we_reg_out_2     : std_logic;
-    signal DE_Rsrc1_data_out   : std_logic_vector(31 downto 0);
-    signal DE_Rsrc2_data_out   : std_logic_vector(31 downto 0);
-    signal DE_dest_out         : std_logic_vector(2 downto 0);
-    signal DE_dest_out_2       : std_logic_vector(2 downto 0);
-    signal DE_AluSelectors_out : std_logic_vector(3 downto 0);
-    signal DE_isImm_OUT        : std_logic;
-    signal DE_flags_en_out     : std_logic_vector (0 to 3);
+    signal DE_Rsrc1_data_out : std_logic_vector(31 downto 0);
+    signal DE_Rsrc2_data_out : std_logic_vector(31 downto 0);
+    signal DE_we1_reg_out    : std_logic;
+    signal DE_we2_reg_out    : std_logic;
+    signal DE_flags_en_out   : std_logic_vector (0 to 3);
+    signal DE_dst1_out       : std_logic_vector(2 downto 0);
+    signal DE_dst2_out       : std_logic_vector(2 downto 0);
+    signal DE_ALUsel_out     : std_logic_vector(3 downto 0);
     --DE Buffer signals end
 
     --ALU signals
@@ -416,7 +377,7 @@ architecture ProcessorArch of Processor is
     signal ctr_writeEnable_mem   : std_logic;
 
     signal ctr_ALUorMem    : std_logic;
-    signal DE_AluOrMem_out : std_logic;
+    signal DE_ALUorMem_out : std_logic;
     signal EM_AluOrMem_out : std_logic;
 
     signal ctr_stall     : std_logic;
@@ -437,7 +398,7 @@ begin
     pc1 : PC port map(
         clk => clk,
         --from control signals 
-        reset    => reset,
+        RES      => reset,
         branch   => isBranch,
         enable   => PC_Enable,
         pcBranch => pcBranchIn,
@@ -465,20 +426,22 @@ begin
 
     -- map FD buffer with instruction cache
     fdBuffer1 : FD_Buffer port map(
-        clk              => clk,
-        reset            => reset,
-        WE               => we,
-        Intruction       => instruction_Out_Cache,
-        OpCode           => opCode_Out,
-        Src1             => Rsrc1_Out,
-        Src2             => Rsrc2_Out,
-        dst              => Rdest_Out,
-        dst2             => Rdest_Out_2,
-        FnNum            => FnNum_Out,
-        FD_isImm_IN      => InsCache_IsImmediate_out,
-        FD_immediate_in  => InsCache_immediate_out,
-        FD_immediate_out => I_FD_immediate_out,
-        FD_isImm_out     => I_FD_IsImm_out
+        clk  => clk,
+        RES  => reset,
+        WE   => we,
+        Inst => instruction_Out_Cache,
+
+        OpCode => FD_OpCode,
+        Src1   => FD_Src1,
+        Src2   => FD_Src2,
+        dst1   => FD_dst1,
+        dst2   => FD_dst2,
+        Func   => Func,
+
+        FD_isImm_in  => InsCache_IsImmediate_out,
+        FD_Imm_in    => InsCache_immediate_out,
+        FD_Imm_out   => FD_Imm_out,
+        FD_isImm_out => FD_isImm_out
     );
     -- map FD buffer with instruction cache end
 
@@ -486,8 +449,8 @@ begin
     registerFile1 : RegisterFile port map(
         clk           => clk,
         rst           => reset,
-        Rsrc1_address => Rsrc1_Out,
-        Rsrc2_address => Rsrc2_Out,
+        Rsrc1_address => FD_Src1,
+        Rsrc2_address => FD_Src2,
         Rdest         => WB_Rdest_Out,
         Rdest_2       => WB_Rdest_Out_2,
         WBdata        => WB_ALUResult_Out,
@@ -501,31 +464,31 @@ begin
 
     -- map DE buffer with RegistersFiles & Controller
     deBuffer1 : DE_Buffer port map(
-        clk             => clk,
-        reset           => reset,
-        WE              => we,
-        Rsrc1_Val_in    => Rsrc1_data_Out,
-        Rsrc2_Val_in    => Rsrc2_data_Out,
-        Dst_in          => Rdest_Out,
-        Dst_in_2        => Rdest_Out_2,
-        aluSelectors_in => ctr_ALU_sel, --we should make this logic in the controller
-        DE_we_reg_in    => ctr_writeEnable_reg,
-        DE_we_reg_in_2  => ctr_writeEnable_reg_2,
-        DE_AluOrMem_in  => ctr_ALUorMem,
-        DE_flags_en_in  => ctr_flags_en,
+        clk          => clk,
+        RES          => reset,
+        WE           => we,
+        Rsrc1_Val_in => Rsrc1_data_Out,
+        Rsrc2_Val_in => Rsrc2_data_Out,
+        DE_Imm       => FD_Imm_out,
+        DE_isImm     => FD_isImm_out,
 
-        DE_flags_en_out  => DE_flags_en_out,
-        DE_AluOrMem_out  => DE_AluOrMem_out,
-        DE_we_reg_out    => DE_we_reg_out,
-        DE_we_reg_out_2  => DE_we_reg_out_2,
-        Rsrc1_Val_out    => DE_Rsrc1_data_out,
-        Rsrc2_Val_out    => DE_Rsrc2_data_out,
-        Dst_out          => DE_dest_out,
-        Dst_out_2        => DE_dest_out_2,
-        aluSelectors_out => DE_AluSelectors_out,
-        De_immediate_IN  => I_FD_immediate_out,
-        DE_isImm_IN      => I_FD_IsImm_out,
-        DE_isImm_OUT     => DE_isImm_OUT
+        DE_ALUopd1 => DE_Rsrc1_data_out,
+        DE_ALUopd2 => DE_Rsrc2_data_out,
+
+        DE_we1_reg_in   => ctr_writeEnable_reg,
+        DE_we1_reg_out  => DE_we1_reg_out,
+        DE_we2_reg_in   => ctr_writeEnable_reg_2,
+        DE_we2_reg_out  => DE_we2_reg_out,
+        DE_ALUorMem_in  => ctr_ALUorMem,
+        DE_ALUorMem_out => DE_ALUorMem_out,
+        DE_flags_en_in  => ctr_flags_en,
+        DE_flags_en_out => DE_flags_en_out,
+        DE_dst1_in      => FD_dst1,
+        DE_dst1_out     => DE_dst1_out,
+        DE_dst2_in      => FD_dst2,
+        DE_dst2_out     => DE_dst2_out,
+        DE_ALUsel_in    => ctr_ALU_sel, --we should make this logic in the controller
+        DE_ALUsel_out   => DE_ALUsel_out
     );
     -- map DE buffer with RegistersFiles & Controller end
 
@@ -533,7 +496,7 @@ begin
     alu1 : ALU port map(
         A   => DE_Rsrc1_data_out,
         B   => DE_Rsrc2_data_out,
-        sel => DE_AluSelectors_out,
+        sel => DE_ALUsel_out,
 
         Result1 => ALU_Result1,
         Result2 => ALU_Result2,
@@ -546,13 +509,13 @@ begin
         clk               => clk,
         reset             => reset,
         WE                => we,
-        Dst_in            => DE_dest_out,
-        Dst_in_2          => DE_dest_out_2,
+        Dst_in            => DE_dst1_out,
+        Dst_in_2          => DE_dst2_out,
         ALU_OutValue_in   => ALU_Result1,
         ALU_OutValue_in_2 => ALU_Result2,
-        EM_we_reg_in      => DE_we_reg_out,
-        EM_we_reg_in_2    => DE_we_reg_out_2,
-        EM_AluOrMem_in    => DE_AluOrMem_out,
+        EM_we_reg_in      => DE_we1_reg_out,
+        EM_we_reg_in_2    => DE_we2_reg_out,
+        EM_AluOrMem_in    => DE_ALUorMem_out,
 
         EM_AluOrMem_out    => EM_AluOrMem_out,
         EM_we_reg_out      => EM_we_reg_out,
@@ -592,12 +555,12 @@ begin
     port map(
         clk           => clk,
         rst           => reset,
-        ctr_opCode_in => opCode_Out,
-        ctr_Rdest_in  => Rdest_Out,
-        ctr_Rdest2_in => Rdest_Out_2,
-        ctr_Rsrc1_in  => Rsrc1_Out,
-        ctr_Rsrc2_in  => Rsrc2_Out,
-        ctr_fnNum_in  => FnNum_Out,
+        ctr_opCode_in => FD_OpCode,
+        ctr_Rdest_in  => FD_dst1,
+        ctr_Rdest2_in => FD_dst2,
+        ctr_Rsrc1_in  => FD_Src1,
+        ctr_Rsrc2_in  => FD_Src2,
+        ctr_fnNum_in  => Func,
 
         ctr_opCode_out   => ctr_opCode_out,
         ctr_fnNum_out    => ctr_fnNum_out,
