@@ -182,22 +182,23 @@ architecture ProcessorArch of Processor is
 
     component EM_Buffer is
         port (
-            clk, reset, WE    : in std_logic;
-            Dst_in            : in std_logic_vector(2 downto 0);
-            Dst_in_2          : in std_logic_vector(2 downto 0);
-            ALU_OutValue_in   : in std_logic_vector(31 downto 0);
-            ALU_OutValue_in_2 : in std_logic_vector(31 downto 0);
-            EM_we_reg_in      : in std_logic;
-            EM_we_reg_in_2    : in std_logic;
-            EM_AluOrMem_in    : in std_logic;
+            clk, RES, WE : in std_logic;
 
-            EM_AluOrMem_out    : out std_logic;
-            EM_we_reg_out      : out std_logic;
-            EM_we_reg_out_2    : out std_logic;
-            ALU_OutValue_out   : out std_logic_vector(31 downto 0);
-            ALU_OutValue_out_2 : out std_logic_vector(31 downto 0);
-            Dst_out            : out std_logic_vector(2 downto 0);
-            Dst_out_2          : out std_logic_vector(2 downto 0)
+            -- Passing through
+            EM_ALUorMem_in    : in std_logic;
+            EM_ALUorMem_out   : out std_logic;
+            EM_we1_reg_in     : in std_logic;
+            EM_we1_reg_out    : out std_logic;
+            EM_we2_reg_in     : in std_logic;
+            EM_we2_reg_out    : out std_logic;
+            EM_dst1_in        : in std_logic_vector(2 downto 0);
+            EM_dst1_out       : out std_logic_vector(2 downto 0);
+            EM_dst2_in        : in std_logic_vector(2 downto 0);
+            EM_dst2_out       : out std_logic_vector(2 downto 0);
+            EM_ALUResult1_in  : in std_logic_vector(31 downto 0);
+            EM_ALUResult1_out : out std_logic_vector(31 downto 0);
+            EM_ALUResult2_in  : in std_logic_vector(31 downto 0);
+            EM_ALUResult2_out : out std_logic_vector(31 downto 0)
         );
     end component;
 
@@ -285,7 +286,7 @@ architecture ProcessorArch of Processor is
     signal FD_Src2      : std_logic_vector(2 downto 0);
     signal FD_dst1      : std_logic_vector(2 downto 0);
     signal FD_dst2      : std_logic_vector(2 downto 0);
-    signal FD_Func         : std_logic_vector(3 downto 0);
+    signal FD_Func      : std_logic_vector(3 downto 0);
     signal FD_Imm_out   : std_logic_vector(15 downto 0);
     signal FD_isImm_out : std_logic;
     --FD Buffer signals end
@@ -313,12 +314,12 @@ architecture ProcessorArch of Processor is
     --ALU signals end
 
     --EM Buffer signals 
-    signal EM_we_reg_out   : std_logic;
-    signal EM_we_reg_out_2 : std_logic;
-    signal EM_ALUResult    : std_logic_vector(31 downto 0);
-    signal EM_ALUResult_2  : std_logic_vector(31 downto 0);
-    signal EM_dest_out     : std_logic_vector(2 downto 0);
-    signal EM_dest_out_2   : std_logic_vector(2 downto 0);
+    signal EM_we1_reg_out    : std_logic;
+    signal EM_we2_reg_out    : std_logic;
+    signal EM_ALUResult1_out : std_logic_vector(31 downto 0);
+    signal EM_ALUResult2_out : std_logic_vector(31 downto 0);
+    signal EM_dst1_out       : std_logic_vector(2 downto 0);
+    signal EM_dst2_out       : std_logic_vector(2 downto 0);
     --EM Buffer signals end
 
     --Data Memory signals
@@ -378,7 +379,7 @@ architecture ProcessorArch of Processor is
 
     signal ctr_ALUorMem    : std_logic;
     signal DE_ALUorMem_out : std_logic;
-    signal EM_AluOrMem_out : std_logic;
+    signal EM_ALUorMem_out : std_logic;
 
     signal ctr_stall     : std_logic;
     signal ctr_int       : std_logic;
@@ -476,19 +477,21 @@ begin
         DE_ALUopd1 => DE_Rsrc1_data_out,
         DE_ALUopd2 => DE_Rsrc2_data_out,
 
-        DE_we1_reg_in   => ctr_writeEnable_reg,
+        -- Passing through
+        DE_we1_reg_in  => ctr_writeEnable_reg,
+        DE_we2_reg_in  => ctr_writeEnable_reg_2,
+        DE_ALUorMem_in => ctr_ALUorMem,
+        DE_flags_en_in => ctr_flags_en,
+        DE_dst1_in     => FD_dst1,
+        DE_dst2_in     => FD_dst2,
+        DE_ALUsel_in   => ctr_ALU_sel,
+
         DE_we1_reg_out  => DE_we1_reg_out,
-        DE_we2_reg_in   => ctr_writeEnable_reg_2,
         DE_we2_reg_out  => DE_we2_reg_out,
-        DE_ALUorMem_in  => ctr_ALUorMem,
         DE_ALUorMem_out => DE_ALUorMem_out,
-        DE_flags_en_in  => ctr_flags_en,
         DE_flags_en_out => DE_flags_en_out,
-        DE_dst1_in      => FD_dst1,
         DE_dst1_out     => DE_dst1_out,
-        DE_dst2_in      => FD_dst2,
         DE_dst2_out     => DE_dst2_out,
-        DE_ALUsel_in    => ctr_ALU_sel, --we should make this logic in the controller
         DE_ALUsel_out   => DE_ALUsel_out
     );
     -- map DE buffer with RegistersFiles & Controller end
@@ -507,24 +510,26 @@ begin
 
     -- map EM buffer with ALU
     emBuffer1 : EM_Buffer port map(
-        clk               => clk,
-        reset             => reset,
-        WE                => we,
-        Dst_in            => DE_dst1_out,
-        Dst_in_2          => DE_dst2_out,
-        ALU_OutValue_in   => ALU_Result1,
-        ALU_OutValue_in_2 => ALU_Result2,
-        EM_we_reg_in      => DE_we1_reg_out,
-        EM_we_reg_in_2    => DE_we2_reg_out,
-        EM_AluOrMem_in    => DE_ALUorMem_out,
+        clk => clk,
+        RES => reset,
+        WE  => we,
 
-        EM_AluOrMem_out    => EM_AluOrMem_out,
-        EM_we_reg_out      => EM_we_reg_out,
-        EM_we_reg_out_2    => EM_we_reg_out_2,
-        ALU_OutValue_out   => EM_ALUResult,
-        ALU_OutValue_out_2 => EM_ALUResult_2,
-        Dst_out            => EM_dest_out,
-        Dst_out_2          => EM_dest_out_2
+        -- Passing through
+        EM_ALUorMem_in   => DE_ALUorMem_out,
+        EM_we1_reg_in    => DE_we1_reg_out,
+        EM_we2_reg_in    => DE_we2_reg_out,
+        EM_dst1_in       => DE_dst1_out,
+        EM_dst2_in       => DE_dst2_out,
+        EM_ALUResult1_in => ALU_Result1,
+        EM_ALUResult2_in => ALU_Result2,
+
+        EM_ALUorMem_out   => EM_ALUorMem_out,
+        EM_we1_reg_out    => EM_we1_reg_out,
+        EM_we2_reg_out    => EM_we2_reg_out,
+        EM_dst1_out       => EM_dst1_out,
+        EM_dst2_out       => EM_dst2_out,
+        EM_ALUResult1_out => EM_ALUResult1_out,
+        EM_ALUResult2_out => EM_ALUResult2_out
     );
     -- map EM buffer with ALU end
 
@@ -533,14 +538,14 @@ begin
         clk               => clk,
         reset             => reset,
         WE                => we,
-        Dst_in            => EM_dest_out,
-        Dst_in_2          => EM_dest_out_2,
-        ALU_OutValue_in   => EM_ALUResult,
-        Alu_OutValue_in_2 => EM_ALUResult_2,
+        Dst_in            => EM_dst1_out,
+        Dst_in_2          => EM_dst2_out,
+        ALU_OutValue_in   => EM_ALUResult1_out,
+        Alu_OutValue_in_2 => EM_ALUResult2_out,
         MemOutValue_in => (others => '0'),
-        WB_we_reg_in      => EM_we_reg_out,
-        WB_we_reg_in_2    => EM_we_reg_out_2,
-        WB_AluOrMem_in    => EM_AluOrMem_out,
+        WB_we_reg_in      => EM_we1_reg_out,
+        WB_we_reg_in_2    => EM_we2_reg_out,
+        WB_AluOrMem_in    => EM_ALUorMem_out,
 
         WB_we_reg_out   => WB_we_reg_out,
         WB_we_reg_out_2 => WB_we_reg_out_2,

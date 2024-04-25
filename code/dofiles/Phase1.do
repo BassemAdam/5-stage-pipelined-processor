@@ -12,7 +12,7 @@ sim:/processor/ALU_flags  \
 sim:/processor/DE_flags_en_out  \
 sim:/processor/WB_ALUResult_Out  \
 sim:/processor/WB_ALUResult_Out_2  \
-sim:/processor/EM_ALUResult
+sim:/processor/EM_ALUResult1_out
 
 
 force -freeze sim:/processor/clk 0 0, 1 {50 ps} -r 100
