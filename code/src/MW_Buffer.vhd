@@ -4,50 +4,50 @@ use ieee.numeric_std.all;
 
 entity MW_Buffer is
     port (
-        clk, reset, WE : in std_logic;
-        --ALU_COUT : in std_logic;
-        Dst_in          : in std_logic_vector(2 downto 0);
-        Dst_in_2          : in std_logic_vector(2 downto 0);
-        ALU_OutValue_in : in std_logic_vector(31 downto 0);
-        ALU_OutValue_in_2 : in std_logic_vector(31 downto 0);
-        MemOutValue_in  : in std_logic_vector(31 downto 0);
-        WB_we_reg_in    : in std_logic;
-        WB_we_reg_in_2    : in std_logic;
-        WB_AluOrMem_in  : in std_logic;
+        clk, RES, WE  : in std_logic;
+        MW_ALUorMem   : in std_logic;
+        MW_ALUResult1 : in std_logic_vector(31 downto 0);
+        MW_ALUResult2 : in std_logic_vector(31 downto 0);
+        MW_MemResult  : in std_logic_vector(31 downto 0);
 
-        WB_we_reg_out : out std_logic;
-        WB_we_reg_out_2 : out std_logic;
-        --ALU_COUT_OUT : out std_logic;
-        WB_value_out : out std_logic_vector(31 downto 0);
-        WB_value_out_2 : out std_logic_vector(31 downto 0);
-        Dst_out      : out std_logic_vector(2 downto 0);
-        Dst_out_2      : out std_logic_vector(2 downto 0)
+        MW_value1 : out std_logic_vector(31 downto 0);
+        MW_value2 : out std_logic_vector(31 downto 0);
+
+        -- Passing through
+        MW_we1_reg_in  : in std_logic;
+        MW_we1_reg_out : out std_logic;
+        MW_we2_reg_in  : in std_logic;
+        MW_we2_reg_out : out std_logic;
+        MW_Rdst1_in     : in std_logic_vector(2 downto 0);
+        MW_Rdst1_out    : out std_logic_vector(2 downto 0);
+        MW_Rdst2_in     : in std_logic_vector(2 downto 0);
+        MW_Rdst2_out    : out std_logic_vector(2 downto 0)
     );
 end entity MW_Buffer;
 
 architecture MW_Buffer_Arch of MW_Buffer is
 begin
-    process (clk, reset)
+    process (clk, RES)
     begin
-        if reset = '1' then
-            WB_we_reg_out    <= '0';
-            WB_we_reg_out_2    <= '0';
-            WB_value_out <= (others => '0');
-            WB_value_out_2 <= (others => '0');
-            Dst_out          <= (others => '0');
-            Dst_out_2          <= (others => '0');
+        if RES = '1' then
+            MW_we1_reg_out <= '0';
+            MW_we2_reg_out <= '0';
+            MW_value1      <= (others => '0');
+            MW_value2      <= (others => '0');
+            MW_Rdst1_out    <= (others => '0');
+            MW_Rdst2_out    <= (others => '0');
         elsif falling_edge(clk) then
             if WE = '1' then
-                if (WB_AluOrMem_in = '1') then
-                    WB_value_out <= MemOutValue_in;
+                if (MW_ALUorMem = '1') then
+                    MW_value1 <= MW_MemResult;
                 else
-                    WB_value_out <= ALU_OutValue_in;
-                    WB_value_out_2 <= ALU_OutValue_in_2;
+                    MW_value1 <= MW_ALUResult1;
+                    MW_value2 <= MW_ALUResult2;
                 end if;
-                WB_we_reg_out    <= WB_we_reg_in;
-                WB_we_reg_out_2    <= WB_we_reg_in_2;
-                Dst_out          <= Dst_in;
-                Dst_out_2          <= Dst_in_2;
+                MW_we1_reg_out <= MW_we1_reg_in;
+                MW_we2_reg_out <= MW_we2_reg_in;
+                MW_Rdst1_out    <= MW_Rdst1_in;
+                MW_Rdst2_out    <= MW_Rdst2_in;
             end if;
         end if;
     end process;

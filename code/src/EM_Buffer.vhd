@@ -13,10 +13,10 @@ entity EM_Buffer is
         EM_we1_reg_out    : out std_logic;
         EM_we2_reg_in     : in std_logic;
         EM_we2_reg_out    : out std_logic;
-        EM_dst1_in        : in std_logic_vector(2 downto 0);
-        EM_dst1_out       : out std_logic_vector(2 downto 0);
-        EM_dst2_in        : in std_logic_vector(2 downto 0);
-        EM_dst2_out       : out std_logic_vector(2 downto 0);
+        EM_Rdst1_in        : in std_logic_vector(2 downto 0);
+        EM_Rdst1_out       : out std_logic_vector(2 downto 0);
+        EM_Rdst2_in        : in std_logic_vector(2 downto 0);
+        EM_Rdst2_out       : out std_logic_vector(2 downto 0);
         EM_ALUResult1_in  : in std_logic_vector(31 downto 0);
         EM_ALUResult1_out : out std_logic_vector(31 downto 0);
         EM_ALUResult2_in  : in std_logic_vector(31 downto 0);
@@ -34,8 +34,8 @@ begin
             EM_ALUorMem_out   <= '0';
             EM_ALUResult1_out <= (others => '0');
             EM_ALUResult2_out <= (others => '0');
-            EM_dst1_out       <= (others => '0');
-            EM_dst2_out       <= (others => '0');
+            EM_Rdst1_out       <= (others => '0');
+            EM_Rdst2_out       <= (others => '0');
         elsif falling_edge(clk) then
             if WE = '1' then
                 EM_ALUorMem_out   <= EM_ALUorMem_in;
@@ -43,8 +43,8 @@ begin
                 EM_we2_reg_out    <= EM_we2_reg_in;
                 EM_ALUResult1_out <= EM_ALUResult1_in;
                 EM_ALUResult2_out <= EM_ALUResult2_in;
-                EM_dst1_out       <= EM_dst1_in;
-                EM_dst2_out       <= EM_dst2_in;
+                EM_Rdst1_out       <= EM_Rdst1_in;
+                EM_Rdst2_out       <= EM_Rdst2_in;
             end if;
         end if;
     end process;

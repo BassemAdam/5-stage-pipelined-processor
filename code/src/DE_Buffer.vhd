@@ -5,8 +5,8 @@ use ieee.numeric_std.all;
 entity DE_Buffer is
     port (
         clk, RES, WE : in std_logic;
-        Rsrc1_Val_in : in std_logic_vector(31 downto 0);
-        Rsrc2_Val_in : in std_logic_vector(31 downto 0);
+        DE_Rsrc1_Val : in std_logic_vector(31 downto 0);
+        DE_Rsrc2_Val : in std_logic_vector(31 downto 0);
         DE_Imm       : in std_logic_vector(15 downto 0);
         DE_isImm     : in std_logic;
 
@@ -22,10 +22,10 @@ entity DE_Buffer is
         DE_ALUorMem_out : out std_logic;
         DE_flags_en_in  : in std_logic_vector (0 to 3);
         DE_flags_en_out : out std_logic_vector (0 to 3);
-        DE_dst1_in      : in std_logic_vector(2 downto 0);
-        DE_dst2_in      : in std_logic_vector(2 downto 0);
-        DE_dst1_out     : out std_logic_vector(2 downto 0);
-        DE_dst2_out     : out std_logic_vector(2 downto 0);
+        DE_Rdst1_in     : in std_logic_vector(2 downto 0);
+        DE_Rdst2_in     : in std_logic_vector(2 downto 0);
+        DE_Rdst1_out    : out std_logic_vector(2 downto 0);
+        DE_Rdst2_out    : out std_logic_vector(2 downto 0);
         DE_ALUsel_in    : in std_logic_vector(3 downto 0);
         DE_ALUsel_out   : out std_logic_vector(3 downto 0)
     );
@@ -42,8 +42,8 @@ begin
             DE_flags_en_out <= (others => '0');
             DE_ALUopd1      <= (others => '0');
             DE_ALUopd2      <= (others => '0');
-            DE_dst1_out     <= (others => '0');
-            DE_dst2_out     <= (others => '0');
+            DE_Rdst1_out    <= (others => '0');
+            DE_Rdst2_out    <= (others => '0');
             DE_ALUsel_out   <= (others => '0');
 
         elsif falling_edge(clk) then
@@ -52,18 +52,18 @@ begin
                 DE_we1_reg_out  <= DE_we1_reg_in;
                 DE_we2_reg_out  <= DE_we2_reg_in;
                 DE_ALUorMem_out <= DE_ALUorMem_in;
-                DE_ALUopd1      <= Rsrc1_Val_in;
+                DE_ALUopd1      <= DE_Rsrc1_Val;
                 DE_flags_en_out <= DE_flags_en_in;
 
                 if DE_isImm = '1' then
                     DE_ALUopd2_var := X"0000" & DE_Imm;
                 else
-                    DE_ALUopd2_var := Rsrc2_Val_in;
+                    DE_ALUopd2_var := DE_Rsrc2_Val;
                 end if;
 
                 DE_ALUopd2    <= DE_ALUopd2_var;
-                DE_dst1_out   <= DE_dst1_in;
-                DE_dst2_out   <= DE_dst2_in;
+                DE_Rdst1_out  <= DE_Rdst1_in;
+                DE_Rdst2_out  <= DE_Rdst2_in;
                 DE_ALUsel_out <= DE_ALUsel_in;
             end if;
         end if;

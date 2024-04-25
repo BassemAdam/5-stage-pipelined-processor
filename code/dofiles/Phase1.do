@@ -10,8 +10,8 @@ sim:/processor/Ipc_out  \
 sim:/processor/CCR_flags  \
 sim:/processor/ALU_flags  \
 sim:/processor/DE_flags_en_out  \
-sim:/processor/WB_ALUResult_Out  \
-sim:/processor/WB_ALUResult_Out_2  \
+sim:/processor/MW_value1  \
+sim:/processor/MW_value2  \
 sim:/processor/EM_ALUResult1_out
 
 
