@@ -54,13 +54,10 @@ architecture ProcessorArch of Processor is
 
     component FD_Buffer is
         port (
-            clk, RES : in std_logic;
-            WE       : in std_logic;
-            --16 bits from instruction memory
-            Inst : in std_logic_vector(15 downto 0);
-
-            FD_isImm_in : in std_logic;
-            FD_Imm_in   : in std_logic_vector(15 downto 0);
+            clk  : in std_logic;
+            RES  : in std_logic;
+            WE   : in std_logic;
+            Inst : in std_logic_vector(15 downto 0); -- 16 bits from instruction memory
 
             OpCode : out std_logic_vector(2 downto 0);
             Src1   : out std_logic_vector(2 downto 0);
@@ -69,7 +66,10 @@ architecture ProcessorArch of Processor is
             dst2   : out std_logic_vector(2 downto 0);
             Func   : out std_logic_vector(3 downto 0);
 
+            -- Passing through
+            FD_isImm_in  : in std_logic;
             FD_isImm_out : out std_logic;
+            FD_Imm_in    : in std_logic_vector(15 downto 0);
             FD_Imm_out   : out std_logic_vector(15 downto 0)
         );
     end component FD_Buffer;
@@ -285,7 +285,7 @@ architecture ProcessorArch of Processor is
     signal FD_Src2      : std_logic_vector(2 downto 0);
     signal FD_dst1      : std_logic_vector(2 downto 0);
     signal FD_dst2      : std_logic_vector(2 downto 0);
-    signal Func         : std_logic_vector(3 downto 0);
+    signal FD_Func         : std_logic_vector(3 downto 0);
     signal FD_Imm_out   : std_logic_vector(15 downto 0);
     signal FD_isImm_out : std_logic;
     --FD Buffer signals end
@@ -436,12 +436,13 @@ begin
         Src2   => FD_Src2,
         dst1   => FD_dst1,
         dst2   => FD_dst2,
-        Func   => Func,
+        Func   => FD_Func,
 
+        -- Passing through
         FD_isImm_in  => InsCache_IsImmediate_out,
+        FD_isImm_out => FD_isImm_out,
         FD_Imm_in    => InsCache_immediate_out,
-        FD_Imm_out   => FD_Imm_out,
-        FD_isImm_out => FD_isImm_out
+        FD_Imm_out   => FD_Imm_out
     );
     -- map FD buffer with instruction cache end
 
@@ -560,7 +561,7 @@ begin
         ctr_Rdest2_in => FD_dst2,
         ctr_Rsrc1_in  => FD_Src1,
         ctr_Rsrc2_in  => FD_Src2,
-        ctr_fnNum_in  => Func,
+        ctr_fnNum_in  => FD_Func,
 
         ctr_opCode_out   => ctr_opCode_out,
         ctr_fnNum_out    => ctr_fnNum_out,

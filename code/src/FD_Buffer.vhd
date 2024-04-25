@@ -5,14 +5,11 @@ use IEEE.STD_LOGIC_UNSIGNED.all;
 
 entity FD_Buffer is
     port (
-        clk, RES : in std_logic;
-        WE       : in std_logic;
-        --16 bits from instruction memory
-        Inst : in std_logic_vector(15 downto 0);
-
-        FD_isImm_in : in std_logic;
-        FD_Imm_in   : in std_logic_vector(15 downto 0);
-
+        clk    : in std_logic;
+        RES    : in std_logic;
+        WE     : in std_logic;
+        Inst   : in std_logic_vector(15 downto 0); -- 16 bits from instruction memory
+        
         OpCode : out std_logic_vector(2 downto 0);
         Src1   : out std_logic_vector(2 downto 0);
         Src2   : out std_logic_vector(2 downto 0);
@@ -20,7 +17,10 @@ entity FD_Buffer is
         dst2   : out std_logic_vector(2 downto 0);
         Func   : out std_logic_vector(3 downto 0);
 
+        -- Passing through
+        FD_isImm_in  : in std_logic;
         FD_isImm_out : out std_logic;
+        FD_Imm_in    : in std_logic_vector(15 downto 0);
         FD_Imm_out   : out std_logic_vector(15 downto 0)
     );
 end entity FD_Buffer;
