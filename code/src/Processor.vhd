@@ -185,16 +185,15 @@ architecture ProcessorArch of Processor is
             DATA_WIDTH : integer := 32;
             ADDR_WIDTH : integer := 12
         );
-
         port (
-            clk, RES  : in std_logic;
-            memWrite  : in std_logic;
-            memRead   : in std_logic;
-            writeAddr : in unsigned(ADDR_WIDTH - 1 downto 0);
-            readAddr  : in unsigned(ADDR_WIDTH - 1 downto 0);
-            writeData : in unsigned(DATA_WIDTH - 1 downto 0);
+            clk, RES : in std_logic;
+            DM_MemR  : in std_logic;
+            DM_MemW  : in std_logic;
+            DM_RAddr : in unsigned(ADDR_WIDTH - 1 downto 0);
+            DM_WAddr : in unsigned(ADDR_WIDTH - 1 downto 0);
+            DM_WData : in unsigned(DATA_WIDTH - 1 downto 0);
 
-            readData : out unsigned(DATA_WIDTH - 1 downto 0)
+            DM_RData : out unsigned(DATA_WIDTH - 1 downto 0)
         );
     end component;
 
@@ -226,11 +225,11 @@ architecture ProcessorArch of Processor is
             WIDTH : integer := 12
         );
         port (
-            reset : in std_logic;
-            push  : in std_logic;
-            pop   : in std_logic;
+            RES     : in std_logic;
+            SP_Push : in std_logic;
+            SP_Pop  : in std_logic;
 
-            pointer : out std_logic_vector(WIDTH - 1 downto 0)
+            SP_SP : out std_logic_vector(WIDTH - 1 downto 0)
         );
     end component;
 
