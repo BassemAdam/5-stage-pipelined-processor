@@ -1,52 +1,42 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity PC is
-    generic (
-        N : integer := 32
+ENTITY PC IS
+    GENERIC (
+        N : INTEGER := 32
     );
-    port (
-        clk, RES    : in std_logic;
-        PC_en       : in std_logic;
-        PC_branch   : in std_logic;
-        PC_branchPC : in std_logic_vector(N - 1 downto 0);
-
-        PC_isImm       : in std_logic;
-        PC_correctedPC : in std_logic_vector(N - 1 downto 0);
-
-        PC_PC : out std_logic_vector(N - 1 downto 0)
+    PORT (
+        clk, RES : IN STD_LOGIC;
+        PC_en : IN STD_LOGIC;
+        PC_branch : IN STD_LOGIC;
+        PC_branchPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+        
+        PC_PC : OUT STD_LOGIC_VECTOR(N - 1 DOWNTO 0)
     );
-end entity PC;
+END ENTITY PC;
 
-architecture PC_ARCH of PC is
+ARCHITECTURE PC_ARCH OF PC IS
 
-    signal pcNext          : std_logic_vector(N - 1 downto 0);
-    signal lastCorrectedPc : std_logic_vector(N - 1 downto 0);
+    SIGNAL pcNext : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
 
-begin
+BEGIN
 
-    process (RES, clk, PC_correctedPC)
-    begin
-        if RES = '1' then
-            pcNext <= (others => '0');
+    PROCESS (RES, clk)
+    BEGIN
+        IF RES = '1' THEN
+            pcNext <= (OTHERS => '0');
 
-        elsif falling_edge(clk) then
-
-            if PC_isImm = '1' and PC_correctedPC /= lastCorrectedPc then
-                pcNext          <= PC_correctedPC;
-                lastCorrectedPc <= PC_correctedPC;
-
-            elsif PC_branch = '1' then
+        ELSIF falling_edge(clk) THEN
+            IF PC_branch = '1' THEN
                 pcNext <= PC_branchPC;
+            ELSIF PC_en = '1' THEN
+                pcNext <= STD_LOGIC_VECTOR(unsigned(pcNext) + 1);
+            END IF;
 
-            elsif PC_en = '1' then
-                pcNext <= std_logic_vector(unsigned(pcNext) + 1);
-            end if;
-
-        end if;
-    end process;
+        END IF;
+    END PROCESS;
 
     PC_PC <= pcNext;
 
-end architecture PC_ARCH;
+END ARCHITECTURE PC_ARCH;

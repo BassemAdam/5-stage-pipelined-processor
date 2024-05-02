@@ -39,6 +39,14 @@ begin
         -- ctr_ALUorMem <= '0';
 
         if RES = '0' then
+            if ctr_opCode = "000" then -- NOP
+                ctr_flags_en <= (others => '0');
+                ctr_we1_reg  <= '0';
+                ctr_we2_reg  <= '0';
+                ctr_we_mem   <= '0';
+                ctr_hasImm   <= '0';
+            end if;
+
             if ctr_opCode = "001" then -- ALU 
                 ctr_ALUsel   <= ctr_Func;
                 ctr_we1_reg  <= '1';

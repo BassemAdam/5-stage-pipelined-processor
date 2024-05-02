@@ -19,7 +19,9 @@ sim:/processor/IC_Inst  \
 sim:/processor/FD_Rsrc1 \
 sim:/processor/FD_Rsrc2 \
 sim:/processor/FD_Rdst1 \
-sim:/processor/FD_Rdst2
+sim:/processor/FD_Rdst2 \
+sim:/processor/ctr_hasImm \
+sim:/processor/FD_OpCode
 
 
 force -freeze sim:/processor/clk 0 0, 1 {50 ps} -r 100

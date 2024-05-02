@@ -12,10 +12,7 @@ entity InstrCache is
         clk, RES : in std_logic;
         IC_PC    : in std_logic_vector(k - 1 downto 0);
 
-        IC_isImm       : out std_logic;
-        IC_Imm         : out std_logic_vector(n - 1 downto 0);
-        IC_data        : buffer std_logic_vector(n - 1 downto 0); --so that i can read and write to
-        IC_correctedPC : out std_logic_vector(k - 1 downto 0)
+        IC_data        : out std_logic_vector(n - 1 downto 0) --so that i can read and write to
     );
 end InstrCache;
 
@@ -31,14 +28,7 @@ begin
     begin
         if rising_edge(clk) then
             if to_integer(unsigned(IC_PC)) < 2 ** m then
-                temp_data := ram(to_integer(unsigned(IC_PC)));
-                IC_data  <= temp_data;
-                IC_isImm <= '0';
-                if temp_data(15 downto 13) = "010" then
-                    IC_Imm         <= ram(to_integer(unsigned(IC_PC)) + 1);
-                    IC_isImm       <= '1';
-                    IC_correctedPC <= std_logic_vector(unsigned(IC_PC) + 2);
-                end if;
+                IC_data <= ram(to_integer(unsigned(IC_PC)));
             end if;
         end if;
     end process;

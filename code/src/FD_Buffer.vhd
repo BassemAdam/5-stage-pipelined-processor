@@ -18,10 +18,7 @@ entity FD_Buffer is
         FD_Func   : out std_logic_vector(3 downto 0);
 
         -- Passing through
-        FD_isImm_in  : in std_logic;
-        FD_isImm_out : out std_logic;
-        FD_Imm_in    : in std_logic_vector(15 downto 0);
-        FD_Imm_out   : out std_logic_vector(15 downto 0)
+        FD_isImm_in  : in std_logic
     );
 end entity FD_Buffer;
 
@@ -40,7 +37,6 @@ begin
             FD_Func   <= (others => '0');
         elsif falling_edge(clk) and WE = '1' then
 
-            FD_OpCode <= FD_Inst(15 downto 13);
             FD_Rdst1  <= FD_Inst(12 downto 10);
             FD_Rdst2  <= FD_Inst(9 downto 7);
             FD_Rsrc1  <= FD_Inst(9 downto 7);
@@ -48,10 +44,10 @@ begin
             FD_Func   <= FD_Inst(3 downto 0);
 
             if FD_isImm_in = '1' then
-                FD_Imm_out <= FD_Imm_in;
+                FD_OpCode <= "000";
+            else
+                FD_OpCode <= FD_Inst(15 downto 13);
             end if;
-
-            FD_isImm_out <= FD_isImm_in;
         end if;
     end process;
 

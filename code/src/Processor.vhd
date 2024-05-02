@@ -18,19 +18,16 @@ architecture ProcessorArch of Processor is
 
     ------------------------------------COMPONENTS------------------------------------
     component PC is
-        generic (
-            N : integer := 32
+        GENERIC (
+            N : INTEGER := 32
         );
-        port (
-            clk, RES    : in std_logic;
-            PC_en       : in std_logic;
-            PC_branch   : in std_logic;
-            PC_branchPC : in std_logic_vector(N - 1 downto 0);
-
-            PC_isImm       : in std_logic;
-            PC_correctedPC : in std_logic_vector(N - 1 downto 0);
-
-            PC_PC : out std_logic_vector(N - 1 downto 0)
+        PORT (
+            clk, RES : IN STD_LOGIC;
+            PC_en : IN STD_LOGIC;
+            PC_branch : IN STD_LOGIC;
+            PC_branchPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+            
+            PC_PC : OUT STD_LOGIC_VECTOR(N - 1 DOWNTO 0)
         );
     end component;
 
@@ -43,11 +40,8 @@ architecture ProcessorArch of Processor is
         port (
             clk, RES : in std_logic;
             IC_PC    : in std_logic_vector(k - 1 downto 0);
-
-            IC_isImm       : out std_logic;
-            IC_Imm         : out std_logic_vector(n - 1 downto 0);
-            IC_data        : buffer std_logic_vector(n - 1 downto 0); --so that i can read and write to
-            IC_correctedPC : out std_logic_vector(k - 1 downto 0)
+    
+            IC_data        : out std_logic_vector(n - 1 downto 0) --so that i can read and write to
         );
     end component;
 
@@ -57,19 +51,16 @@ architecture ProcessorArch of Processor is
             RES     : in std_logic;
             WE      : in std_logic;
             FD_Inst : in std_logic_vector(15 downto 0); -- 16 bits from instruction memory
-
+    
             FD_OpCode : out std_logic_vector(2 downto 0);
             FD_Rsrc1  : out std_logic_vector(2 downto 0);
             FD_Rsrc2  : out std_logic_vector(2 downto 0);
             FD_Rdst1  : out std_logic_vector(2 downto 0);
             FD_Rdst2  : out std_logic_vector(2 downto 0);
             FD_Func   : out std_logic_vector(3 downto 0);
-
+    
             -- Passing through
-            FD_isImm_in  : in std_logic;
-            FD_isImm_out : out std_logic;
-            FD_Imm_in    : in std_logic_vector(15 downto 0);
-            FD_Imm_out   : out std_logic_vector(15 downto 0)
+            FD_isImm_in  : in std_logic
         );
     end component FD_Buffer;
 
@@ -253,9 +244,6 @@ architecture ProcessorArch of Processor is
 
     -- Instruction Cache signals
     signal IC_Inst        : std_logic_vector(15 downto 0);
-    signal IC_Imm         : std_logic_vector(15 downto 0);
-    signal IC_isImm       : std_logic;
-    signal IC_correctedPC : std_logic_vector(31 downto 0);
     -- Instruction Cache signals end
 
     -- FD Buffer signals
@@ -266,8 +254,6 @@ architecture ProcessorArch of Processor is
     signal FD_Rdst2  : std_logic_vector(2 downto 0);
     signal FD_Func   : std_logic_vector(3 downto 0);
 
-    signal FD_Imm_out   : std_logic_vector(15 downto 0);
-    signal FD_isImm_out : std_logic;
     -- FD Buffer signals end
 
     -- Register File signals
@@ -343,9 +329,6 @@ begin
         PC_en     => PC_en,
         PC_branchPC => (others => '0'),
 
-        --from instruction cache
-        PC_isImm       => IC_isImm,
-        PC_correctedPC => IC_correctedPC,
 
         PC_PC => PC_PC
     );
@@ -357,11 +340,7 @@ begin
         RES   => reset,
         IC_PC => PC_PC,
 
-        IC_data        => IC_Inst,
-        IC_Imm         => IC_Imm,
-        IC_isImm       => IC_isImm,
-        IC_correctedPC => IC_correctedPC
-
+        IC_data        => IC_Inst
     );
     -- map instruction cacheend
 
@@ -380,11 +359,7 @@ begin
         FD_Func   => FD_Func,
 
         -- Passing through
-        FD_isImm_in => IC_isImm,
-        FD_Imm_in   => IC_Imm,
-
-        FD_isImm_out => FD_isImm_out,
-        FD_Imm_out   => FD_Imm_out
+        FD_isImm_in => ctr_hasImm
     );
     -- map FD buffer end
 
@@ -415,8 +390,8 @@ begin
         WE           => we,
         DE_Rsrc1_Val => RF_Rdata1,
         DE_Rsrc2_Val => RF_Rdata2,
-        DE_Imm       => FD_Imm_out,
-        DE_isImm     => FD_isImm_out,
+        DE_Imm       => IC_Inst,
+        DE_isImm     => ctr_hasImm,
 
         DE_ALUopd1 => DE_ALUopd1,
         DE_ALUopd2 => DE_ALUopd2,
