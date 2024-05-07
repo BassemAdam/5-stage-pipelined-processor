@@ -7,10 +7,10 @@ entity Processor is
         clk       : in std_logic;
         reset, we : in std_logic;
         INT_In    : in std_logic; -- interrupt signal
-        IN_PORT   : in std_logic_vector(7 downto 0);
+        IN_PORT   : in std_logic_vector(31 downto 0);
 
         exception : out std_logic; -- exception signal
-        OUT_PORT  : out std_logic_vector(7 downto 0)
+        OUT_PORT  : out std_logic_vector(31 downto 0)
     );
 end entity Processor;
 
@@ -56,6 +56,7 @@ architecture ProcessorArch of Processor is
             RES     : in std_logic;
             WE      : in std_logic;
             FD_Inst : in std_logic_vector(15 downto 0); -- 16 bits from instruction memory
+            FD_IN_PORT : in std_logic_vector(31 downto 0); 
     
             FD_OpCode : out std_logic_vector(2 downto 0);
             FD_Rsrc1  : out std_logic_vector(2 downto 0);
@@ -63,6 +64,7 @@ architecture ProcessorArch of Processor is
             FD_Rdst1  : out std_logic_vector(2 downto 0);
             FD_Rdst2  : out std_logic_vector(2 downto 0);
             FD_Func   : out std_logic_vector(3 downto 0);
+            FD_InputPort : out std_logic_vector(31 downto 0);
     
             -- Passing through
             FD_isImm_in  : in std_logic
@@ -101,45 +103,52 @@ architecture ProcessorArch of Processor is
             RES        : in std_logic;
             ctr_opCode : in std_logic_vector(2 downto 0);
             ctr_Func   : in std_logic_vector(3 downto 0);
-
+    
             ctr_hasImm   : out std_logic;
             ctr_ALUsel   : out std_logic_vector(3 downto 0);
             ctr_flags_en : out std_logic_vector(0 to 3);
             ctr_we1_reg  : out std_logic;
             ctr_we2_reg  : out std_logic;
             ctr_we_mem   : out std_logic;
-            ctr_ALUorMem : out std_logic
-
+            ctr_ALUorMem : out std_logic;
+            ctr_isInput    : out std_logic
+    
             -- Passing through should be none its not a buffer
         );
     end component controller;
 
     component DE_Buffer is
-        port (
-            clk, RES, WE : in std_logic;
-            DE_Rsrc1_Val : in std_logic_vector(31 downto 0);
-            DE_Rsrc2_Val : in std_logic_vector(31 downto 0);
-            DE_Imm       : in std_logic_vector(15 downto 0);
-            DE_isImm     : in std_logic;
-
-            DE_ALUopd1 : out std_logic_vector(31 downto 0);
-            DE_ALUopd2 : out std_logic_vector(31 downto 0);
-
+        PORT (
+            clk, RES, WE : IN STD_LOGIC;
+            DE_Rsrc1_Val : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            DE_Rsrc2_Val : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            DE_Imm : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+            DE_isImm : IN STD_LOGIC;
+    
+            DE_ALUopd1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            DE_ALUopd2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    
             -- Passing through
-            DE_we1_reg_in   : in std_logic;
-            DE_we1_reg_out  : out std_logic;
-            DE_we2_reg_in   : in std_logic;
-            DE_we2_reg_out  : out std_logic;
-            DE_ALUorMem_in  : in std_logic;
-            DE_ALUorMem_out : out std_logic;
-            DE_flags_en_in  : in std_logic_vector (0 to 3);
-            DE_flags_en_out : out std_logic_vector (0 to 3);
-            DE_Rdst1_in     : in std_logic_vector(2 downto 0);
-            DE_Rdst2_in     : in std_logic_vector(2 downto 0);
-            DE_Rdst1_out    : out std_logic_vector(2 downto 0);
-            DE_Rdst2_out    : out std_logic_vector(2 downto 0);
-            DE_ALUsel_in    : in std_logic_vector(3 downto 0);
-            DE_ALUsel_out   : out std_logic_vector(3 downto 0)
+            DE_InPort_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            DE_InPort_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    
+            -- Control signals
+            ctr_isInput_in : IN STD_LOGIC;
+            ctr_isInput_out : OUT STD_LOGIC;
+            DE_we1_reg_in : IN STD_LOGIC;
+            DE_we1_reg_out : OUT STD_LOGIC;
+            DE_we2_reg_in : IN STD_LOGIC;
+            DE_we2_reg_out : OUT STD_LOGIC;
+            DE_ALUorMem_in : IN STD_LOGIC;
+            DE_ALUorMem_out : OUT STD_LOGIC;
+            DE_flags_en_in : IN STD_LOGIC_VECTOR (0 TO 3);
+            DE_flags_en_out : OUT STD_LOGIC_VECTOR (0 TO 3);
+            DE_Rdst1_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            DE_Rdst2_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            DE_Rdst1_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            DE_Rdst2_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            DE_ALUsel_in : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+            DE_ALUsel_out : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
         );
     end component;
 
@@ -243,82 +252,84 @@ architecture ProcessorArch of Processor is
 
     ------------------------------------SIGNALS------------------------------------
     -- PC signals
-    signal PC_en : std_logic;
-    signal PC_PC : std_logic_vector(31 downto 0);
+        signal PC_en : std_logic;
+        signal PC_PC : std_logic_vector(31 downto 0);
     -- PC signals end
 
     -- Instruction Cache signals
-    signal IC_Inst        : std_logic_vector(15 downto 0);
-    signal IC_InterruptPC : std_logic_vector(31 downto 0);
-    signal IC_ResetPC     : std_logic_vector(31 downto 0);
+        signal IC_Inst        : std_logic_vector(15 downto 0);
+        signal IC_InterruptPC : std_logic_vector(31 downto 0);
+        signal IC_ResetPC     : std_logic_vector(31 downto 0);
     -- Instruction Cache signals end
 
     -- FD Buffer signals
-    signal FD_OpCode : std_logic_vector(2 downto 0);
-    signal FD_Rsrc1  : std_logic_vector(2 downto 0);
-    signal FD_Rsrc2  : std_logic_vector(2 downto 0);
-    signal FD_Rdst1  : std_logic_vector(2 downto 0);
-    signal FD_Rdst2  : std_logic_vector(2 downto 0);
-    signal FD_Func   : std_logic_vector(3 downto 0);
+        signal FD_OpCode : std_logic_vector(2 downto 0);
+        signal FD_Rsrc1  : std_logic_vector(2 downto 0);
+        signal FD_Rsrc2  : std_logic_vector(2 downto 0);
+        signal FD_Rdst1  : std_logic_vector(2 downto 0);
+        signal FD_Rdst2  : std_logic_vector(2 downto 0);
+        signal FD_Func   : std_logic_vector(3 downto 0);
+        signal FD_InputPort :std_logic_vector(31 downto 0);
 
     -- FD Buffer signals end
 
     -- Register File signals
-    signal RF_Rdata1 : std_logic_vector(31 downto 0);
-    signal RF_Rdata2 : std_logic_vector(31 downto 0);
+        signal RF_Rdata1 : std_logic_vector(31 downto 0);
+        signal RF_Rdata2 : std_logic_vector(31 downto 0);
     -- Register File signals end
 
     -- DE Buffer signals
-    signal DE_ALUopd1 : std_logic_vector(31 downto 0);
-    signal DE_ALUopd2 : std_logic_vector(31 downto 0);
-
-    signal DE_we1_reg_out  : std_logic;
-    signal DE_we2_reg_out  : std_logic;
-    signal DE_ALUorMem_out : std_logic;
-    signal DE_flags_en_out : std_logic_vector (0 to 3);
-    signal DE_Rdst1_out    : std_logic_vector(2 downto 0);
-    signal DE_Rdst2_out    : std_logic_vector(2 downto 0);
-    signal DE_ALUsel_out   : std_logic_vector(3 downto 0);
+        signal DE_ALUopd1 : std_logic_vector(31 downto 0);
+        signal DE_ALUopd2 : std_logic_vector(31 downto 0);
+        signal DE_InPort_out : std_logic_vector(31 downto 0);
+        signal DE_we1_reg_out  : std_logic;
+        signal DE_we2_reg_out  : std_logic;
+        signal DE_ALUorMem_out : std_logic;
+        signal DE_flags_en_out : std_logic_vector (0 to 3);
+        signal DE_Rdst1_out    : std_logic_vector(2 downto 0);
+        signal DE_Rdst2_out    : std_logic_vector(2 downto 0);
+        signal DE_ALUsel_out   : std_logic_vector(3 downto 0);
     -- DE Buffer signals end
 
     -- ALU signals
-    signal ALU_Result1 : std_logic_vector(31 downto 0);
-    signal ALU_Result2 : std_logic_vector(31 downto 0);
-    signal ALU_flags   : std_logic_vector(0 to 3);
+        signal ALU_Result1 : std_logic_vector(31 downto 0);
+        signal ALU_Result2 : std_logic_vector(31 downto 0);
+        signal ALU_flags   : std_logic_vector(0 to 3);
     -- ALU signals end
 
     -- EM Buffer signals 
-    signal EM_ALUorMem_out   : std_logic;
-    signal EM_we1_reg_out    : std_logic;
-    signal EM_we2_reg_out    : std_logic;
-    signal EM_Rdst1_out      : std_logic_vector(2 downto 0);
-    signal EM_Rdst2_out      : std_logic_vector(2 downto 0);
-    signal EM_ALUResult1_out : std_logic_vector(31 downto 0);
-    signal EM_ALUResult2_out : std_logic_vector(31 downto 0);
+        signal EM_ALUorMem_out   : std_logic;
+        signal EM_we1_reg_out    : std_logic;
+        signal EM_we2_reg_out    : std_logic;
+        signal EM_Rdst1_out      : std_logic_vector(2 downto 0);
+        signal EM_Rdst2_out      : std_logic_vector(2 downto 0);
+        signal EM_ALUResult1_out : std_logic_vector(31 downto 0);
+        signal EM_ALUResult2_out : std_logic_vector(31 downto 0);
     -- EM Buffer signals end
 
     -- MW Buffer signals
-    signal MW_value1 : std_logic_vector(31 downto 0);
-    signal MW_value2 : std_logic_vector(31 downto 0);
+        signal MW_value1 : std_logic_vector(31 downto 0);
+        signal MW_value2 : std_logic_vector(31 downto 0);
 
-    signal MW_we1_reg_out : std_logic;
-    signal MW_we2_reg_out : std_logic;
-    signal MW_Rdst1_out   : std_logic_vector(2 downto 0);
-    signal MW_Rdst2_out   : std_logic_vector(2 downto 0);
+        signal MW_we1_reg_out : std_logic;
+        signal MW_we2_reg_out : std_logic;
+        signal MW_Rdst1_out   : std_logic_vector(2 downto 0);
+        signal MW_Rdst2_out   : std_logic_vector(2 downto 0);
     -- MW Buffer signals end
 
     -- CCR signals
-    signal CCR_flags : std_logic_vector(3 downto 0);
+         signal CCR_flags : std_logic_vector(3 downto 0);
     -- CCR signals end
 
     -- Controller Signals (most of the are not connected)
-    signal ctr_hasImm   : std_logic;
-    signal ctr_ALUsel   : std_logic_vector(3 downto 0);
-    signal ctr_flags_en : std_logic_vector(0 to 3);
-    signal ctr_we1_reg  : std_logic;
-    signal ctr_we2_reg  : std_logic;
-    signal ctr_we_mem   : std_logic;
-    signal ctr_ALUorMem : std_logic;
+        signal ctr_hasImm   : std_logic;
+        signal ctr_ALUsel   : std_logic_vector(3 downto 0);
+        signal ctr_flags_en : std_logic_vector(0 to 3);
+        signal ctr_we1_reg  : std_logic;
+        signal ctr_we2_reg  : std_logic;
+        signal ctr_we_mem   : std_logic;
+        signal ctr_ALUorMem : std_logic;
+        signal ctr_isInput  : std_logic;
     -- Controller signals end
 
     ------------------------------------SIGNALS END-----------------------------------
@@ -362,6 +373,7 @@ begin
         RES     => reset,
         WE      => we,
         FD_Inst => IC_Inst,
+  
 
         FD_OpCode => FD_OpCode,
         FD_Rsrc1  => FD_Rsrc1,
@@ -369,9 +381,11 @@ begin
         FD_Rdst1  => FD_Rdst1,
         FD_Rdst2  => FD_Rdst2,
         FD_Func   => FD_Func,
-
+        FD_IN_PORT  => IN_PORT,
+   
         -- Passing through
-        FD_isImm_in => ctr_hasImm
+        FD_isImm_in => ctr_hasImm,
+        FD_InputPort => FD_InputPort
     );
     -- map FD buffer end
 
@@ -404,11 +418,14 @@ begin
         DE_Rsrc2_Val => RF_Rdata2,
         DE_Imm       => IC_Inst,
         DE_isImm     => ctr_hasImm,
-
+    
         DE_ALUopd1 => DE_ALUopd1,
         DE_ALUopd2 => DE_ALUopd2,
 
         -- Passing through
+        DE_InPort_in  => FD_InputPort,
+        DE_InPort_out => DE_InPort_out,
+        ctr_isInput_in  => ctr_isInput,
         DE_we1_reg_in  => ctr_we1_reg,
         DE_we2_reg_in  => ctr_we2_reg,
         DE_ALUorMem_in => ctr_ALUorMem,
@@ -504,7 +521,8 @@ begin
         ctr_we1_reg  => ctr_we1_reg,
         ctr_we2_reg  => ctr_we2_reg,
         ctr_we_mem   => ctr_we_mem,
-        ctr_ALUorMem => ctr_ALUorMem
+        ctr_ALUorMem => ctr_ALUorMem,
+        ctr_isInput  => ctr_isInput
     );
     -- map controller end
 
@@ -520,8 +538,13 @@ begin
     -- map CCR end
 
     ------------------------------------PORTS END----------------------------------
-    ------------------------------------PROCESS------------------------------------
-    -- i added those because we will need them later and for test cases
+    ----------------------------------PROCESS------------------------------------
+    --process for the PC-Reset port 
+    -- process (clk,IC_InterruptPC)
+    -- begin  
+    --          PC_ResetPC <= IC_ResetPC;
+    -- end process;
+    --i added those because we will need them later and for test cases
     -- process for the output port 
     -- process (clk)
     -- begin
@@ -545,6 +568,6 @@ begin
     --         end if;
     --     end if;
     -- end process;
-    ----------------------------------END PROCESS----------------------------------
+    --------------------------------END PROCESS----------------------------------
 
 end architecture ProcessorArch;

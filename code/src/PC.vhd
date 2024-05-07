@@ -27,7 +27,7 @@ BEGIN
 
     PROCESS (RES, clk)
     BEGIN
-        IF RES = '1' THEN
+        IF  falling_edge(clk) and RES = '1'  THEN
             pcNext <= (PC_ResetPC);
         ELSIF PC_Interrupt = '1' THEN
             pcNext <= PC_InterruptPC;

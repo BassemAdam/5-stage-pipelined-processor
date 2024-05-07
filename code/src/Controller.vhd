@@ -18,7 +18,8 @@ entity Controller is
         ctr_we1_reg  : out std_logic;
         ctr_we2_reg  : out std_logic;
         ctr_we_mem   : out std_logic;
-        ctr_ALUorMem : out std_logic
+        ctr_ALUorMem : out std_logic;
+        ctr_isInput    : out std_logic
 
         -- Passing through should be none its not a buffer
     );
@@ -122,6 +123,16 @@ begin
             if ctr_opCode = "011" then -- Data Operations 
                 if ctr_Func = "0000" then
                 end if;
+                if ctr_Func = "1001" then -- Input
+                    ctr_isInput <= '1';
+                    ctr_hasImm   <= '0';
+                    ctr_ALUsel   <= "0101";
+                    ctr_flags_en <= "0000";
+                    ctr_we1_reg  <= '1';
+                    ctr_we2_reg  <= '0';
+                    ctr_we_mem   <= '0';
+                    ctr_ALUorMem <= '0';
+                    end if;
             end if;
 
             if ctr_opCode = "100" then -- Conditional Jump

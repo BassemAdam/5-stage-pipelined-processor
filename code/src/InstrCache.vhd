@@ -24,7 +24,8 @@ architecture Behavioral of InstrCache is
     signal ram : ram_type;
 
 begin
-
+    PC_Reset <= ram(0)&ram(1);
+    PC_Interrupt <= ram(2)&ram(3);
     process (clk, RES)
         variable temp_data : std_logic_vector(n - 1 downto 0);
     begin
@@ -34,6 +35,4 @@ begin
             end if;
         end if;
     end process;
-    PC_Reset <= ram(0)&ram(1);
-    PC_Interrupt <= ram(2)&ram(3);
 end architecture Behavioral;

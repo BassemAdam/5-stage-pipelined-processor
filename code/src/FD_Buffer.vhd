@@ -9,6 +9,7 @@ entity FD_Buffer is
         RES     : in std_logic;
         WE      : in std_logic;
         FD_Inst : in std_logic_vector(15 downto 0); -- 16 bits from instruction memory
+        FD_IN_PORT : in std_logic_vector(31 downto 0); 
 
         FD_OpCode : out std_logic_vector(2 downto 0);
         FD_Rsrc1  : out std_logic_vector(2 downto 0);
@@ -16,6 +17,7 @@ entity FD_Buffer is
         FD_Rdst1  : out std_logic_vector(2 downto 0);
         FD_Rdst2  : out std_logic_vector(2 downto 0);
         FD_Func   : out std_logic_vector(3 downto 0);
+        FD_InputPort : out std_logic_vector(31 downto 0);
 
         -- Passing through
         FD_isImm_in  : in std_logic
@@ -42,7 +44,7 @@ begin
             FD_Rsrc1  <= FD_Inst(9 downto 7);
             FD_Rsrc2  <= FD_Inst(6 downto 4);
             FD_Func   <= FD_Inst(3 downto 0);
-
+            FD_InputPort <= FD_IN_PORT;
             if FD_isImm_in = '1' then
                 FD_OpCode <= "000";
             else
