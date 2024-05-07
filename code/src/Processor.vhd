@@ -24,8 +24,11 @@ architecture ProcessorArch of Processor is
         PORT (
             clk, RES : IN STD_LOGIC;
             PC_en : IN STD_LOGIC;
+            PC_Interrupt : IN STD_LOGIC;
             PC_branch : IN STD_LOGIC;
             PC_branchPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+            PC_InterruptPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+            PC_ResetPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
             
             PC_PC : OUT STD_LOGIC_VECTOR(N - 1 DOWNTO 0)
         );
@@ -41,7 +44,9 @@ architecture ProcessorArch of Processor is
             clk, RES : in std_logic;
             IC_PC    : in std_logic_vector(k - 1 downto 0);
     
-            IC_data        : out std_logic_vector(n - 1 downto 0) --so that i can read and write to
+            IC_data        : out std_logic_vector(n - 1 downto 0); --so that i can read and write to
+            PC_Reset       : out std_logic_vector(k - 1 downto 0); --to reset the PC
+            PC_Interrupt   : out std_logic_vector(k - 1 downto 0) --to interrupt the PC
         );
     end component;
 
@@ -244,6 +249,8 @@ architecture ProcessorArch of Processor is
 
     -- Instruction Cache signals
     signal IC_Inst        : std_logic_vector(15 downto 0);
+    signal IC_InterruptPC : std_logic_vector(31 downto 0);
+    signal IC_ResetPC     : std_logic_vector(31 downto 0);
     -- Instruction Cache signals end
 
     -- FD Buffer signals
@@ -327,8 +334,11 @@ begin
         RES       => reset,
         PC_branch => '0',
         PC_en     => PC_en,
-        PC_branchPC => (others => '0'),
+        PC_Interrupt => '0',  -- PROBABLY NEED TO CHANGE THIS AND TAKE IT AS AN INPUT TO THE PROCESSOR
 
+        PC_branchPC => (others => '0'),
+        PC_InterruptPC => IC_InterruptPC,
+        PC_ResetPC => IC_ResetPC,
 
         PC_PC => PC_PC
     );
@@ -340,7 +350,9 @@ begin
         RES   => reset,
         IC_PC => PC_PC,
 
-        IC_data        => IC_Inst
+        IC_data        => IC_Inst,
+        PC_Reset       => IC_ResetPC,
+        PC_Interrupt   => IC_InterruptPC
     );
     -- map instruction cacheend
 

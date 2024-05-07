@@ -2,7 +2,7 @@
 project compileall
 
 vsim -gui work.processor
-mem load -infile {mem_files/instrCache1.mem} instrCache1
+mem load -infile {mem_files/instrCache.mem} instrCache1
 
 add wave -position insertpoint  \
 sim:/processor/clk  \

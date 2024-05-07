@@ -9,8 +9,11 @@ ENTITY PC IS
     PORT (
         clk, RES : IN STD_LOGIC;
         PC_en : IN STD_LOGIC;
+        PC_Interrupt : IN STD_LOGIC;
         PC_branch : IN STD_LOGIC;
         PC_branchPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+        PC_InterruptPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+        PC_ResetPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
         
         PC_PC : OUT STD_LOGIC_VECTOR(N - 1 DOWNTO 0)
     );
@@ -25,8 +28,9 @@ BEGIN
     PROCESS (RES, clk)
     BEGIN
         IF RES = '1' THEN
-            pcNext <= (OTHERS => '0');
-
+            pcNext <= (PC_ResetPC);
+        ELSIF PC_Interrupt = '1' THEN
+            pcNext <= PC_InterruptPC;
         ELSIF falling_edge(clk) THEN
             IF PC_branch = '1' THEN
                 pcNext <= PC_branchPC;

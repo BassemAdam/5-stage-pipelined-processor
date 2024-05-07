@@ -12,7 +12,9 @@ entity InstrCache is
         clk, RES : in std_logic;
         IC_PC    : in std_logic_vector(k - 1 downto 0);
 
-        IC_data        : out std_logic_vector(n - 1 downto 0) --so that i can read and write to
+        IC_data        : out std_logic_vector(n - 1 downto 0); --so that i can read and write to
+        PC_Reset       : out std_logic_vector(k - 1 downto 0); --to reset the PC
+        PC_Interrupt   : out std_logic_vector(k - 1 downto 0) --to interrupt the PC
     );
 end InstrCache;
 
@@ -32,5 +34,6 @@ begin
             end if;
         end if;
     end process;
-
+    PC_Reset <= ram(0)&ram(1);
+    PC_Interrupt <= ram(2)&ram(3);
 end architecture Behavioral;
