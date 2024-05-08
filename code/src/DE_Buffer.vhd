@@ -69,7 +69,11 @@ BEGIN
                 ELSE
                     DE_ALUopd2_var := DE_Rsrc2_Val;
                 END IF;
-              
+                IF DE_isInput_in = '1' THEN
+                    DE_ALUopd2 <= DE_InPort_in;
+                ELSE
+                    DE_ALUopd2 <= DE_ALUopd2_var;
+                END IF;
 
                 DE_Rdst1_out <= DE_Rdst1_in;
                 DE_Rdst2_out <= DE_Rdst2_in;

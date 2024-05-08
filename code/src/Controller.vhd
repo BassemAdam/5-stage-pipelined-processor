@@ -30,96 +30,100 @@ ARCHITECTURE ControllerArch3 OF Controller IS
 
 BEGIN
     PROCESS (ctr_opCode, ctr_Func, RES)
+        VARIABLE ctr_hasImm_var : STD_LOGIC := '0';
+        VARIABLE ctr_ALUsel_var : STD_LOGIC_VECTOR(3 DOWNTO 0) := (OTHERS => '0');
+        VARIABLE ctr_flags_en_var : STD_LOGIC_VECTOR(0 TO 3) := (OTHERS => '0');
+        VARIABLE ctr_we1_reg_var : STD_LOGIC := '0';
+        VARIABLE ctr_we2_reg_var : STD_LOGIC := '0';
+        VARIABLE ctr_we_mem_var : STD_LOGIC := '0';
+        VARIABLE ctr_ALUorMem_var : STD_LOGIC := '0';
+        VARIABLE ctr_isInput_var : STD_LOGIC := '0';
+        VARIABLE ctr_OUTport_en_var : STD_LOGIC := '0';
     BEGIN
-
-        -- ctr_hasImm   <= '0';
-        -- ctr_ALUsel   <= (others => '0');
-        -- ctr_flags_en <= (others => '0');
-        -- ctr_we1_reg  <= '0';
-        -- ctr_we2_reg  <= '0';
-        -- ctr_we_mem   <= '0';
-        -- ctr_ALUorMem <= '0';
-        -- ctr_OUTport_en <= '0';
-
+        ctr_hasImm_var := '0';
+        ctr_ALUsel_var := (OTHERS => '0');
+        ctr_flags_en_var := (OTHERS => '0');
+        ctr_we1_reg_var := '0';
+        ctr_we2_reg_var := '0';
+        ctr_we_mem_var := '0';
+        ctr_ALUorMem_var := '0';
+        ctr_isInput_var := '0';
+        ctr_OUTport_en_var := '0';
         IF RES = '0' THEN
             IF ctr_opCode = "000" THEN -- NOP
-                ctr_flags_en <= (OTHERS => '0');
-                ctr_we1_reg <= '0';
-                ctr_we2_reg <= '0';
-                ctr_we_mem <= '0';
-                ctr_hasImm <= '0';
-                ctr_OUTport_en <= '0';
+                -- ctr_flags_en_var := (OTHERS => '0');
+                -- ctr_we1_reg_var := '0';
+                -- ctr_we2_reg_var := '0';
+                -- ctr_we_mem_var := '0';
+                -- ctr_hasImm_var := '0';
+                -- ctr_OUTport_en_var := '0';
             END IF;
 
             IF ctr_opCode = "001" THEN -- ALU 
-                ctr_ALUsel <= ctr_Func;
-                ctr_we1_reg <= '1';
-                ctr_ALUorMem <= '0';
-
+                ctr_ALUsel_var := ctr_Func;
+                ctr_we1_reg_var := '1';
                 IF ctr_Func = "0000" THEN -- NOT
-                    ctr_flags_en <= "1100";
+                    ctr_flags_en_var := "1100";
                 END IF;
                 IF ctr_Func = "0001" THEN -- NEG
-                    ctr_flags_en <= "1100";
+                    ctr_flags_en_var := "1100";
                 END IF;
                 IF ctr_Func = "0010" THEN -- INC
-                    ctr_flags_en <= "1111";
+                    ctr_flags_en_var := "1111";
                 END IF;
                 IF ctr_Func = "0011" THEN -- DEC
-                    ctr_flags_en <= "1111";
+                    ctr_flags_en_var := "1111";
                 END IF;
                 IF ctr_Func = "0100" THEN -- MOV
-                    ctr_flags_en <= "0000";
+                    ctr_flags_en_var := "0000";
                 END IF;
                 IF ctr_Func = "0101" THEN -- MOV
-                    ctr_flags_en <= "0000";
+                    ctr_flags_en_var := "0000";
                 END IF;
                 IF ctr_Func = "0110" THEN -- ADD
-                    ctr_flags_en <= "1111";
+                    ctr_flags_en_var := "1111";
                 END IF;
                 IF ctr_Func = "0111" THEN -- SUB
-                    ctr_flags_en <= "1111";
+                    ctr_flags_en_var := "1111";
                 END IF;
                 IF ctr_Func = "1000" THEN -- AND
-                    ctr_flags_en <= "1100";
+                    ctr_flags_en_var := "1100";
                 END IF;
                 IF ctr_Func = "1001" THEN -- OR
-                    ctr_flags_en <= "1100";
+                    ctr_flags_en_var := "1100";
                 END IF;
                 IF ctr_Func = "1010" THEN -- XOR
-                    ctr_flags_en <= "1100";
+                    ctr_flags_en_var := "1100";
                 END IF;
                 IF ctr_Func = "1011" THEN -- CMP
-                    ctr_we1_reg <= '0';
-                    ctr_flags_en <= "1100";
+                    ctr_we1_reg_var := '0';
+                    ctr_flags_en_var := "1100";
                 END IF;
             END IF;
             ----------------------------Imm-------------------------------------------
             IF ctr_opCode = "010" THEN -- Immediate 
-                ctr_hasImm <= '1';
+                ctr_hasImm_var := '1';
                 IF ctr_Func = "0011" THEN -- STD
-                    ctr_we_mem <= '1';
-                    ctr_ALUsel <= "0110";
+                    ctr_we_mem_var := '1';
+                    ctr_ALUsel_var := "0110";
                 END IF;
                 IF ctr_Func = "1100" THEN -- LDD
-                    ctr_ALUorMem <= '1';
-                    ctr_ALUsel <= "0110";
+                    ctr_ALUorMem_var := '1';
+                    ctr_ALUsel_var := "0110";
                 END IF;
                 IF ctr_Func = "0010" THEN -- LDM
-                    ctr_ALUsel <= "0101";
-                    ctr_we1_reg <= '1';
+                    ctr_ALUsel_var := "0101";
+                    ctr_we1_reg_var := '1';
                 END IF;
                 IF ctr_Func = "0000" THEN -- ADDI
-                    ctr_ALUsel <= "0110";
-                    ctr_flags_en <= "1111";
-                    ctr_we1_reg <= '1';
-                    ctr_ALUorMem <= '0';
+                    ctr_ALUsel_var := "0110";
+                    ctr_flags_en_var := "1111";
+                    ctr_we1_reg_var := '1';
                 END IF;
                 IF ctr_Func = "0001" THEN -- SUBI
-                    ctr_ALUsel <= "0111";
-                    ctr_flags_en <= "1111";
-                    ctr_we1_reg <= '1';
-                    ctr_ALUorMem <= '0';
+                    ctr_ALUsel_var := "0111";
+                    ctr_flags_en_var := "1111";
+                    ctr_we1_reg_var := '1';
                 END IF;
             END IF;
 
@@ -127,24 +131,14 @@ BEGIN
                 IF ctr_Func = "0000" THEN
                 END IF;
                 IF ctr_Func = "1001" THEN -- Input
-                    ctr_isInput <= '1';
-                    ctr_hasImm <= '0';
-                    ctr_ALUsel <= "0101";
-                    ctr_flags_en <= "0000";
-                    ctr_we1_reg <= '1';
-                    ctr_we2_reg <= '0';
-                    ctr_we_mem <= '0';
-                    ctr_ALUorMem <= '0';
+                    ctr_isInput_var := '1';
+                    ctr_ALUsel_var := "0101";
+                    ctr_flags_en_var := "0000";
+                    ctr_we1_reg_var := '1';
                 END IF;
                 IF ctr_Func = "0001" THEN -- Output
-                    ctr_OUTport_en <= '1';
-                    ctr_hasImm <= '0';
-                    ctr_ALUsel <= "0100";
-                    ctr_flags_en <= "0000";
-                    ctr_we1_reg <= '0';
-                    ctr_we2_reg <= '0';
-                    ctr_we_mem <= '0';
-                    ctr_ALUorMem <= '0';
+                    ctr_OUTport_en_var := '1';
+                    ctr_ALUsel_var := "0100";
                 END IF;
             END IF;
 
@@ -168,14 +162,23 @@ BEGIN
                 END IF;
             END IF;
         ELSE
-            ctr_hasImm <= '0';
-            ctr_ALUsel <= (OTHERS => '0');
-            ctr_flags_en <= (OTHERS => '0');
-            ctr_we1_reg <= '0';
-            ctr_we2_reg <= '0';
-            ctr_we_mem <= '0';
-            ctr_ALUorMem <= '0';
+            -- ctr_hasImm <= '0';
+            -- ctr_ALUsel <= (OTHERS => '0');
+            -- ctr_flags_en <= (OTHERS => '0');
+            -- ctr_we1_reg <= '0';
+            -- ctr_we2_reg <= '0';
+            -- ctr_we_mem <= '0';
+            -- ctr_ALUorMem <= '0';
         END IF;
+        ctr_hasImm <= ctr_hasImm_var;
+        ctr_ALUsel <= ctr_ALUsel_var;
+        ctr_flags_en <= ctr_flags_en_var;
+        ctr_we1_reg <= ctr_we1_reg_var;
+        ctr_we2_reg <= ctr_we2_reg_var;
+        ctr_we_mem <= ctr_we_mem_var;
+        ctr_ALUorMem <= ctr_ALUorMem_var;
+        ctr_isInput <= ctr_isInput_var;
+        ctr_OUTport_en <= ctr_OUTport_en_var;
     END PROCESS;
 END ARCHITECTURE ControllerArch3;
 
