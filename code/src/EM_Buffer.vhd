@@ -7,6 +7,8 @@ entity EM_Buffer is
         clk, RES, WE : in std_logic;
 
         -- Passing through
+        EM_OUTport_en_out : out std_logic;
+        EM_OUTport_en_in     : in std_logic;
         EM_ALUorMem_in    : in std_logic;
         EM_ALUorMem_out   : out std_logic;
         EM_we1_reg_in     : in std_logic;
@@ -36,8 +38,10 @@ begin
             EM_ALUResult2_out <= (others => '0');
             EM_Rdst1_out       <= (others => '0');
             EM_Rdst2_out       <= (others => '0');
+            EM_OUTport_en_out <= '0';
         elsif falling_edge(clk) then
             if WE = '1' then
+                EM_OUTport_en_out <= EM_OUTport_en_in;
                 EM_ALUorMem_out   <= EM_ALUorMem_in;
                 EM_we1_reg_out    <= EM_we1_reg_in;
                 EM_we2_reg_out    <= EM_we2_reg_in;

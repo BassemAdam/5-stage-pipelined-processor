@@ -22,6 +22,8 @@ entity RegisterFile is
 
         RF_Rdata1 : out std_logic_vector(n - 1 downto 0);
         RF_Rdata2 : out std_logic_vector(n - 1 downto 0)
+
+       
     );
 end entity RegisterFile;
 
@@ -43,7 +45,9 @@ begin
                 q_registers(TO_INTEGER(unsigned(RF_Rdst2))) <= RF_Wdata2;
             end if;
         end if;
+          
     end process;
+    
 
     RF_Rdata1 <= q_registers(TO_INTEGER(unsigned(RF_Rsrc1)));
     RF_Rdata2 <= q_registers(TO_INTEGER(unsigned(RF_Rsrc2)));

@@ -14,6 +14,9 @@ entity MW_Buffer is
         MW_value2 : out std_logic_vector(31 downto 0);
 
         -- Passing through
+
+        MW_OUTport_en_out : out std_logic;
+        MW_OUTport_en_in  : in std_logic;
         MW_we1_reg_in  : in std_logic;
         MW_we1_reg_out : out std_logic;
         MW_we2_reg_in  : in std_logic;
@@ -36,6 +39,7 @@ begin
             MW_value2      <= (others => '0');
             MW_Rdst1_out    <= (others => '0');
             MW_Rdst2_out    <= (others => '0');
+            MW_OUTport_en_out <= '0';
         elsif falling_edge(clk) then
             if WE = '1' then
                 if (MW_ALUorMem = '1') then
@@ -44,6 +48,7 @@ begin
                     MW_value1 <= MW_ALUResult1;
                     MW_value2 <= MW_ALUResult2;
                 end if;
+                MW_OUTport_en_out <= MW_OUTport_en_in;
                 MW_we1_reg_out <= MW_we1_reg_in;
                 MW_we2_reg_out <= MW_we2_reg_in;
                 MW_Rdst1_out    <= MW_Rdst1_in;

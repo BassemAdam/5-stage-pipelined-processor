@@ -1,56 +1,57 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.all;
-use IEEE.STD_LOGIC_ARITH.all;
-use IEEE.STD_LOGIC_UNSIGNED.all;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.STD_LOGIC_ARITH.ALL;
+USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 
-entity FD_Buffer is
-    port (
-        clk     : in std_logic;
-        RES     : in std_logic;
-        WE      : in std_logic;
-        FD_Inst : in std_logic_vector(15 downto 0); -- 16 bits from instruction memory
-        FD_IN_PORT : in std_logic_vector(31 downto 0); 
+ENTITY FD_Buffer IS
+    PORT (
+        clk : IN STD_LOGIC;
+        RES : IN STD_LOGIC;
+        WE : IN STD_LOGIC;
+        FD_Inst : IN STD_LOGIC_VECTOR(15 DOWNTO 0); -- 16 bits from instruction memory
+        FD_IN_PORT : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-        FD_OpCode : out std_logic_vector(2 downto 0);
-        FD_Rsrc1  : out std_logic_vector(2 downto 0);
-        FD_Rsrc2  : out std_logic_vector(2 downto 0);
-        FD_Rdst1  : out std_logic_vector(2 downto 0);
-        FD_Rdst2  : out std_logic_vector(2 downto 0);
-        FD_Func   : out std_logic_vector(3 downto 0);
-        FD_InputPort : out std_logic_vector(31 downto 0);
+        FD_OpCode : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+        FD_Rsrc1 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+        FD_Rsrc2 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+        FD_Rdst1 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+        FD_Rdst2 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+        FD_Func : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+        FD_InputPort : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 
         -- Passing through
-        FD_isImm_in  : in std_logic
+        FD_isImm_in : IN STD_LOGIC
     );
-end entity FD_Buffer;
+END ENTITY FD_Buffer;
 
-architecture Behavioral of FD_Buffer is
+ARCHITECTURE Behavioral OF FD_Buffer IS
 
-begin
-    process (CLK, RES)
-    begin
-        if RES = '1' then
+BEGIN
+    PROCESS (CLK, RES)
+    BEGIN
+        IF RES = '1' THEN
             -- Asynchronous RES
-            FD_OpCode <= (others => '0');
-            FD_Rsrc1  <= (others => '0');
-            FD_Rsrc2  <= (others => '0');
-            FD_Rdst1  <= (others => '0');
-            FD_Rdst2  <= (others => '0');
-            FD_Func   <= (others => '0');
-        elsif falling_edge(clk) and WE = '1' then
+            FD_OpCode <= (OTHERS => '0');
+            FD_Rsrc1 <= (OTHERS => '0');
+            FD_Rsrc2 <= (OTHERS => '0');
+            FD_Rdst1 <= (OTHERS => '0');
+            FD_Rdst2 <= (OTHERS => '0');
+            FD_Func <= (OTHERS => '0');
+        ELSIF falling_edge(clk) AND WE = '1' THEN
 
-            FD_Rdst1  <= FD_Inst(12 downto 10);
-            FD_Rdst2  <= FD_Inst(9 downto 7);
-            FD_Rsrc1  <= FD_Inst(9 downto 7);
-            FD_Rsrc2  <= FD_Inst(6 downto 4);
-            FD_Func   <= FD_Inst(3 downto 0);
+            FD_Rdst1 <= FD_Inst(12 DOWNTO 10);
+            FD_Rdst2 <= FD_Inst(9 DOWNTO 7);
+
+            FD_Rsrc1 <= FD_Inst(9 DOWNTO 7);
+            FD_Rsrc2 <= FD_Inst(6 DOWNTO 4);
+            FD_Func <= FD_Inst(3 DOWNTO 0);
             FD_InputPort <= FD_IN_PORT;
-            if FD_isImm_in = '1' then
+            IF FD_isImm_in = '1' THEN
                 FD_OpCode <= "000";
-            else
-                FD_OpCode <= FD_Inst(15 downto 13);
-            end if;
-        end if;
-    end process;
+            ELSE
+                FD_OpCode <= FD_Inst(15 DOWNTO 13);
+            END IF;
+        END IF;
+    END PROCESS;
 
-end architecture Behavioral;
+END ARCHITECTURE Behavioral;

@@ -2,13 +2,15 @@
 project compileall
 
 vsim -gui work.processor
-mem load -infile {mem_files/PH3_OneOP.mem} instrCache1
+mem load -infile {mem_files/PH3_OneOP copy.mem} instrCache1
 
 # Add signals to the waveform viewer
 add wave -position insertpoint  \
+sim:/processor/NumberOfCycle  \
 sim:/processor/clk  \
 sim:/processor/reset  \
 sim:/processor/IN_PORT  \
+sim:/processor/OUT_PORT  \
 sim:/processor/ctr_we1_reg  \
 sim:/processor/PC_PC  \
 sim:/processor/IC_ResetPC  \
