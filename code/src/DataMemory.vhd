@@ -1,49 +1,75 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity DataMemory is
-    generic (
-        DATA_WIDTH : integer := 16;
-        ADDR_WIDTH : integer := 12
+ENTITY DataMemory IS
+    GENERIC (
+        DATA_WIDTH : INTEGER := 17;
+        ADDR_WIDTH : INTEGER := 12
     );
 
-    port (
-        clk, RES : in std_logic;
-        DM_MemR  : in std_logic;
-        DM_MemW  : in std_logic;
-        DM_RAddr : in unsigned(ADDR_WIDTH - 1 downto 0);
-        DM_WAddr : in unsigned(ADDR_WIDTH - 1 downto 0);
-        DM_WData : in unsigned(DATA_WIDTH - 1 downto 0);
-
-        DM_RData : out unsigned(DATA_WIDTH - 1 downto 0)
+    PORT (
+        clk, RES : IN STD_LOGIC;
+        DM_MemR : IN STD_LOGIC;
+        DM_MemW : IN STD_LOGIC;
+        DM_Push : IN STD_LOGIC;
+        DM_Pop : IN STD_LOGIC;
+        DM_RAddr : IN unsigned(ADDR_WIDTH - 1 DOWNTO 0);
+        DM_WAddr : IN unsigned(ADDR_WIDTH - 1 DOWNTO 0);
+        DM_WData : IN unsigned(31 DOWNTO 0);
+        DM_Free : IN STD_LOGIC;
+        DM_Protect : IN STD_LOGIC;
+        DM_Exception : OUT STD_LOGIC;
+        DM_RData : OUT unsigned(31 DOWNTO 0)
     );
-end entity DataMemory;
+END ENTITY DataMemory;
 
-architecture DataMemory_arch of dataMemory is
+ARCHITECTURE DataMemory_arch OF dataMemory IS
 
-    type memory is array(0 to 2 ** ADDR_WIDTH - 1) of unsigned(DATA_WIDTH - 1 downto 0);
-    signal mem : memory := (others => (others => '0'));
+    TYPE memory IS ARRAY(0 TO 4096) OF unsigned(DATA_WIDTH - 1 DOWNTO 0);
+    SIGNAL mem : memory := (OTHERS => (OTHERS => '0'));
+    SIGNAL sp : INTEGER RANGE 0 TO 2 ** ADDR_WIDTH - 1 := 4095;
+BEGIN
+    PROCESS (clk, RES)
+    BEGIN
 
-begin
-    process (clk, RES)
-    begin
+        IF RES = '1' THEN
+            mem <= (OTHERS => (OTHERS => '0'));
 
-        if RES = '1' then
-            mem <= (others => (others => '0'));
+        ELSIF rising_edge(clk) THEN
 
-        elsif rising_edge(clk) then
-
-            if DM_MemW = '1' then
-                mem(to_integer(DM_WAddr))     <= DM_WData(15 downto 0);
-                mem(to_integer(DM_WAddr) + 1) <= DM_WData(31 downto 16);
-            end if;
-
-            if DM_MemR = '1' then
+            IF DM_MemW = '1' THEN
+                IF mem(to_integer(unsigned(DM_WAddr)))(16) = '1' THEN
+                    DM_Exception <= '1';
+                ELSE
+                    mem(to_integer(DM_WAddr)) <= DM_WData(15 DOWNTO 0);
+                    mem(to_integer(DM_WAddr) + 1) <= DM_WData(31 DOWNTO 16);
+                END IF;
+            ELSIF DM_MemR = '1' THEN
                 DM_RData <= mem(to_integer(DM_RAddr));
-            end if;
-
-        end if;
-
-    end process;
-end architecture DataMemory_arch;
+            ELSIF DM_Push = '1' THEN
+                IF sp = 0 OR mem(sp)(16) = '1' OR mem(sp - 1)(16) = '1' THEN
+                    DM_Exception <= '1';
+                ELSE
+                    sp <= sp - 2;
+                    mem(sp - 1)(15 DOWNTO 0) <= DM_WData(15 DOWNTO 0);
+                    mem(sp)(15 DOWNTO 0) <= DM_WData(31 DOWNTO 16);
+                END IF;
+            ELSIF DM_Pop = '1' THEN
+                IF sp = 4095 OR mem(sp+1)(16) = '1' OR mem(sp + 2)(16) = '1' THEN
+                    DM_Exception <= '1';
+                ELSE
+                    DM_RData(15 DOWNTO 0) <= mem(sp +1)(15 DOWNTO 0);
+                    DM_RData(31 DOWNTO 16) <= mem(sp+2)(15 DOWNTO 0);
+                    mem(sp+1) <= (OTHERS => '0');
+                    mem(sp+2) <= (OTHERS => '0');
+                    sp <= sp + 2;
+                END IF;
+            ELSIF DM_Protect = '1' THEN
+                mem(to_integer(DM_WAddr))(16) <= '1';
+            ELSIF DM_Free = '1' THEN
+                mem(to_integer(DM_WAddr))(16) <= '0';
+            END IF;
+        END IF;
+    END PROCESS;
+END ARCHITECTURE DataMemory_arch;

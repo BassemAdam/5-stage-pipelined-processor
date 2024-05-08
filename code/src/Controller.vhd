@@ -140,6 +140,29 @@ BEGIN
                     ctr_OUTport_en_var := '1';
                     ctr_ALUsel_var := "0100";
                 END IF;
+                --Memory Operations
+                IF ctr_Func = "0010" OR ctr_Func = "0011" THEN --PUSH
+                    ctr_hasImm_var := '0';
+                    ctr_ALUsel_var := (OTHERS => '0');
+                    ctr_flags_en_var := (OTHERS => '0');
+                    ctr_we1_reg_var := '0';
+                    ctr_we2_reg_var := '0';
+                    ctr_we_mem_var := '0';
+                    ctr_ALUorMem_var := '0';
+                    ctr_isInput_var := '0';
+                    ctr_OUTport_en_var := '0';
+                END IF;
+                IF ctr_Func = "1010" OR ctr_Func = "1011" THEN --POP
+                    ctr_hasImm_var := '0';
+                    ctr_ALUsel_var := (OTHERS => '0');
+                    ctr_flags_en_var := (OTHERS => '0');
+                    ctr_we1_reg_var := '0';
+                    ctr_we2_reg_var := '0';
+                    ctr_we_mem_var := '0';
+                    ctr_ALUorMem_var := '0';
+                    ctr_isInput_var := '0';
+                    ctr_OUTport_en_var := '0';
+                END IF;
             END IF;
 
             IF ctr_opCode = "100" THEN -- Conditional Jump
