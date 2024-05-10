@@ -24,7 +24,7 @@ entity MW_Buffer is
         MW_Rdst1_in     : in std_logic_vector(2 downto 0);
         MW_Rdst1_out    : out std_logic_vector(2 downto 0);
         MW_Rdst2_in     : in std_logic_vector(2 downto 0);
-        MW_Rdst2_out    : out std_logic_vector(2 downto 0)
+        MW_Rdst2_out    : out std_logic_vector(2 downto 0);
 
     );
 end entity MW_Buffer;

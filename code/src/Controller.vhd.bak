@@ -18,11 +18,11 @@ ENTITY Controller IS
         ctr_we1_reg : OUT STD_LOGIC;
         ctr_we2_reg : OUT STD_LOGIC;
         ctr_MemW : OUT STD_LOGIC;
-        ctr_MemR : OUT STD_LOGIC;
-        ctr_Push : OUT STD_LOGIC;
-        ctr_Pop : OUT STD_LOGIC;
-        ctr_Free : OUT STD_LOGIC;
-        ctr_Protect : OUT STD_LOGIC;
+        ctr_MemR   : OUT STD_LOGIC;
+        ctr_Push   : OUT STD_LOGIC;
+        ctr_Pop    : OUT STD_LOGIC;
+        ctr_Free   : OUT STD_LOGIC;
+        ctr_Protect: OUT STD_LOGIC;
         ctr_ALUorMem : OUT STD_LOGIC;
         ctr_isInput : OUT STD_LOGIC;
 
@@ -164,12 +164,12 @@ BEGIN
                 --Memory Operations
                 IF ctr_Func = "0010" THEN --PUSH
                     ctr_Push_var := '1';
+                    ctr_we1_reg_var := '1';
                     ctr_ALUsel_var := "0100";
                 END IF;
                 IF ctr_Func = "1010" THEN --POP
                     ctr_Pop_var := '1';
                     ctr_we1_reg_var := '1';
-                    ctr_AluOrMem_var := '1';
                 END IF;
             END IF;
 
@@ -184,13 +184,11 @@ BEGIN
             END IF;
 
             IF ctr_opCode = "110" THEN -- Memory Security
-                IF ctr_Func = "0000" THEN -- Protect
-                    ctr_Protect_var := '1';
-                    ctr_ALUsel_var := "0100";
-                END IF;
-                IF ctr_Func = "1000" THEN -- Free
+                IF ctr_Func = "0000" THEN -- Free
                     ctr_Free_var := '1';
-                    ctr_ALUsel_var := "0100";
+                END IF;
+                IF ctr_Func = "1000" THEN -- Protect
+                    ctr_Protect_var := '1';
                 END IF;
             END IF;
 
@@ -212,6 +210,7 @@ BEGIN
         ctr_flags_en <= ctr_flags_en_var;
         ctr_we1_reg <= ctr_we1_reg_var;
         ctr_we2_reg <= ctr_we2_reg_var;
+        ctr_we_mem <= ctr_we_mem_var;
         ctr_ALUorMem <= ctr_ALUorMem_var;
         ctr_isInput <= ctr_isInput_var;
         ctr_OUTport_en <= ctr_OUTport_en_var;

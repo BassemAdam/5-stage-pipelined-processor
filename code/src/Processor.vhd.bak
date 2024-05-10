@@ -372,7 +372,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
     -- EM Buffer signals end
 
     -- Data Memory signals
-        SIGNAL DM_RData : STD_LOGIC_VECTOR(31 DOWNTO 0);
+
     -- Data Memory signals end
 
     -- MW Buffer signals
@@ -595,14 +595,14 @@ BEGIN
         DM_Push => EM_Push_out,
         DM_Pop => EM_Pop_out,
 
-        DM_RAddr => EM_ALUResult1_out(11 DOWNTO 0),
-        DM_WAddr => EM_ALUResult1_out(11 DOWNTO 0),
-        DM_WData => EM_ALUResult1_out, -- need to modify for push and std
+        DM_RAddr => ALU_Result1(11 DOWNTO 0),
+        DM_WAddr => ALU_Result1(11 DOWNTO 0),
+        DM_WData => ALU_Result1,
 
-        DM_Free => EM_Free_out,
+        DM_Free => EM_Protect_out,
         DM_Protect => EM_Protect_out,
         DM_Exception => exception,
-        DM_RData => DM_RData
+        DM_RData => MW_value1
     );
     -- map DataMemory end
 
@@ -615,7 +615,7 @@ BEGIN
         MW_ALUorMem => EM_ALUorMem_out,
         MW_ALUResult1 => EM_ALUResult1_out,
         MW_ALUResult2 => EM_ALUResult2_out,
-        MW_MemResult => DM_RData,
+        MW_MemResult => (OTHERS => '0'),
 
         MW_value1 => MW_value1,
         MW_value2 => MW_value2,
@@ -650,7 +650,7 @@ BEGIN
         ctr_we2_reg => ctr_we2_reg,
         ctr_ALUorMem => ctr_ALUorMem,
         ctr_isInput => ctr_isInput,
-        ctr_OUTport_en => ctr_OUTport_en,
+        ctr_OUTport_en => ctr_OUTport_en
         ctr_MemW => ctr_MemW,
         ctr_MemR   => ctr_MemR,
         ctr_Push   => ctr_Push,

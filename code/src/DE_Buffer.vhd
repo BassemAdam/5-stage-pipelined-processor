@@ -35,6 +35,20 @@ ENTITY DE_Buffer IS
         DE_Rdst1_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
         DE_Rdst2_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
         DE_ALUsel_in : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        --MEMORY OPERATIONS SIGNALS
+        DE_MemW_in : IN STD_LOGIC;
+        DE_MemW_out : OUT STD_LOGIC;
+        DE_MemR_in : IN STD_LOGIC;
+        DE_MemR_out : OUT STD_LOGIC;
+        DE_Push_in : IN STD_LOGIC;
+        DE_Push_out : OUT STD_LOGIC;
+        DE_Pop_in : IN STD_LOGIC;
+        DE_Pop_out : OUT STD_LOGIC;
+        DE_Protect_in : IN STD_LOGIC;
+        DE_Protect_out : OUT STD_LOGIC;
+        DE_Free_in : IN STD_LOGIC;
+        DE_Free_out : OUT STD_LOGIC;
+        --END MEMORY OPERATIONS SIGNALS
         DE_ALUsel_out : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
     );
 END ENTITY DE_Buffer;
@@ -54,6 +68,15 @@ BEGIN
             DE_Rdst2_out <= (OTHERS => '0');
             DE_ALUsel_out <= (OTHERS => '0');
             DE_OUTport_en_out <= '0';
+            DE_we2_reg_out <= '0';
+            DE_InPort_out <= (OTHERS => '0');
+            DE_isInput_out <= '0';
+            DE_MemW_out <= '0';
+            DE_MemR_out <= '0';
+            DE_Push_out <= '0';
+            DE_Pop_out <= '0';
+            DE_Protect_out <= '0';
+            DE_Free_out <= '0';
         ELSIF falling_edge(clk) THEN
 
             IF WE = '1' THEN
@@ -78,6 +101,14 @@ BEGIN
                 DE_Rdst1_out <= DE_Rdst1_in;
                 DE_Rdst2_out <= DE_Rdst2_in;
                 DE_ALUsel_out <= DE_ALUsel_in;
+                --Memory Operations
+                DE_MemW_out <= DE_MemW_in;
+                DE_MemR_out <= DE_MemR_in;
+                DE_Push_out <= DE_Push_in;
+                DE_Pop_out <= DE_Pop_in;
+                DE_Protect_out <= DE_Protect_in;
+                DE_Free_out <= DE_Free_in;
+                --End Memory Operations
             END IF;
         END IF;
     END PROCESS;

@@ -60,7 +60,7 @@ begin
             EM_Push_out <= '0';
             EM_Pop_out <= '0';
             EM_Protect_out <= '0';
-            EM_Free_out <= '0';
+            EM_Free_out <= '0'
             --END MEMORY OPERATIONS SIGNALS
         elsif falling_edge(clk) then
             if WE = '1' then

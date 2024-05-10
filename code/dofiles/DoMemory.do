@@ -1,10 +1,10 @@
-# Compile all the files in the project
+#Compile all the files in the project
 project compileall
 
-# Load the simulation
+#Load the simulation
 vsim -gui work.DataMemory
 
-# Add signals to the waveform viewer
+#Add signals to the waveform viewer
 add wave -position insertpoint  \
 sim:/DataMemory/clk  \
 sim:/DataMemory/RES  \
@@ -22,7 +22,7 @@ sim:/DataMemory/DM_Exception  \
 sim:/DataMemory/DM_RData
 
 
-# Run the simulation for a specified amount of time
+#Run the simulation for a specified amount of time
 force -freeze sim:/DataMemory/RES 1 0
 
 force -freeze sim:/DataMemory/clk 1 0, 0 {50 ps} -r 100
