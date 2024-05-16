@@ -26,7 +26,8 @@ ARCHITECTURE ProcessorArch OF Processor IS
             PC_en : IN STD_LOGIC;
             PC_Interrupt : IN STD_LOGIC;
             PC_branch : IN STD_LOGIC;
-            PC_branchPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+            PC_JZ_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+            PC_JMP_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
             PC_InterruptPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
             PC_ResetPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
 
@@ -110,11 +111,11 @@ ARCHITECTURE ProcessorArch OF Processor IS
             ctr_we1_reg : OUT STD_LOGIC;
             ctr_we2_reg : OUT STD_LOGIC;
             ctr_MemW : OUT STD_LOGIC;
-            ctr_MemR   : OUT STD_LOGIC;
-            ctr_Push   : OUT STD_LOGIC;
-            ctr_Pop    : OUT STD_LOGIC;
-            ctr_Free   : OUT STD_LOGIC;
-            ctr_Protect: OUT STD_LOGIC;
+            ctr_MemR : OUT STD_LOGIC;
+            ctr_Push : OUT STD_LOGIC;
+            ctr_Pop : OUT STD_LOGIC;
+            ctr_Free : OUT STD_LOGIC;
+            ctr_Protect : OUT STD_LOGIC;
             ctr_ALUorMem : OUT STD_LOGIC;
             ctr_isInput : OUT STD_LOGIC;
 
@@ -188,26 +189,26 @@ ARCHITECTURE ProcessorArch OF Processor IS
     END COMPONENT;
 
     COMPONENT EM_Buffer IS
-        port (
-            clk, RES, WE : in std_logic;
+        PORT (
+            clk, RES, WE : IN STD_LOGIC;
 
             -- Passing through
-            EM_OUTport_en_out : out std_logic;
-            EM_OUTport_en_in     : in std_logic;
-            EM_ALUorMem_in    : in std_logic;
-            EM_ALUorMem_out   : out std_logic;
-            EM_we1_reg_in     : in std_logic;
-            EM_we1_reg_out    : out std_logic;
-            EM_we2_reg_in     : in std_logic;
-            EM_we2_reg_out    : out std_logic;
-            EM_Rdst1_in        : in std_logic_vector(2 downto 0);
-            EM_Rdst1_out       : out std_logic_vector(2 downto 0);
-            EM_Rdst2_in        : in std_logic_vector(2 downto 0);
-            EM_Rdst2_out       : out std_logic_vector(2 downto 0);
-            EM_ALUResult1_in  : in std_logic_vector(31 downto 0);
-            EM_ALUResult1_out : out std_logic_vector(31 downto 0);
-            EM_ALUResult2_in  : in std_logic_vector(31 downto 0);
-            EM_ALUResult2_out : out std_logic_vector(31 downto 0);
+            EM_OUTport_en_out : OUT STD_LOGIC;
+            EM_OUTport_en_in : IN STD_LOGIC;
+            EM_ALUorMem_in : IN STD_LOGIC;
+            EM_ALUorMem_out : OUT STD_LOGIC;
+            EM_we1_reg_in : IN STD_LOGIC;
+            EM_we1_reg_out : OUT STD_LOGIC;
+            EM_we2_reg_in : IN STD_LOGIC;
+            EM_we2_reg_out : OUT STD_LOGIC;
+            EM_Rdst1_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            EM_Rdst1_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            EM_Rdst2_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            EM_Rdst2_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            EM_ALUResult1_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            EM_ALUResult1_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            EM_ALUResult2_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            EM_ALUResult2_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 
             --MEMORY OPERATIONS SIGNALS
             EM_STD_VALUE_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -225,7 +226,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
             EM_Free_in : IN STD_LOGIC;
             EM_Free_out : OUT STD_LOGIC
             --END MEMORY OPERATIONS SIGNALS
-            );
+        );
     END COMPONENT;
 
     COMPONENT DataMemory IS
@@ -252,28 +253,28 @@ ARCHITECTURE ProcessorArch OF Processor IS
 
     COMPONENT MW_Buffer IS
         PORT (
-            clk, RES, WE  : in std_logic;
-            MW_ALUorMem   : in std_logic;
-            MW_ALUResult1 : in std_logic_vector(31 downto 0);
-            MW_ALUResult2 : in std_logic_vector(31 downto 0);
-            MW_MemResult  : in std_logic_vector(31 downto 0);
-    
-            MW_value1 : out std_logic_vector(31 downto 0);
-            MW_value2 : out std_logic_vector(31 downto 0);
-    
+            clk, RES, WE : IN STD_LOGIC;
+            MW_ALUorMem : IN STD_LOGIC;
+            MW_ALUResult1 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            MW_ALUResult2 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            MW_MemResult : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+            MW_value1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            MW_value2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+
             -- Passing through
-    
-            MW_OUTport_en_out : out std_logic;
-            MW_OUTport_en_in  : in std_logic;
-            MW_we1_reg_in  : in std_logic;
-            MW_we1_reg_out : out std_logic;
-            MW_we2_reg_in  : in std_logic;
-            MW_we2_reg_out : out std_logic;
-            MW_Rdst1_in     : in std_logic_vector(2 downto 0);
-            MW_Rdst1_out    : out std_logic_vector(2 downto 0);
-            MW_Rdst2_in     : in std_logic_vector(2 downto 0);
-            MW_Rdst2_out    : out std_logic_vector(2 downto 0)
-    
+
+            MW_OUTport_en_out : OUT STD_LOGIC;
+            MW_OUTport_en_in : IN STD_LOGIC;
+            MW_we1_reg_in : IN STD_LOGIC;
+            MW_we1_reg_out : OUT STD_LOGIC;
+            MW_we2_reg_in : IN STD_LOGIC;
+            MW_we2_reg_out : OUT STD_LOGIC;
+            MW_Rdst1_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            MW_Rdst1_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            MW_Rdst2_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            MW_Rdst2_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0)
+
         );
     END COMPONENT MW_Buffer;
 
@@ -303,116 +304,116 @@ ARCHITECTURE ProcessorArch OF Processor IS
     ------------------------------------COMPONENTS END-----------------------------------
 
     ------------------------------------SIGNALS------------------------------------
-        -- PC signals
-        SIGNAL PC_en : STD_LOGIC;
-        SIGNAL PC_PC : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        -- PC signals end
+    -- PC signals
+    SIGNAL PC_en : STD_LOGIC;
+    SIGNAL PC_PC : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    -- PC signals end
 
-        -- Instruction Cache signals
-        SIGNAL IC_Inst : STD_LOGIC_VECTOR(15 DOWNTO 0);
-        SIGNAL IC_InterruptPC : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        SIGNAL IC_ResetPC : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        -- Instruction Cache signals end
+    -- Instruction Cache signals
+    SIGNAL IC_Inst : STD_LOGIC_VECTOR(15 DOWNTO 0);
+    SIGNAL IC_InterruptPC : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL IC_ResetPC : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    -- Instruction Cache signals end
 
-        -- FD Buffer signals
-        SIGNAL FD_OpCode : STD_LOGIC_VECTOR(2 DOWNTO 0);
-        SIGNAL FD_Rsrc1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-        SIGNAL FD_Rsrc2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-        SIGNAL FD_Rdst1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-        SIGNAL FD_Rdst2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-        SIGNAL FD_Func : STD_LOGIC_VECTOR(3 DOWNTO 0);
-        SIGNAL FD_InputPort : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    -- FD Buffer signals
+    SIGNAL FD_OpCode : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL FD_Rsrc1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL FD_Rsrc2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL FD_Rdst1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL FD_Rdst2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL FD_Func : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    SIGNAL FD_InputPort : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-        -- FD Buffer signals end
+    -- FD Buffer signals end
 
-        -- Register File signals
-        SIGNAL RF_Rdata1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        SIGNAL RF_Rdata2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        -- Register File signals end
+    -- Register File signals
+    SIGNAL RF_Rdata1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL RF_Rdata2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    -- Register File signals end
 
-        -- DE Buffer signals
-        SIGNAL DE_ALUopd1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        SIGNAL DE_ALUopd2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        SIGNAL DE_InPort_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        SIGNAL DE_we1_reg_out : STD_LOGIC;
-        SIGNAL DE_we2_reg_out : STD_LOGIC;
-        SIGNAL DE_ALUorMem_out : STD_LOGIC;
-        SIGNAL DE_OUTport_en_out : STD_LOGIC;
-        SIGNAL DE_flags_en_out : STD_LOGIC_VECTOR (0 TO 3);
-        SIGNAL DE_Rdst1_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
-        SIGNAL DE_Rdst2_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
-        SIGNAL DE_ALUsel_out : STD_LOGIC_VECTOR(3 DOWNTO 0);
-        SIGNAL DE_MemW_out : STD_LOGIC;
-        SIGNAL DE_MemR_out : STD_LOGIC;
-        SIGNAL DE_Push_out : STD_LOGIC;
-        SIGNAL DE_Pop_out : STD_LOGIC;
-        SIGNAL DE_Protect_out : STD_LOGIC;
-        SIGNAL DE_Free_out : STD_LOGIC;
-        SIGNAL DE_STD_VALUE : STD_LOGIC_VECTOR(31 DOWNTO 0); -- for std
-        -- DE Buffer signals end
+    -- DE Buffer signals
+    SIGNAL DE_ALUopd1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL DE_ALUopd2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL DE_InPort_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL DE_we1_reg_out : STD_LOGIC;
+    SIGNAL DE_we2_reg_out : STD_LOGIC;
+    SIGNAL DE_ALUorMem_out : STD_LOGIC;
+    SIGNAL DE_OUTport_en_out : STD_LOGIC;
+    SIGNAL DE_flags_en_out : STD_LOGIC_VECTOR (0 TO 3);
+    SIGNAL DE_Rdst1_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL DE_Rdst2_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL DE_ALUsel_out : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    SIGNAL DE_MemW_out : STD_LOGIC;
+    SIGNAL DE_MemR_out : STD_LOGIC;
+    SIGNAL DE_Push_out : STD_LOGIC;
+    SIGNAL DE_Pop_out : STD_LOGIC;
+    SIGNAL DE_Protect_out : STD_LOGIC;
+    SIGNAL DE_Free_out : STD_LOGIC;
+    SIGNAL DE_STD_VALUE : STD_LOGIC_VECTOR(31 DOWNTO 0); -- for std
+    -- DE Buffer signals end
 
-        -- ALU signals
-        SIGNAL ALU_Result1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        SIGNAL ALU_Result2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        SIGNAL ALU_flags : STD_LOGIC_VECTOR(0 TO 3);
-        -- ALU signals end
+    -- ALU signals
+    SIGNAL ALU_Result1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL ALU_Result2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL ALU_flags : STD_LOGIC_VECTOR(0 TO 3);
+    -- ALU signals end
 
-        -- EM Buffer signals 
-            SIGNAL EM_ALUorMem_out : STD_LOGIC;
-            SIGNAL EM_we1_reg_out : STD_LOGIC;
-            SIGNAL EM_we2_reg_out : STD_LOGIC;
-            SIGNAL EM_OUTport_en_out : STD_LOGIC;
-            SIGNAL EM_Rdst1_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
-            SIGNAL EM_Rdst2_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
-            SIGNAL EM_ALUResult1_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
-            SIGNAL EM_ALUResult2_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
-            -- MEMORY OPERATIONS SIGNALS
-            SIGNAL EM_MemW_out : STD_LOGIC;
-            SIGNAL EM_MemR_out : STD_LOGIC;
-            SIGNAL EM_Push_out : STD_LOGIC;
-            SIGNAL EM_Pop_out : STD_LOGIC;
-            SIGNAL EM_Protect_out : STD_LOGIC;
-            SIGNAL EM_Free_out : STD_LOGIC;
-            SIGNAL EM_STD_VALUE : STD_LOGIC_VECTOR(31 DOWNTO 0); -- for std
-        -- EM Buffer signals end
+    -- EM Buffer signals 
+    SIGNAL EM_ALUorMem_out : STD_LOGIC;
+    SIGNAL EM_we1_reg_out : STD_LOGIC;
+    SIGNAL EM_we2_reg_out : STD_LOGIC;
+    SIGNAL EM_OUTport_en_out : STD_LOGIC;
+    SIGNAL EM_Rdst1_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL EM_Rdst2_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL EM_ALUResult1_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL EM_ALUResult2_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    -- MEMORY OPERATIONS SIGNALS
+    SIGNAL EM_MemW_out : STD_LOGIC;
+    SIGNAL EM_MemR_out : STD_LOGIC;
+    SIGNAL EM_Push_out : STD_LOGIC;
+    SIGNAL EM_Pop_out : STD_LOGIC;
+    SIGNAL EM_Protect_out : STD_LOGIC;
+    SIGNAL EM_Free_out : STD_LOGIC;
+    SIGNAL EM_STD_VALUE : STD_LOGIC_VECTOR(31 DOWNTO 0); -- for std
+    -- EM Buffer signals end
 
-        -- Data Memory signals
-            SIGNAL DM_RData : STD_LOGIC_VECTOR(31 DOWNTO 0);
-        -- Data Memory signals end
+    -- Data Memory signals
+    SIGNAL DM_RData : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    -- Data Memory signals end
 
-        -- MW Buffer signals
-            SIGNAL MW_value1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
-            SIGNAL MW_value2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    -- MW Buffer signals
+    SIGNAL MW_value1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL MW_value2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-            SIGNAL MW_we1_reg_out : STD_LOGIC;
-            SIGNAL MW_we2_reg_out : STD_LOGIC;
-            SIGNAL MW_OUTport_en_out : STD_LOGIC;
-            SIGNAL MW_Rdst1_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
-            SIGNAL MW_Rdst2_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
-        -- MW Buffer signals end
+    SIGNAL MW_we1_reg_out : STD_LOGIC;
+    SIGNAL MW_we2_reg_out : STD_LOGIC;
+    SIGNAL MW_OUTport_en_out : STD_LOGIC;
+    SIGNAL MW_Rdst1_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL MW_Rdst2_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    -- MW Buffer signals end
 
-        -- CCR signals
-        SIGNAL CCR_flags : STD_LOGIC_VECTOR(3 DOWNTO 0);
-        -- CCR signals end
+    -- CCR signals
+    SIGNAL CCR_flags : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    -- CCR signals end
 
-        -- Controller Signals (most of the are not connected)
-            SIGNAL ctr_hasImm : STD_LOGIC;
-            SIGNAL ctr_ALUsel : STD_LOGIC_VECTOR(3 DOWNTO 0);
-            SIGNAL ctr_flags_en : STD_LOGIC_VECTOR(0 TO 3);
-            SIGNAL ctr_we1_reg : STD_LOGIC;
-            SIGNAL ctr_we2_reg : STD_LOGIC;
-            SIGNAL ctr_ALUorMem : STD_LOGIC;
-            SIGNAL ctr_isInput : STD_LOGIC;
-            SIGNAL ctr_OUTport_en : STD_LOGIC;
-            -- Controller for memoryData
-            SIGNAL ctr_MemW : STD_LOGIC;
-            SIGNAL ctr_MemR   : STD_LOGIC;
-            SIGNAL ctr_Push   : STD_LOGIC;
-            SIGNAL ctr_Pop    : STD_LOGIC;
-            SIGNAL ctr_Free   : STD_LOGIC;
-            SIGNAL ctr_Protect: STD_LOGIC;
-        -- Controller signals end
-         SIGNAL NumberOfCycle : INTEGER := 0;
+    -- Controller Signals (most of the are not connected)
+    SIGNAL ctr_hasImm : STD_LOGIC;
+    SIGNAL ctr_ALUsel : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    SIGNAL ctr_flags_en : STD_LOGIC_VECTOR(0 TO 3);
+    SIGNAL ctr_we1_reg : STD_LOGIC;
+    SIGNAL ctr_we2_reg : STD_LOGIC;
+    SIGNAL ctr_ALUorMem : STD_LOGIC;
+    SIGNAL ctr_isInput : STD_LOGIC;
+    SIGNAL ctr_OUTport_en : STD_LOGIC;
+    -- Controller for memoryData
+    SIGNAL ctr_MemW : STD_LOGIC;
+    SIGNAL ctr_MemR : STD_LOGIC;
+    SIGNAL ctr_Push : STD_LOGIC;
+    SIGNAL ctr_Pop : STD_LOGIC;
+    SIGNAL ctr_Free : STD_LOGIC;
+    SIGNAL ctr_Protect : STD_LOGIC;
+    -- Controller signals end
+    SIGNAL NumberOfCycle : INTEGER := 0;
     ------------------------------------SIGNALS END-----------------------------------
 
 BEGIN
@@ -428,7 +429,8 @@ BEGIN
         PC_en => PC_en,
         PC_Interrupt => '0', -- PROBABLY NEED TO CHANGE THIS AND TAKE IT AS AN INPUT TO THE PROCESSOR
 
-        PC_branchPC => (OTHERS => '0'),
+        PC_JZ_PC => (OTHERS => '0'),
+        PC_JMP_PC => RF_Rdata1,
         PC_InterruptPC => IC_InterruptPC,
         PC_ResetPC => IC_ResetPC,
 
@@ -604,7 +606,7 @@ BEGIN
 
         DM_RAddr => EM_ALUResult1_out(11 DOWNTO 0),
         DM_WAddr => EM_ALUResult1_out(11 DOWNTO 0),
-        DM_WData => EM_STD_VALUE,--EM_ALUResult1_out, -- need to modify for push and std 
+        DM_WData => EM_STD_VALUE, --EM_ALUResult1_out, -- need to modify for push and std 
 
         DM_Free => EM_Free_out,
         DM_Protect => EM_Protect_out,
@@ -612,8 +614,6 @@ BEGIN
         DM_RData => DM_RData
     );
     -- map DataMemory end
-
-
     -- map MW buffer
     MW_Buffer1 : MW_Buffer PORT MAP(
         clk => clk,
@@ -659,11 +659,11 @@ BEGIN
         ctr_isInput => ctr_isInput,
         ctr_OUTport_en => ctr_OUTport_en,
         ctr_MemW => ctr_MemW,
-        ctr_MemR   => ctr_MemR,
-        ctr_Push   => ctr_Push,
-        ctr_Pop    => ctr_Pop,
-        ctr_Free   => ctr_Free,
-        ctr_Protect=> ctr_Protect
+        ctr_MemR => ctr_MemR,
+        ctr_Push => ctr_Push,
+        ctr_Pop => ctr_Pop,
+        ctr_Free => ctr_Free,
+        ctr_Protect => ctr_Protect
     );
     -- map controller end
 
