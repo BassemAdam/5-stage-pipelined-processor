@@ -5,7 +5,7 @@ project compileall
 vsim -gui work.processor
 
 # Load the memory
-mem load -infile {mem_files/DoMemHaz.mem} instrCache1
+mem load -infile {mem_files/DoDataHazard.mem} instrCache1
 
 # Add signals to the waveform viewer
 add wave -position insertpoint  \

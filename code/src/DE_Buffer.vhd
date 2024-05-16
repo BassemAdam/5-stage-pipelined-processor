@@ -48,6 +48,7 @@ ENTITY DE_Buffer IS
         DE_Protect_out : OUT STD_LOGIC;
         DE_Free_in : IN STD_LOGIC;
         DE_Free_out : OUT STD_LOGIC;
+        DE_STD_VALUE : OUT STD_LOGIC_VECTOR(31 DOWNTO 0); -- for std 
         --END MEMORY OPERATIONS SIGNALS
         DE_ALUsel_out : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
     );
@@ -77,6 +78,7 @@ BEGIN
             DE_Pop_out <= '0';
             DE_Protect_out <= '0';
             DE_Free_out <= '0';
+            DE_STD_VALUE <= (OTHERS => '0');
         ELSIF falling_edge(clk) THEN
 
             IF WE = '1' THEN
@@ -85,12 +87,20 @@ BEGIN
                 DE_we1_reg_out <= DE_we1_reg_in;
                 DE_we2_reg_out <= DE_we2_reg_in;
                 DE_ALUorMem_out <= DE_ALUorMem_in;
-                DE_ALUopd1 <= DE_Rsrc1_Val;
+
                 DE_flags_en_out <= DE_flags_en_in;
                 IF DE_isImm = '1' THEN
                     DE_ALUopd2_var := X"0000" & DE_Imm;
                 ELSE
+
                     DE_ALUopd2_var := DE_Rsrc2_Val;
+                END IF;
+                IF DE_MemW_in = '1' AND DE_isImm ='1' THEN
+                    DE_ALUopd1 <= DE_Rsrc2_Val;
+                    DE_STD_VALUE <= DE_Rsrc1_Val;
+                ELSE
+                    DE_ALUopd1 <= DE_Rsrc1_Val;
+                    DE_STD_VALUE <= (OTHERS => '0');
                 END IF;
                 IF DE_isInput_in = '1' THEN
                     DE_ALUopd2 <= DE_InPort_in;

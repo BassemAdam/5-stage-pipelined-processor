@@ -42,14 +42,14 @@ BEGIN
                 IF mem(to_integer(unsigned(DM_WAddr)))(16) = '1' THEN
                     DM_Exception <= '1';
                 ELSE
-                    mem(to_integer(unsigned(DM_WAddr))) <= DM_WData(15 DOWNTO 0);
-                    mem(to_integer(unsigned(DM_WAddr)) + 1) <= DM_WData(31 DOWNTO 16);
+                    mem(to_integer(unsigned(DM_WAddr)))(15 DOWNTO 0) <=  DM_WData(15 DOWNTO 0);
+                    mem(to_integer(unsigned(DM_WAddr)) + 1)(15 DOWNTO 0) <= DM_WData(31 DOWNTO 16);
                 END IF;
             ELSIF DM_MemR = '1' THEN
                 --DM_RData <= mem(to_integer(unsigned(DM_RAddr)));
                 DM_RData(15 DOWNTO 0) <= mem(to_integer(unsigned(DM_RAddr)))(15 DOWNTO 0) ;
-                DM_RData(31 DOWNTO 16) <= (OTHERS => '0');
-                --DM_RData(31 DOWNTO 16) <= mem(to_integer(unsigned(DM_RAddr)) + 1)(15 DOWNTO 0) ;
+                -- DM_RData(31 DOWNTO 16) <= (OTHERS => '0');
+                DM_RData(31 DOWNTO 16) <= mem(to_integer(unsigned(DM_RAddr)) + 1)(15 DOWNTO 0) ;
             ELSIF DM_Push = '1' THEN
                 IF sp = 0 OR mem(sp)(16) = '1' OR mem(sp - 1)(16) = '1' THEN
                     DM_Exception <= '1';
