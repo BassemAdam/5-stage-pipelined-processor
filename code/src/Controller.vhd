@@ -25,6 +25,7 @@ ENTITY Controller IS
         ctr_Protect : OUT STD_LOGIC;
         ctr_ALUorMem : OUT STD_LOGIC;
         ctr_isInput : OUT STD_LOGIC;
+        ctr_JMP : out std_logic;
 
         ctr_OUTport_en : OUT STD_LOGIC
 
@@ -52,6 +53,7 @@ BEGIN
         VARIABLE ctr_Pop_var : STD_LOGIC := '0';
         VARIABLE ctr_Free_var : STD_LOGIC := '0';
         VARIABLE ctr_Protect_var : STD_LOGIC := '0';
+        VARIABLE ctr_JMP_var : STD_LOGIC := '0';
     BEGIN
         ctr_hasImm_var := '0';
         ctr_ALUsel_var := (OTHERS => '0');
@@ -68,6 +70,7 @@ BEGIN
         ctr_Pop_var := '0';
         ctr_Free_var := '0';
         ctr_Protect_var := '0';
+        ctr_JMP_var := '0';
         IF RES = '0' THEN
             IF ctr_opCode = "000" THEN -- NOP
                 -- ctr_flags_en_var := (OTHERS => '0');
@@ -180,6 +183,7 @@ BEGIN
 
             IF ctr_opCode = "101" THEN -- Unconditional Jump
                 IF ctr_Func = "0000" THEN
+                ctr_JMP_var = '1';
                 END IF;
             END IF;
 
@@ -221,6 +225,7 @@ BEGIN
         ctr_Pop <= ctr_Pop_var;
         ctr_Free <= ctr_Free_var;
         ctr_Protect <= ctr_Protect_var;
+        ctr_JMP <= ctr_JMP_var;
     END PROCESS;
 END ARCHITECTURE ControllerArch3;
 
