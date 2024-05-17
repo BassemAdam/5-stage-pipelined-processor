@@ -42,8 +42,8 @@ BEGIN
         ELSIF falling_edge(clk) AND WE = '1' AND NOT FD_stall_PopUse ='1' THEN
 
             FD_Rdst1 <= FD_Inst(12 DOWNTO 10);
-            FD_Rdst2 <= FD_Inst(9 DOWNTO 7);
-
+            -- FD_Rdst2 <= FD_Inst(9 DOWNTO 7);
+            FD_Rdst2 <= FD_Inst(6 DOWNTO 4);
             FD_Rsrc1 <= FD_Inst(9 DOWNTO 7);
             FD_Rsrc2 <= FD_Inst(6 DOWNTO 4);
             FD_Func <= FD_Inst(3 DOWNTO 0);

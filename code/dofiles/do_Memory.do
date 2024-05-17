@@ -5,7 +5,7 @@ project compileall
 vsim -gui work.processor
 
 # Load the memory
-mem load -infile {mem_files/TwoOperands.mem} instrCache1
+mem load -infile {mem_files/Memory.mem} instrCache1
 
 # Add signals to the waveform viewer
 add wave -position insertpoint  \
@@ -148,36 +148,13 @@ force -freeze sim:/processor/reset 0 0
 run 50ps
 
 
-force -freeze sim:/processor/IN_PORT 32'h0005 0
-run
 force -freeze sim:/processor/IN_PORT 32'h0019 0
 run
 force -freeze sim:/processor/IN_PORT 32'hFFFFFFFF 0
-
 run
-force -freeze sim:/processor/IN_PORT 32'hFFFFF320 0
+force -freeze sim:/processor/IN_PORT 32'hFFFFF320  0
 run
-
 
 
 
-# prolly ta will ask to run one at a time to see values of registers 
 
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run

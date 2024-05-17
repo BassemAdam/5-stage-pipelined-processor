@@ -34,7 +34,7 @@ begin
         std_logic_vector(0 - unsigned(A)) when "0001", -- NEG
         A when "0100",                                 -- MOV A
         B when "0101",                                 -- MOV B used in LDM Functionality
-        A when "1111",                                 -- SWAP
+        B when "1111",                                 -- SWAP
         A and B when "1000",                           -- AND
         A or B when "1001",                            -- OR
         A xor B when "1010",                           -- XOR
@@ -49,7 +49,7 @@ begin
 
     with ALU_sel select
         ALU_Result2 <=
-        B when "1111",
+        A when "1111",
         (others => '0') when others;
 
     Zero <=
