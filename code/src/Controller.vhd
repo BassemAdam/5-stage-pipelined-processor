@@ -27,6 +27,7 @@ ENTITY Controller IS
         ctr_ALUorMem : OUT STD_LOGIC;
         ctr_isInput : OUT STD_LOGIC;
         ctr_JMP_DEC : OUT STD_LOGIC;
+        ctr_JMP_EXE : OUT STD_LOGIC;
         ctr_Flush_FD : OUT STD_LOGIC;
         ctr_Flush_DE : OUT STD_LOGIC;
         ctr_Predictor : OUT STD_LOGIC;
@@ -61,6 +62,7 @@ BEGIN
         VARIABLE ctr_Free_var : STD_LOGIC := '0';
         VARIABLE ctr_Protect_var : STD_LOGIC := '0';
         VARIABLE ctr_JMP_DEC_var : STD_LOGIC := '0';
+        VARIABLE ctr_JMP_EXE_var : STD_LOGIC := '0';
         VARIABLE ctr_Flush_FD_var : STD_LOGIC := '0';
         VARIABLE ctr_Flush_DE_var : STD_LOGIC := '0';
     BEGIN
@@ -80,11 +82,13 @@ BEGIN
         ctr_Free_var := '0';
         ctr_Protect_var := '0';
         ctr_JMP_DEC_var := '0';
+        ctr_JMP_EXE_var := '0';
         ctr_Flush_FD_var := '0';
         ctr_Flush_DE_var := '0';
         IF RES = '0' THEN
             IF ctr_Correction = '1' THEN
                 ctr_Predictor_var := NOT ctr_Predictor_var;
+                ctr_JMP_EXE_var := '1';
                 ctr_Flush_FD_var := '1';
                 ctr_Flush_DE_var := '1';
             END IF;
@@ -250,6 +254,7 @@ BEGIN
         ctr_Free <= ctr_Free_var;
         ctr_Protect <= ctr_Protect_var;
         ctr_JMP_DEC <= ctr_JMP_DEC_var;
+        ctr_JMP_EXE <= ctr_JMP_EXE_var;
         ctr_Flush_FD <= ctr_Flush_FD_var;
         ctr_Flush_DE <= ctr_Flush_DE_var;
         ctr_Predictor <= ctr_Predictor_var;
