@@ -11,6 +11,7 @@ ENTITY Controller IS
         RES : IN STD_LOGIC;
         ctr_opCode : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
         ctr_Func : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        ctr_Correction : IN STD_LOGIC;
 
         ctr_hasImm : OUT STD_LOGIC;
         ctr_ALUsel : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -25,7 +26,10 @@ ENTITY Controller IS
         ctr_Protect : OUT STD_LOGIC;
         ctr_ALUorMem : OUT STD_LOGIC;
         ctr_isInput : OUT STD_LOGIC;
-        ctr_JMP : out std_logic;
+        ctr_JMP_DEC : OUT STD_LOGIC;
+        ctr_Flush_FD : OUT STD_LOGIC;
+        ctr_Flush_DE : OUT STD_LOGIC;
+        ctr_Predictor : OUT STD_LOGIC;
 
         ctr_OUTport_en : OUT STD_LOGIC
 
@@ -34,9 +38,12 @@ ENTITY Controller IS
 END ENTITY Controller;
 
 ARCHITECTURE ControllerArch3 OF Controller IS
+    -- TYPE Predict_type IS (taken, untaken);
 
 BEGIN
-    PROCESS (ctr_opCode, ctr_Func, RES)
+    PROCESS (ctr_opCode, ctr_Func, RES, ctr_Correction)
+        VARIABLE ctr_Predictor_var : STD_LOGIC := '1';
+
         VARIABLE ctr_hasImm_var : STD_LOGIC := '0';
         VARIABLE ctr_ALUsel_var : STD_LOGIC_VECTOR(3 DOWNTO 0) := (OTHERS => '0');
         VARIABLE ctr_flags_en_var : STD_LOGIC_VECTOR(0 TO 3) := (OTHERS => '0');
@@ -53,7 +60,9 @@ BEGIN
         VARIABLE ctr_Pop_var : STD_LOGIC := '0';
         VARIABLE ctr_Free_var : STD_LOGIC := '0';
         VARIABLE ctr_Protect_var : STD_LOGIC := '0';
-        VARIABLE ctr_JMP_var : STD_LOGIC := '0';
+        VARIABLE ctr_JMP_DEC_var : STD_LOGIC := '0';
+        VARIABLE ctr_Flush_FD_var : STD_LOGIC := '0';
+        VARIABLE ctr_Flush_DE_var : STD_LOGIC := '0';
     BEGIN
         ctr_hasImm_var := '0';
         ctr_ALUsel_var := (OTHERS => '0');
@@ -70,8 +79,16 @@ BEGIN
         ctr_Pop_var := '0';
         ctr_Free_var := '0';
         ctr_Protect_var := '0';
-        ctr_JMP_var := '0';
+        ctr_JMP_DEC_var := '0';
+        ctr_Flush_FD_var := '0';
+        ctr_Flush_DE_var := '0';
         IF RES = '0' THEN
+            IF ctr_Correction = '1' THEN
+                ctr_Predictor_var := NOT ctr_Predictor_var;
+                ctr_Flush_FD_var := '1';
+                ctr_Flush_DE_var := '1';
+            END IF;
+
             IF ctr_opCode = "000" THEN -- NOP
                 -- ctr_flags_en_var := (OTHERS => '0');
                 -- ctr_we1_reg_var := '0';
@@ -178,12 +195,19 @@ BEGIN
 
             IF ctr_opCode = "100" THEN -- Conditional Jump
                 IF ctr_Func = "0000" THEN
+                    IF ctr_Predictor_var = '1' THEN
+                        ctr_JMP_DEC_var := '1';
+                        ctr_Flush_FD_var := '1';
+                    ELSE
+
+                    END IF;
                 END IF;
             END IF;
 
             IF ctr_opCode = "101" THEN -- Unconditional Jump
                 IF ctr_Func = "0000" THEN
-                ctr_JMP_var = '1';
+                    ctr_JMP_DEC_var := '1';
+                    ctr_Flush_FD_var := '1';
                 END IF;
             END IF;
 
@@ -225,7 +249,10 @@ BEGIN
         ctr_Pop <= ctr_Pop_var;
         ctr_Free <= ctr_Free_var;
         ctr_Protect <= ctr_Protect_var;
-        ctr_JMP <= ctr_JMP_var;
+        ctr_JMP_DEC <= ctr_JMP_DEC_var;
+        ctr_Flush_FD <= ctr_Flush_FD_var;
+        ctr_Flush_DE <= ctr_Flush_DE_var;
+        ctr_Predictor <= ctr_Predictor_var;
     END PROCESS;
 END ARCHITECTURE ControllerArch3;
 

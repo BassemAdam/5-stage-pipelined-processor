@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <ctype.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/file.h>
@@ -20,6 +21,7 @@ typedef enum
     UNCOND_JUMP,
     MEM_SECURITY,
     INPUT_SIGNAL,
+    ORG,
     UNKNOWN
 } InstructionType;
 
@@ -65,6 +67,11 @@ InstructionType get_instruction_type(char *inst)
     {
         return INPUT_SIGNAL;
     }
+    if (strcmp(operation, ".ORG") == 0)
+    {
+        return ORG;
+    }
+
     return UNKNOWN;
 }
 
@@ -157,7 +164,7 @@ typedef struct
 {
     unsigned int opcode : 3;
     unsigned int rdst;
-    unsigned int rsrc1 : 3;
+    unsigned int rsrc1;
     unsigned int rsrc2 : 3;
     unsigned int fn_num : 1;
     unsigned int rest : 3;
@@ -186,7 +193,7 @@ unsigned int parser_ALU_inst(char *inst)
         char *destination = strtok(NULL, " ");
         sscanf(destination, "R%u", &alu_inst.rdst);
 
-        alu_inst.rsrc1 = 0;
+        alu_inst.rsrc1 = alu_inst.rdst;
         alu_inst.rsrc2 = 0;
         alu_inst.fn_num = 0;
     }
@@ -194,29 +201,32 @@ unsigned int parser_ALU_inst(char *inst)
     {
         alu_inst.opcode = 1;
         alu_inst.fn_num = 1;
-        alu_inst.rsrc1 = 0;
+
         alu_inst.rsrc2 = 0;
         char *destination = strtok(NULL, " ");
         sscanf(destination, "R%u", &alu_inst.rdst);
+        alu_inst.rsrc1 = alu_inst.rdst;
     }
     if (strcmp(operation, "INC") == 0)
     {
         alu_inst.opcode = 1;
         alu_inst.fn_num = 2;
-        alu_inst.rsrc1 = 0;
+
         alu_inst.rsrc2 = 0;
         char *destination = strtok(NULL, " ");
         sscanf(destination, "R%u", &alu_inst.rdst);
+        alu_inst.rsrc1 = alu_inst.rdst;
     }
 
     if (strcmp(operation, "DEC") == 0)
     {
         alu_inst.opcode = 1;
         alu_inst.fn_num = 3;
-        alu_inst.rsrc1 = 0;
+
         alu_inst.rsrc2 = 0;
         char *destination = strtok(NULL, " ");
         sscanf(destination, "R%u", &alu_inst.rdst);
+        alu_inst.rsrc1 = alu_inst.rdst;
     }
     if (strcmp(operation, "MOV") == 0)
     {
@@ -224,75 +234,79 @@ unsigned int parser_ALU_inst(char *inst)
         alu_inst.fn_num = 4;
         alu_inst.rsrc2 = 0;
         char *instruction_copy = strdup(inst);
-        char *destination = strtok(NULL, ",");
+        char *destination = strtok(NULL, ", ");
         sscanf(destination, "R%u", &alu_inst.rdst);
-        char *source = strtok(NULL, ",");
+        char *source = strtok(NULL, " ");
         sscanf(source, "R%u", &alu_inst.rsrc1);
+        printf("rdst: %u rsrc1: %u\n", alu_inst.rdst, alu_inst.rsrc1);
     }
     if (strcmp(operation, "SWAP") == 0)
     {
         alu_inst.opcode = 1;
         alu_inst.fn_num = 5;
-        char *destination = strtok(NULL, ",");
+        char *destination = strtok(NULL, ", ");
         sscanf(destination, "R%u", &alu_inst.rdst);
-        char *source1 = strtok(NULL, ",");
-        sscanf(source1, "R%u", &alu_inst.rsrc1);
-        char *source2 = strtok(NULL, ",");
-        sscanf(source2, "R%u", &alu_inst.rsrc2);
+        char *source1 = strtok(NULL, " ");
+        sscanf(source1, "R%u", &alu_inst.rsrc2);
+        alu_inst.rsrc1 = alu_inst.rdst;
     }
     if (strcmp(operation, "ADD") == 0)
     {
         alu_inst.opcode = 1;
         alu_inst.fn_num = 6;
-        char *destination = strtok(NULL, ",");
+        char *destination = strtok(NULL, ", ");
         sscanf(destination, "R%u", &alu_inst.rdst);
-        char *source1 = strtok(NULL, ",");
+        char *source1 = strtok(NULL, ", ");
+        printf("source1: %s\n", source1);
         sscanf(source1, "R%u", &alu_inst.rsrc1);
-        char *source2 = strtok(NULL, ",");
+
+        char *source2 = strtok(NULL, " ");
         sscanf(source2, "R%u", &alu_inst.rsrc2);
+        printf("rdst: %u rsrc1: %u rsrc2: %u\n", alu_inst.rdst, alu_inst.rsrc1, alu_inst.rsrc2);
     }
     if (strcmp(operation, "SUB") == 0)
     {
         alu_inst.opcode = 1;
         alu_inst.fn_num = 7;
-        char *destination = strtok(NULL, ",");
+        char *destination = strtok(NULL, ", ");
         sscanf(destination, "R%u", &alu_inst.rdst);
-        char *source1 = strtok(NULL, ",");
+        char *source1 = strtok(NULL, ", ");
         sscanf(source1, "R%u", &alu_inst.rsrc1);
-        char *source2 = strtok(NULL, ",");
+        char *source2 = strtok(NULL, " ");
         sscanf(source2, "R%u", &alu_inst.rsrc2);
     }
     if (strcmp(operation, "AND") == 0)
     {
         alu_inst.opcode = 1;
         alu_inst.fn_num = 8;
-        char *destination = strtok(NULL, ",");
+        char *destination = strtok(NULL, ", ");
         sscanf(destination, "R%u", &alu_inst.rdst);
-        char *source1 = strtok(NULL, ",");
+        char *source1 = strtok(NULL, ", ");
         sscanf(source1, "R%u", &alu_inst.rsrc1);
-        char *source2 = strtok(NULL, ",");
+        char *source2 = strtok(NULL, " ");
         sscanf(source2, "R%u", &alu_inst.rsrc2);
     }
     if (strcmp(operation, "OR") == 0)
     {
         alu_inst.opcode = 1;
         alu_inst.fn_num = 9;
-        char *destination = strtok(NULL, ",");
+        char *destination = strtok(NULL, ", ");
         sscanf(destination, "R%u", &alu_inst.rdst);
-        char *source1 = strtok(NULL, ",");
+        char *source1 = strtok(NULL, ", ");
         sscanf(source1, "R%u", &alu_inst.rsrc1);
-        char *source2 = strtok(NULL, ",");
+        char *source2 = strtok(NULL, " ");
         sscanf(source2, "R%u", &alu_inst.rsrc2);
+        printf("rdst: %u rsrc1: %u rsrc2: %u\n", alu_inst.rdst, alu_inst.rsrc1, alu_inst.rsrc2);
     }
     if (strcmp(operation, "XOR") == 0)
     {
         alu_inst.opcode = 1;
         alu_inst.fn_num = 10;
-        char *destination = strtok(NULL, ",");
+        char *destination = strtok(NULL, ", ");
         sscanf(destination, "R%u", &alu_inst.rdst);
-        char *source1 = strtok(NULL, ",");
+        char *source1 = strtok(NULL, ", ");
         sscanf(source1, "R%u", &alu_inst.rsrc1);
-        char *source2 = strtok(NULL, ",");
+        char *source2 = strtok(NULL, " ");
         sscanf(source2, "R%u", &alu_inst.rsrc2);
     }
     if (strcmp(operation, "CMP") == 0)
@@ -300,9 +314,9 @@ unsigned int parser_ALU_inst(char *inst)
         alu_inst.opcode = 1;
         alu_inst.fn_num = 11;
         alu_inst.rdst = 0;
-        char *source1 = strtok(NULL, ",");
+        char *source1 = strtok(NULL, ", ");
         sscanf(source1, "R%u", &alu_inst.rsrc1);
-        char *source2 = strtok(NULL, ",");
+        char *source2 = strtok(NULL, " ");
         sscanf(source2, "R%u", &alu_inst.rsrc2);
     }
 
@@ -325,24 +339,24 @@ unsigned int parse_Immediate_instruction(char *instruction)
         imm_inst.opcode = 2;
         imm_inst.fn_num = 0;
         imm_inst.rsrc2 = 0;
-        char *destination = strtok(NULL, ",");
+        char *destination = strtok(NULL, ", ");
         sscanf(destination, "R%u", &imm_inst.rdst);
-        char *source1 = strtok(NULL, ",");
+        char *source1 = strtok(NULL, ", ");
         sscanf(source1, "R%u", &imm_inst.rsrc1);
-        char *immediate = strtok(NULL, ",");
-        sscanf(immediate, "%d", &imm_inst.imm);
+        char *immediate = strtok(NULL, " ");
+        sscanf(immediate, "%x", &imm_inst.imm);
     }
     if (strcmp(operation, "SUBI") == 0)
     {
         imm_inst.opcode = 2;
         imm_inst.fn_num = 1;
         imm_inst.rsrc2 = 0;
-        char *destination = strtok(NULL, ",");
+        char *destination = strtok(NULL, ", ");
         sscanf(destination, "R%u", &imm_inst.rdst);
-        char *source1 = strtok(NULL, ",");
+        char *source1 = strtok(NULL, ", ");
         sscanf(source1, "R%u", &imm_inst.rsrc1);
-        char *immediate = strtok(NULL, ",");
-        sscanf(immediate, "%d", &imm_inst.imm);
+        char *immediate = strtok(NULL, " ");
+        sscanf(immediate, "%x", &imm_inst.imm);
     }
     if (strcmp(operation, "LDM") == 0)
     {
@@ -350,32 +364,32 @@ unsigned int parse_Immediate_instruction(char *instruction)
         imm_inst.fn_num = 2;
         imm_inst.rsrc2 = 0;
         imm_inst.rsrc1 = 0;
-        char *destination = strtok(NULL, ",");
+        char *destination = strtok(NULL, ", ");
         sscanf(destination, "R%u", &imm_inst.rdst);
-        char *immediate = strtok(NULL, ",");
-        sscanf(immediate, "%d", &imm_inst.imm);
+        char *immediate = strtok(NULL, " ");
+        sscanf(immediate, "%x", &imm_inst.imm);
     }
     if (strcmp(operation, "STD") == 0)
     {
         imm_inst.opcode = 2;
         imm_inst.fn_num = 3;
-        imm_inst.rsrc2 = 0;
-        char *destination = strtok(NULL, ",");
-        sscanf(destination, "R%u", &imm_inst.rdst);
+        imm_inst.rdst = 0;
+        char *destination = strtok(NULL, ", ");
+        sscanf(destination, "R%u", &imm_inst.rsrc1);
 
-        char *immediate_and_source = strtok(NULL, ",");
-        sscanf(immediate_and_source, "%d(R%u)", &imm_inst.imm, &imm_inst.rsrc1);
+        char *immediate_and_source = strtok(NULL, " ");
+        sscanf(immediate_and_source, "%d(R%u)", &imm_inst.imm, &imm_inst.rsrc2);
     }
     if (strcmp(operation, "LDD") == 0)
     {
         imm_inst.opcode = 2;
-        imm_inst.fn_num = 4;
+        imm_inst.fn_num = 12;
         imm_inst.rsrc2 = 0;
-        char *destination = strtok(NULL, ",");
+        char *destination = strtok(NULL, ", ");
         sscanf(destination, "R%u", &imm_inst.rdst);
 
-        char *immediate_and_source = strtok(NULL, ",");
-        sscanf(immediate_and_source, "%d(R%u)", &imm_inst.imm, &imm_inst.rsrc1);
+        char *immediate_and_source = strtok(NULL, " ");
+        sscanf(immediate_and_source, "%x(R%u)", &imm_inst.imm, &imm_inst.rsrc1);
     }
     unsigned int result = 0;
     result |= (imm_inst.opcode & 0x7) << 29; // Assuming opcode is 3 bits
@@ -400,7 +414,7 @@ unsigned int parse_Data_Op_instruction(char *instruction)
         data_op_inst.mem_op = 0;
         data_op_inst.stack_op = 0;
         data_op_inst.port_op = 1;
-        char *destination = strtok(NULL, ",");
+        char *destination = strtok(NULL, " ");
         sscanf(destination, "R%u", &data_op_inst.rsrc1);
         data_op_inst.rdst = 0;
         data_op_inst.rsrc2 = 0;
@@ -412,7 +426,7 @@ unsigned int parse_Data_Op_instruction(char *instruction)
         data_op_inst.mem_op = 0;
         data_op_inst.stack_op = 0;
         data_op_inst.port_op = 1;
-        char *destination = strtok(NULL, ",");
+        char *destination = strtok(NULL, " ");
         sscanf(destination, "R%u", &data_op_inst.rdst);
         data_op_inst.rsrc1 = 0;
         data_op_inst.rsrc2 = 0;
@@ -424,7 +438,7 @@ unsigned int parse_Data_Op_instruction(char *instruction)
         data_op_inst.mem_op = 0;
         data_op_inst.stack_op = 1;
         data_op_inst.port_op = 0;
-        char *destination = strtok(NULL, ",");
+        char *destination = strtok(NULL, " ");
         sscanf(destination, "R%u", &data_op_inst.rsrc1);
         data_op_inst.rdst = 0;
         data_op_inst.rsrc2 = 0;
@@ -436,7 +450,7 @@ unsigned int parse_Data_Op_instruction(char *instruction)
         data_op_inst.mem_op = 0;
         data_op_inst.stack_op = 1;
         data_op_inst.port_op = 0;
-        char *destination = strtok(NULL, ",");
+        char *destination = strtok(NULL, " ");
         sscanf(destination, "R%u", &data_op_inst.rdst);
         data_op_inst.rsrc1 = 0;
         data_op_inst.rsrc2 = 0;
@@ -542,8 +556,8 @@ unsigned int parse_mem_security_instruction(char *instruction)
     {
         mem_security_inst.opcode = 6;
         char *source = strtok(NULL, " ");
-        sscanf(source, "R%u", &mem_security_inst.rdst);
-        mem_security_inst.rsrc1 = 0;
+        sscanf(source, "R%u", &mem_security_inst.rsrc1);
+        mem_security_inst.rdst = 0;
         mem_security_inst.rsrc2 = 0;
         mem_security_inst.fn_num = 0;
         mem_security_inst.rest = 0;
@@ -552,8 +566,8 @@ unsigned int parse_mem_security_instruction(char *instruction)
     {
         mem_security_inst.opcode = 6;
         char *source = strtok(NULL, " ");
-        sscanf(source, "R%u", &mem_security_inst.rdst);
-        mem_security_inst.rsrc1 = 0;
+        sscanf(source, "R%u", &mem_security_inst.rsrc1);
+        mem_security_inst.rdst = 0;
         mem_security_inst.rsrc2 = 0;
         mem_security_inst.fn_num = 1;
         mem_security_inst.rest = 0;
@@ -601,19 +615,28 @@ unsigned int parse_Input_Signal(char *instruction)
     return result;
 }
 
-int main()
+int main(int argc, char **argv)
 {
+	char* infile = "instructions.asm";
+	if (argc > 1) {
+        infile = argv[1];
+    }
+	char* outfile = "binary.mem";
+	if (argc > 2) {
+        outfile = argv[2];
+    }
     FILE *fptr;
     FILE *binptr;
-    fptr = fopen("instructions.asm", "r");
-    binptr = fopen("binary.mem", "w");
+    fptr = fopen(infile, "r");
+    binptr = fopen(outfile, "w");
+    fprintf(binptr, "// memory data file (do not edit the following line - required for mem load use)\n// instance=/processor/instrCache1/ram\n// format=mti addressradix=d dataradix=b version=1.0 wordsperline=1\n");
     if (fptr == NULL)
     {
         printf("Error!");
         exit(1);
     }
     char inst[100];
-
+    int i = 0;
     while (fgets(inst, 100, fptr) != NULL)
     {
         inst[strcspn(inst, "\n")] = 0;
@@ -621,6 +644,12 @@ int main()
         while (*start == ' ' || *start == '\t')
         {
             start++;
+        }
+
+        // Convert to uppercase
+        for (int i = 0; start[i]; i++)
+        {
+            start[i] = toupper((unsigned char)start[i]);
         }
 
         // If the line is a comment or empty, skip it
@@ -638,7 +667,8 @@ int main()
             machine_code = int_to_binary(parser_ALU_inst(inst), 16);
             printf("Machine code: %s\n", machine_code);
             // write to file
-            fprintf(binptr, "%s\n", machine_code);
+            fprintf(binptr, "%d: %s\n", i, machine_code);
+            i++;
             break;
         case IMMEDIATE:
             printf("Immediate instruction\n");
@@ -654,46 +684,116 @@ int main()
 
             printf("Machine code: %s\n", first_half);
             printf("Immediate value: %s\n", second_half);
-            fprintf(binptr, "%s\n", first_half);
-            fprintf(binptr, "%s\n", second_half);
+            fprintf(binptr, "%d: %s\n", i, first_half);
+            i++;
+            fprintf(binptr, "%d: %s\n", i, second_half);
+            i++;
             break;
         case NOP:
             printf("NOP instruction\n");
             printf("Machine code: %s\n", int_to_binary(0, 16));
-            fprintf(binptr, "%s\n", int_to_binary(0, 16));
+            fprintf(binptr, "%d: %s\n", i, int_to_binary(0, 16));
+            i++;
             break;
         case DATA_OP:
             printf("Data Operation instruction\n");
             // printf("Machine code: %s\n", int_to_binary(parse_Data_Op_instruction(inst), 32));
             machine_code = int_to_binary(parse_Data_Op_instruction(inst), 16);
             printf("Machine code: %s\n", machine_code);
-            fprintf(binptr, "%s\n", machine_code);
+            fprintf(binptr, "%d: %s\n", i, machine_code);
+            i++;
             break;
         case COND_JUMP:
             printf("\nConditional Jump instruction\n");
             machine_code = int_to_binary(parse_cond_jump_instruction(inst), 16);
             printf("Machine code: %s\n", machine_code);
-            fprintf(binptr, "%s\n", machine_code);
+            fprintf(binptr, "%d: %s\n", i, machine_code);
+            i++;
             break;
         case UNCOND_JUMP:
             printf("Unconditional Jump instruction\n");
             machine_code = int_to_binary(parse_uncond_jump_instruction(inst), 16);
             printf("Machine code: %s\n", machine_code);
-            fprintf(binptr, "%s\n", machine_code);
-
+            fprintf(binptr, "%d: %s\n", i, machine_code);
+            i++;
             break;
         case MEM_SECURITY:
             printf("Memory Security instruction\n");
             machine_code = int_to_binary(parse_mem_security_instruction(inst), 16);
             printf("Machine code: %s\n", machine_code);
-            fprintf(binptr, "%s\n", machine_code);
-
+            fprintf(binptr, "%d: %s\n", i, machine_code);
+            i++;
             break;
         case INPUT_SIGNAL:
             printf("Input Signal instruction\n");
             machine_code = int_to_binary(parse_Input_Signal(inst), 16);
             printf("Machine code: %s\n", machine_code);
-            fprintf(binptr, "%s\n", machine_code);
+            fprintf(binptr, "%d: %s\n", i, machine_code);
+            i++;
+            break;
+        case ORG:
+            printf("ORG instruction\n");
+            // read the org number
+            char *org = strtok(inst, " ");
+            char *org_num = strtok(NULL, " ");
+            int org_num_dec = strtol(org_num, NULL, 16);
+            printf("ORG number: %s\n", org_num);
+            if (org_num_dec != 0 && org_num_dec != 2)
+            {
+                // covert org num from hexa to decimal
+
+                printf("ORG number in decimal: %d\n", org_num_dec);
+                int start = i;
+                for (int j = start; j < org_num_dec; j++)
+                {
+                    fprintf(binptr, "%d: %s\n", i, int_to_binary(0, 16));
+                    i++;
+                }
+            }
+            else if (org_num_dec == 2)
+            {
+                // check number in the next line and convert it from hex to binary
+
+                fgets(inst, 100, fptr);
+                inst[strcspn(inst, "\n")] = 0;
+                int address;
+                sscanf(inst, "%x", &address);
+                printf("address: %d\n", address);
+                unsigned int result = 0;
+                result |= (address & 0xFFFFFFFF);
+                printf("result: %u\n", result);
+                unsigned int upper16Bits = (result >> 16) & 0xFFFF;
+                unsigned int lower16Bits = result & 0xFFFF;
+                printf("upper16Bits: %u\n", upper16Bits);
+                printf("lower16Bits: %u\n", lower16Bits);
+                fprintf(binptr, "%d: %s\n", 2, int_to_binary(upper16Bits, 16)); // print 1st 16 bits
+                fprintf(binptr, "%d: %s\n", 3, int_to_binary(lower16Bits, 16));
+                // print 1st 16 bits
+                i = 4;
+                continue;
+            }
+            else if (org_num_dec == 0)
+            {
+                fgets(inst, 100, fptr);
+                inst[strcspn(inst, "\n")] = 0;
+                int address;
+                sscanf(inst, "%x", &address);
+                printf("address: %d\n", address);
+                unsigned int result = 0;
+                result |= (address & 0xFFFFFFFF);
+                printf("result: %u\n", result);
+                unsigned int upper16Bits = (result >> 16) & 0xFFFF;
+                unsigned int lower16Bits = result & 0xFFFF;
+                printf("upper16Bits: %u\n", upper16Bits);
+                printf("lower16Bits: %u\n", lower16Bits);
+                fprintf(binptr, "%d: %s\n", 0, int_to_binary(upper16Bits, 16)); // print 1st 16 bits
+                fprintf(binptr, "%d: %s\n", 1, int_to_binary(lower16Bits, 16));
+                // print 1st 16 bits
+                i = 2;
+                continue;
+            }
+
+            i = strtol(org_num, NULL, 16);
             break;
         case UNKNOWN:
             printf("Unknown instruction\n");

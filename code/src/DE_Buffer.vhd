@@ -5,13 +5,18 @@ USE ieee.numeric_std.ALL;
 ENTITY DE_Buffer IS
     PORT (
         clk, RES, WE : IN STD_LOGIC;
+        DE_Flush_DE : IN STD_LOGIC;
         DE_Rsrc1_Val : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         DE_Rsrc2_Val : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         DE_Imm : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         DE_isImm : IN STD_LOGIC;
+        DE_Zflag : IN STD_LOGIC;
+        DE_OpCode : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+        DE_Predictor : IN STD_LOGIC;
 
         DE_ALUopd1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         DE_ALUopd2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        DE_Correction : OUT STD_LOGIC;
 
         -- Passing through
         DE_InPort_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -55,6 +60,8 @@ ENTITY DE_Buffer IS
 END ENTITY DE_Buffer;
 
 ARCHITECTURE DE_Buffer_Arch OF DE_Buffer IS
+    SIGNAL DE_OpCode_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL DE_Predictor_out : STD_LOGIC;
 BEGIN
     PROCESS (clk, RES)
         VARIABLE DE_ALUopd2_var : STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -79,6 +86,16 @@ BEGIN
             DE_Protect_out <= '0';
             DE_Free_out <= '0';
             DE_STD_VALUE <= (OTHERS => '0');
+            DE_Correction <= '0';
+            DE_Predictor_out <= '0';
+
+        ELSIF falling_edge(clk) AND DE_Flush_DE = '1' THEN
+            DE_we1_reg_out <= '0';
+            DE_we2_reg_out <= '0';
+            DE_flags_en_out <= (OTHERS => '0');
+            DE_OUTport_en_out <= '0';
+            DE_Correction <= '0';
+
         ELSIF falling_edge(clk) THEN
 
             IF WE = '1' THEN
@@ -95,7 +112,7 @@ BEGIN
 
                     DE_ALUopd2_var := DE_Rsrc2_Val;
                 END IF;
-                IF DE_MemW_in = '1' AND DE_isImm ='1' THEN
+                IF DE_MemW_in = '1' AND DE_isImm = '1' THEN
                     DE_ALUopd1 <= DE_Rsrc2_Val;
                     DE_STD_VALUE <= DE_Rsrc1_Val;
                 ELSE
@@ -119,6 +136,20 @@ BEGIN
                 DE_Protect_out <= DE_Protect_in;
                 DE_Free_out <= DE_Free_in;
                 --End Memory Operations
+
+                IF DE_OpCode = "100" THEN
+                    ASSERT (DE_Predictor = '1')
+                    REPORT "DE_Predictor"
+                        SEVERITY error;
+                        ASSERT (DE_Zflag = '1')
+                    REPORT "DE_Zflag"
+                        SEVERITY error;
+                    DE_Correction <= DE_Predictor XOR DE_Zflag;
+                ELSE
+                    DE_Correction <= '0';
+                END IF;
+                DE_OpCode_out <= DE_OpCode;
+                DE_Predictor_out <= DE_Predictor;
             END IF;
         END IF;
     END PROCESS;

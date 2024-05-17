@@ -11,8 +11,8 @@ ENTITY PC IS
         PC_en : IN STD_LOGIC;
         PC_Interrupt : IN STD_LOGIC;
         PC_branch : IN STD_LOGIC;
-        PC_JZ_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
-        PC_JMP_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+        PC_JMP_EXE_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+        PC_JMP_DEC_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
         PC_InterruptPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
         PC_ResetPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
         
@@ -34,7 +34,7 @@ BEGIN
             pcNext <= PC_InterruptPC;
         ELSIF falling_edge(clk) THEN
             IF PC_branch = '1' THEN
-                pcNext <= PC_JMP_PC;
+                pcNext <= PC_JMP_DEC_PC;
             ELSIF PC_en = '1' THEN
                 pcNext <= STD_LOGIC_VECTOR(unsigned(pcNext) + 1);
             END IF;

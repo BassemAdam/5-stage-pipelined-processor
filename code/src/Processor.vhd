@@ -26,8 +26,8 @@ ARCHITECTURE ProcessorArch OF Processor IS
             PC_en : IN STD_LOGIC;
             PC_Interrupt : IN STD_LOGIC;
             PC_branch : IN STD_LOGIC;
-            PC_JZ_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
-            PC_JMP_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+            PC_JMP_EXE_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+            PC_JMP_DEC_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
             PC_InterruptPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
             PC_ResetPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
 
@@ -56,6 +56,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
             clk : IN STD_LOGIC;
             RES : IN STD_LOGIC;
             WE : IN STD_LOGIC;
+            FD_Flush_FD : IN STD_LOGIC;
             FD_Inst : IN STD_LOGIC_VECTOR(15 DOWNTO 0); -- 16 bits from instruction memory
             FD_IN_PORT : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
@@ -104,6 +105,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
             RES : IN STD_LOGIC;
             ctr_opCode : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
             ctr_Func : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+            ctr_Correction : IN STD_LOGIC;
 
             ctr_hasImm : OUT STD_LOGIC;
             ctr_ALUsel : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -118,6 +120,10 @@ ARCHITECTURE ProcessorArch OF Processor IS
             ctr_Protect : OUT STD_LOGIC;
             ctr_ALUorMem : OUT STD_LOGIC;
             ctr_isInput : OUT STD_LOGIC;
+            ctr_JMP_DEC : OUT STD_LOGIC;
+            ctr_Flush_FD : OUT STD_LOGIC;
+            ctr_Flush_DE : OUT STD_LOGIC;
+            ctr_Predictor : OUT STD_LOGIC;
 
             ctr_OUTport_en : OUT STD_LOGIC
 
@@ -128,13 +134,18 @@ ARCHITECTURE ProcessorArch OF Processor IS
     COMPONENT DE_Buffer IS
         PORT (
             clk, RES, WE : IN STD_LOGIC;
+            DE_Flush_DE : IN STD_LOGIC;
             DE_Rsrc1_Val : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             DE_Rsrc2_Val : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             DE_Imm : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
             DE_isImm : IN STD_LOGIC;
+            DE_Zflag : IN STD_LOGIC;
+            DE_OpCode : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            DE_Predictor : IN STD_LOGIC;
 
             DE_ALUopd1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             DE_ALUopd2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            DE_Correction : OUT STD_LOGIC;
 
             -- Passing through
             DE_InPort_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -350,6 +361,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
     SIGNAL DE_Protect_out : STD_LOGIC;
     SIGNAL DE_Free_out : STD_LOGIC;
     SIGNAL DE_STD_VALUE : STD_LOGIC_VECTOR(31 DOWNTO 0); -- for std
+    SIGNAL DE_Correction : STD_LOGIC;
     -- DE Buffer signals end
 
     -- ALU signals
@@ -393,7 +405,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
     -- MW Buffer signals end
 
     -- CCR signals
-    SIGNAL CCR_flags : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    SIGNAL CCR_flags : STD_LOGIC_VECTOR(0 to 3);
     -- CCR signals end
 
     -- Controller Signals (most of the are not connected)
@@ -405,12 +417,16 @@ ARCHITECTURE ProcessorArch OF Processor IS
     SIGNAL ctr_ALUorMem : STD_LOGIC;
     SIGNAL ctr_isInput : STD_LOGIC;
     SIGNAL ctr_OUTport_en : STD_LOGIC;
+    SIGNAL ctr_Predictor : STD_LOGIC;
     -- Controller for memoryData
     SIGNAL ctr_MemW : STD_LOGIC;
     SIGNAL ctr_MemR : STD_LOGIC;
     SIGNAL ctr_Push : STD_LOGIC;
     SIGNAL ctr_Pop : STD_LOGIC;
     SIGNAL ctr_Free : STD_LOGIC;
+    SIGNAL ctr_JMP_DEC : STD_LOGIC;
+    SIGNAL ctr_Flush_FD : STD_LOGIC;
+    SIGNAL ctr_Flush_DE : STD_LOGIC;
     SIGNAL ctr_Protect : STD_LOGIC;
     -- Controller signals end
     SIGNAL NumberOfCycle : INTEGER := 0;
@@ -425,12 +441,12 @@ BEGIN
         clk => clk,
         --from control signals 
         RES => reset,
-        PC_branch => '0',
+        PC_branch => ctr_JMP_DEC,
         PC_en => PC_en,
         PC_Interrupt => '0', -- PROBABLY NEED TO CHANGE THIS AND TAKE IT AS AN INPUT TO THE PROCESSOR
 
-        PC_JZ_PC => (OTHERS => '0'),
-        PC_JMP_PC => RF_Rdata1,
+        PC_JMP_EXE_PC => (OTHERS => '0'),
+        PC_JMP_DEC_PC => RF_Rdata1,
         PC_InterruptPC => IC_InterruptPC,
         PC_ResetPC => IC_ResetPC,
 
@@ -455,6 +471,7 @@ BEGIN
         clk => clk,
         RES => reset,
         WE => we,
+        FD_Flush_FD => ctr_Flush_FD,
         FD_Inst => IC_Inst,
         FD_OpCode => FD_OpCode,
         FD_Rsrc1 => FD_Rsrc1,
@@ -495,13 +512,18 @@ BEGIN
         clk => clk,
         RES => reset,
         WE => we,
+        DE_Flush_DE => ctr_Flush_DE,
         DE_Rsrc1_Val => RF_Rdata1,
         DE_Rsrc2_Val => RF_Rdata2,
         DE_Imm => IC_Inst,
         DE_isImm => ctr_hasImm,
+        DE_Zflag => CCR_flags(0),
+        DE_OpCode => FD_OpCode,
+        DE_Predictor => ctr_Predictor,
 
         DE_ALUopd1 => DE_ALUopd1,
         DE_ALUopd2 => DE_ALUopd2,
+        DE_Correction => DE_Correction,
 
         -- Passing through
         DE_InPort_in => FD_InputPort,
@@ -649,6 +671,7 @@ BEGIN
         RES => reset,
         ctr_opCode => FD_OpCode,
         ctr_Func => FD_Func,
+        ctr_Correction => DE_Correction,
 
         ctr_hasImm => ctr_hasImm,
         ctr_ALUsel => ctr_ALUsel,
@@ -663,7 +686,11 @@ BEGIN
         ctr_Push => ctr_Push,
         ctr_Pop => ctr_Pop,
         ctr_Free => ctr_Free,
-        ctr_Protect => ctr_Protect
+        ctr_Protect => ctr_Protect,
+        ctr_JMP_DEC => ctr_JMP_DEC,
+        ctr_Flush_FD => ctr_Flush_FD,
+        ctr_Flush_DE => ctr_Flush_DE,
+        ctr_Predictor => ctr_Predictor
     );
     -- map controller end
 
