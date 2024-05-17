@@ -143,7 +143,7 @@ typedef struct
 {
     unsigned int opcode : 3;
     unsigned int rdst;
-    unsigned int rsrc1 : 3;
+    unsigned int rsrc1;
     unsigned int rsrc2 : 3;
     unsigned int fn_num : 1;
     unsigned int rest : 3;
@@ -154,7 +154,7 @@ typedef struct
 {
     unsigned int opcode : 3;
     unsigned int rdst;
-    unsigned int rsrc1 : 3;
+    unsigned int rsrc1;
     unsigned int rsrc2 : 3;
     unsigned int fn_num : 2;
     unsigned int rest : 2;
@@ -479,7 +479,7 @@ unsigned int parse_cond_jump_instruction(char *instruction)
         cond_jump_inst.opcode = 4;
         cond_jump_inst.fn_num = 0;
         char *destination = strtok(NULL, " ");
-        sscanf(destination, "R%u", &cond_jump_inst.rscr1);
+        sscanf(destination, "R%u", &cond_jump_inst.rsrc1);
         cond_jump_inst.rdst = 0;
         cond_jump_inst.rsrc2 = 0;
         cond_jump_inst.rest = 0;
