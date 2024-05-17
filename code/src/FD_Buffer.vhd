@@ -8,6 +8,8 @@ ENTITY FD_Buffer IS
         clk : IN STD_LOGIC;
         RES : IN STD_LOGIC;
         WE : IN STD_LOGIC;
+        FLUSH : IN STD_LOGIC;
+        FD_stall_PopUse : IN STD_LOGIC;
         FD_Inst : IN STD_LOGIC_VECTOR(15 DOWNTO 0); -- 16 bits from instruction memory
         FD_IN_PORT : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
@@ -37,7 +39,7 @@ BEGIN
             FD_Rdst1 <= (OTHERS => '0');
             FD_Rdst2 <= (OTHERS => '0');
             FD_Func <= (OTHERS => '0');
-        ELSIF falling_edge(clk) AND WE = '1' THEN
+        ELSIF falling_edge(clk) AND WE = '1' AND NOT FD_stall_PopUse ='1' THEN
 
             FD_Rdst1 <= FD_Inst(12 DOWNTO 10);
             FD_Rdst2 <= FD_Inst(9 DOWNTO 7);

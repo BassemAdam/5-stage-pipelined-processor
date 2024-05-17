@@ -4,7 +4,7 @@ USE ieee.numeric_std.ALL;
 
 ENTITY DE_Buffer IS
     PORT (
-        clk, RES, WE : IN STD_LOGIC;
+        clk, RES, WE, DE_stall_PopUse,FLUSH : IN STD_LOGIC;
         DE_Rsrc1_Val : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         DE_Rsrc2_Val : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         DE_Imm : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -102,7 +102,7 @@ BEGIN
             DE_ALUopd2_address <= (OTHERS => '0');
         ELSIF falling_edge(clk) THEN
 
-            IF WE = '1' THEN
+            IF WE = '1' AND NOT DE_stall_PopUse = '1' THEN
 
                 DE_OUTport_en_out <= DE_OUTport_en_in;
                 DE_we1_reg_out <= DE_we1_reg_in;

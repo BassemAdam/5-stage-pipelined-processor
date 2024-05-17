@@ -5,12 +5,12 @@
 1: 0000000000000100
 2: 0000000000000000
 3: 0000000000000000
-4: 0111110000001001
-5: 0011111110000011
-6: 0101101110000000
-7: 0000000000000101
-8: 0100001101110011
-9: 0000000000000011
+4: 0110000010000010
+5: 0110100000001010
+6: 0110000100000001
+
+
+
 
 
 
@@ -21,8 +21,7 @@
 // .org 0  #this means the the following line would be  at address  0 , and this is the reset address
 // 4
 // .org 4 
-// IN R7
-// DEC R7            F d e m w
-// ADDI R6, R7, 5      f d e m w
-//                       f d e m w
-// STD R6, 3(R7)           f d e m w
+// PUSH R1         
+// POP R2 
+// its like that we need to be add nop
+// OUT R2    

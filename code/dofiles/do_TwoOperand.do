@@ -5,20 +5,22 @@ project compileall
 vsim -gui work.processor
 
 # Load the memory
-mem load -infile {mem_files/DoDataHazard.mem} instrCache1
+mem load -infile {mem_files/TwoOperands.mem} instrCache1
 
 # Add signals to the waveform viewer
 add wave -position insertpoint  \
 sim:/processor/NumberOfCycle  \
+sim:/processor/PC_PC  \
+sim:/processor/DM_SP_signal  \
+sim:/processor/CCR_flags  \
 sim:/processor/clk  \
 sim:/processor/reset  \
-sim:/processor/exception  \
+sim:/processor/INT_In  \
 sim:/processor/IN_PORT  \
-sim:/processor/OUT_PORT  
+sim:/processor/OUT_PORT  \
+sim:/processor/exception  
 
-# PC signals 
-add wave -position insertpoint  \
-sim:/processor/PC_PC  
+
 
 # InstrCache
 
@@ -135,7 +137,8 @@ sim:/processor/ctr_Protect
 
 
 # Force data
-force -freeze sim:/processor/IN_PORT 32'h00000005 0
+
+# cycle 1
 force -freeze sim:/processor/clk 1 0, 0 {50 ps} -r 100
 force -freeze sim:/processor/we 1 0
 force -freeze sim:/processor/PC_en 1 0
@@ -143,6 +146,14 @@ force -freeze sim:/processor/reset 1 0
 run 50ps
 force -freeze sim:/processor/reset 0 0
 run 50ps
-force -freeze sim:/processor/IN_PORT 00000000000000000000000000001101 0
-mem load -filltype value -filldata 00000011 -fillradix hexadecimal /processor/Regfile/q_registers(1)
-mem load -filltype value -filldata {0ABAB } -fillradix hexadecimal /processor/DataMemory1/mem(3)
+
+
+force -freeze sim:/processor/IN_PORT 32'h0005 0
+run
+force -freeze sim:/processor/IN_PORT 32'h0019 0
+run
+force -freeze sim:/processor/IN_PORT 32'hFFFFFFFF 0
+
+run
+force -freeze sim:/processor/IN_PORT 32'hFFFFF320 0
+run

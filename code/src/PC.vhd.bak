@@ -35,7 +35,7 @@ BEGIN
         ELSIF falling_edge(clk) THEN
             IF PC_branch = '1' THEN
                 pcNext <= PC_branchPC;
-            ELSIF PC_en = '1' AND NOT PC_stall_PopUse  = '1' THEN
+            ELSIF PC_en AND NOT PC_stall_PopUse  = '1' THEN
                 pcNext <= STD_LOGIC_VECTOR(unsigned(pcNext) + 1);
             END IF;
 

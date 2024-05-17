@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 entity MW_Buffer is
     port (
-        clk, RES, WE  : in std_logic;
+        clk, RES, WE,FLUSH  : in std_logic;
         MW_ALUorMem   : in std_logic;
         MW_ALUResult1 : in std_logic_vector(31 downto 0);
         MW_ALUResult2 : in std_logic_vector(31 downto 0);

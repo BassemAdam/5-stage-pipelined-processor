@@ -20,7 +20,8 @@ ENTITY DataMemory IS
         DM_Free : IN STD_LOGIC;
         DM_Protect : IN STD_LOGIC;
         DM_Exception : OUT STD_LOGIC;
-        DM_RData : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        DM_RData : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        DM_SP : OUT INTEGER RANGE 0 TO 2 ** ADDR_WIDTH - 1
     );
 END ENTITY DataMemory;
 
@@ -75,4 +76,5 @@ BEGIN
             END IF;
         END IF;
     END PROCESS;
+    DM_SP <= sp;
 END ARCHITECTURE DataMemory_arch;

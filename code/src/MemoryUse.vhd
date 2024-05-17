@@ -5,27 +5,24 @@ use ieee.numeric_std.all;
 entity MemoryUse is --for load and pop
     port (
         RES : in std_logic;
-        DE_Ctrl_MemRead : in std_logic;
+        DE_Ctrl_Pop_Flag : in std_logic;
         DE_src1 : in std_logic_vector(2 downto 0);
         DE_src2 : in std_logic_vector(2 downto 0);
         EM_dst : in std_logic_vector(2 downto 0);
-        stall : out std_logic
+
+        DE_SRC1_USE : IN STD_LOGIC;
+        DE_SRC2_USE : IN STD_LOGIC;
+        EM_WE : IN STD_LOGIC;
+
+        stall_PopUse : out std_logic;
+        flush_EM : out std_logic
     );
 end entity MemoryUse;
 
 architecture HDU_Arch of MemoryUse is
 begin
-    process (RES, DE_Ctrl_MemRead, DE_src1, DE_src2, EM_dst)
-    begin
-        if RES = '1' then
-            stall <= '0';
-        else
-            -- Detect load-use hazard
-            if DE_Ctrl_MemRead = '1' and (EM_dst = DE_src1 or EM_dst = DE_src2) then
-                stall <= '1';  -- Stall the pipeline
-            else
-                stall <= '0';  -- No hazard detected
-            end if;
-        end if;
-    end process;
+
+    stall_PopUse <= '1' when DE_Ctrl_Pop_Flag = '1' and ((EM_dst = DE_src1 AND DE_SRC1_USE='1') or (EM_dst = DE_src2 AND DE_SRC2_USE='1')) and EM_WE ='1'  else '0';
+    flush_EM <= '1' when DE_Ctrl_Pop_Flag = '1' and ((EM_dst = DE_src1 AND DE_SRC1_USE='1') or (EM_dst = DE_src2 AND DE_SRC2_USE='1')) and EM_WE ='1'  else '0';
+
 end architecture HDU_Arch;
