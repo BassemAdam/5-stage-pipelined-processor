@@ -4,7 +4,7 @@ USE ieee.numeric_std.ALL;
 
 ENTITY DE_Buffer IS
     PORT (
-        clk, RES, WE, DE_stall_PopUse,FLUSH : IN STD_LOGIC;
+        clk, RES, WE, DE_flush_PopUse, FLUSH : IN STD_LOGIC;
         DE_Rsrc1_Val : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         DE_Rsrc2_Val : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         DE_Imm : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -74,7 +74,7 @@ BEGIN
     PROCESS (clk, RES)
         VARIABLE DE_ALUopd2_var : STD_LOGIC_VECTOR(31 DOWNTO 0);
     BEGIN
-        IF RES = '1' THEN
+        IF RES = '1'  THEN
             DE_we1_reg_out <= '0';
             DE_ALUorMem_out <= '0';
             DE_flags_en_out <= (OTHERS => '0');
@@ -102,7 +102,7 @@ BEGIN
             DE_ALUopd2_address <= (OTHERS => '0');
         ELSIF falling_edge(clk) THEN
 
-            IF WE = '1' AND NOT DE_stall_PopUse = '1' THEN
+            IF WE = '1' AND DE_flush_PopUse = '0' THEN
 
                 DE_OUTport_en_out <= DE_OUTport_en_in;
                 DE_we1_reg_out <= DE_we1_reg_in;
@@ -116,7 +116,7 @@ BEGIN
                     DE_ALUopd2_var := DE_Rsrc2_Val;
                     DE_ALUopd2_address <= DE_Rsrc2_address;
                 END IF;
-                IF DE_MemW_in = '1' AND DE_isImm ='1' THEN
+                IF DE_MemW_in = '1' AND DE_isImm = '1' THEN
                     DE_ALUopd1 <= DE_Rsrc2_Val;
                     DE_ALUopd2_var := X"0000" & DE_Imm;
                     DE_STD_VALUE <= DE_Rsrc1_Val;
@@ -148,6 +148,32 @@ BEGIN
                 DE_src1_use_out <= DE_src1_use_in;
                 DE_src2_use_out <= DE_src2_use_in;
                 DE_STD_use_out <= DE_STD_use_in;
+            ELSE
+                DE_we1_reg_out <= '0';
+                DE_ALUorMem_out <= '0';
+                DE_flags_en_out <= (OTHERS => '0');
+                DE_ALUopd1 <= (OTHERS => '0');
+                DE_ALUopd2 <= (OTHERS => '0');
+                DE_Rdst1_out <= (OTHERS => '0');
+                DE_Rdst2_out <= (OTHERS => '0');
+                DE_ALUsel_out <= (OTHERS => '0');
+                DE_OUTport_en_out <= '0';
+                DE_we2_reg_out <= '0';
+                DE_InPort_out <= (OTHERS => '0');
+                DE_isInput_out <= '0';
+                DE_MemW_out <= '0';
+                DE_MemR_out <= '0';
+                DE_Push_out <= '0';
+                DE_Pop_out <= '0';
+                DE_Protect_out <= '0';
+                DE_Free_out <= '0';
+                DE_STD_VALUE <= (OTHERS => '0');
+                DE_src1_use_out <= '0';
+                DE_src2_use_out <= '0';
+                DE_STD_use_out <= '0';
+                DE_STD_address <= (OTHERS => '0');
+                DE_ALUopd1_address <= (OTHERS => '0');
+                DE_ALUopd2_address <= (OTHERS => '0');
             END IF;
         END IF;
     END PROCESS;

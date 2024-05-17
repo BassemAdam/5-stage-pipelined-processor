@@ -4,7 +4,7 @@ USE ieee.numeric_std.ALL;
 
 ENTITY EM_Buffer IS
     PORT (
-        clk, RES, WE, EM_flush_PopUse, FLUSH : IN STD_LOGIC;
+        clk, RES, WE, FLUSH : IN STD_LOGIC;
 
         -- Passing through
         EM_OUTport_en_out : OUT STD_LOGIC;
@@ -67,7 +67,7 @@ BEGIN
             EM_Free_out <= '0';
             --END MEMORY OPERATIONS SIGNALS
         ELSIF falling_edge(clk) THEN
-            IF WE = '1' AND EM_flush_PopUse = '0' THEN
+            IF WE = '1' THEN
                 EM_OUTport_en_out <= EM_OUTport_en_in;
                 EM_ALUorMem_out <= EM_ALUorMem_in;
                 EM_we1_reg_out <= EM_we1_reg_in;
@@ -89,22 +89,6 @@ BEGIN
                     EM_STD_VALUE_out <= EM_ALUResult1_in;
                 END IF;
                 --END MEMORY OPERATIONS SIGNALS
-            ELSE
-                EM_OUTport_en_out <= '0';
-                EM_ALUorMem_out <= '0';
-                EM_we1_reg_out <= '0';
-                EM_we2_reg_out <= '0';
-                EM_ALUResult1_out <= (OTHERS => '0');
-                EM_ALUResult2_out <= (OTHERS => '0');
-                EM_Rdst1_out <= (OTHERS => '0');
-                EM_Rdst2_out <= (OTHERS => '0');
-                --MEMORY OPERATIONS SIGNALS
-                EM_MemW_out <= '0';
-                EM_MemR_out <= '0';
-                EM_Push_out <= '0';
-                EM_Pop_out <= '0';
-                EM_Protect_out <= '0';
-                EM_Free_out <= '0';
                 --END MEMORY OPERATIONS SIGNALS
             END IF;
         END IF;

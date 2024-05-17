@@ -130,70 +130,70 @@ ARCHITECTURE ProcessorArch OF Processor IS
         END COMPONENT controller;
 
         COMPONENT DE_Buffer IS
-            PORT (
-                clk, RES, WE,FLUSH,DE_stall_PopUse : IN STD_LOGIC;
-                DE_Rsrc1_Val : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-                DE_Rsrc2_Val : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-                DE_Imm : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-                DE_isImm : IN STD_LOGIC;
-        
-                DE_ALUopd1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-                DE_ALUopd2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-        
-                -- Passing through
-                DE_InPort_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-                DE_InPort_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-        
-                -- Control signals
-                DE_OUTport_en_in : IN STD_LOGIC;
-                DE_OUTport_en_out : OUT STD_LOGIC;
-                DE_isInput_in : IN STD_LOGIC;
-                DE_isInput_out : OUT STD_LOGIC;
-                DE_we1_reg_in : IN STD_LOGIC;
-                DE_we1_reg_out : OUT STD_LOGIC;
-                DE_we2_reg_in : IN STD_LOGIC;
-                DE_we2_reg_out : OUT STD_LOGIC;
-                DE_ALUorMem_in : IN STD_LOGIC;
-                DE_ALUorMem_out : OUT STD_LOGIC;
-                DE_flags_en_in : IN STD_LOGIC_VECTOR (0 TO 3);
-                DE_flags_en_out : OUT STD_LOGIC_VECTOR (0 TO 3);
-                DE_Rdst1_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-                DE_Rdst2_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-                DE_Rdst1_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-                DE_Rdst2_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-                DE_ALUsel_in : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-                --MEMORY OPERATIONS SIGNALS
-                DE_MemW_in : IN STD_LOGIC;
-                DE_MemW_out : OUT STD_LOGIC;
-                DE_MemR_in : IN STD_LOGIC;
-                DE_MemR_out : OUT STD_LOGIC;
-                DE_Push_in : IN STD_LOGIC;
-                DE_Push_out : OUT STD_LOGIC;
-                DE_Pop_in : IN STD_LOGIC;
-                DE_Pop_out : OUT STD_LOGIC;
-                DE_Protect_in : IN STD_LOGIC;
-                DE_Protect_out : OUT STD_LOGIC;
-                DE_Free_in : IN STD_LOGIC;
-                DE_Free_out : OUT STD_LOGIC; -- for std 
-                --END MEMORY OPERATIONS SIGNALS
-                DE_ALUsel_out : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-                --SRCS PROPAGATION
-                DE_STD_VALUE : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-        
-                DE_Rsrc1_address : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-                DE_Rsrc2_address : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-        
-                DE_STD_address : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-                DE_ALUopd1_address : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-                DE_ALUopd2_address : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-        
-                DE_src1_use_in : IN STD_LOGIC;
-                DE_src1_use_out : OUT STD_LOGIC;
-                DE_src2_use_in : IN STD_LOGIC;
-                DE_src2_use_out : OUT STD_LOGIC;
-                DE_STD_use_in : IN STD_LOGIC;
-                DE_STD_use_out : OUT STD_LOGIC
-            );
+        PORT (
+            clk, RES, WE, DE_flush_PopUse, FLUSH : IN STD_LOGIC;
+            DE_Rsrc1_Val : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            DE_Rsrc2_Val : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            DE_Imm : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+            DE_isImm : IN STD_LOGIC;
+    
+            DE_ALUopd1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            DE_ALUopd2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    
+            -- Passing through
+            DE_InPort_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            DE_InPort_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    
+            -- Control signals
+            DE_OUTport_en_in : IN STD_LOGIC;
+            DE_OUTport_en_out : OUT STD_LOGIC;
+            DE_isInput_in : IN STD_LOGIC;
+            DE_isInput_out : OUT STD_LOGIC;
+            DE_we1_reg_in : IN STD_LOGIC;
+            DE_we1_reg_out : OUT STD_LOGIC;
+            DE_we2_reg_in : IN STD_LOGIC;
+            DE_we2_reg_out : OUT STD_LOGIC;
+            DE_ALUorMem_in : IN STD_LOGIC;
+            DE_ALUorMem_out : OUT STD_LOGIC;
+            DE_flags_en_in : IN STD_LOGIC_VECTOR (0 TO 3);
+            DE_flags_en_out : OUT STD_LOGIC_VECTOR (0 TO 3);
+            DE_Rdst1_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            DE_Rdst2_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            DE_Rdst1_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            DE_Rdst2_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            DE_ALUsel_in : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+            --MEMORY OPERATIONS SIGNALS
+            DE_MemW_in : IN STD_LOGIC;
+            DE_MemW_out : OUT STD_LOGIC;
+            DE_MemR_in : IN STD_LOGIC;
+            DE_MemR_out : OUT STD_LOGIC;
+            DE_Push_in : IN STD_LOGIC;
+            DE_Push_out : OUT STD_LOGIC;
+            DE_Pop_in : IN STD_LOGIC;
+            DE_Pop_out : OUT STD_LOGIC;
+            DE_Protect_in : IN STD_LOGIC;
+            DE_Protect_out : OUT STD_LOGIC;
+            DE_Free_in : IN STD_LOGIC;
+            DE_Free_out : OUT STD_LOGIC; -- for std 
+            --END MEMORY OPERATIONS SIGNALS
+            DE_ALUsel_out : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+            --SRCS PROPAGATION
+            DE_STD_VALUE : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    
+            DE_Rsrc1_address : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            DE_Rsrc2_address : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+    
+            DE_STD_address : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            DE_ALUopd1_address : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            DE_ALUopd2_address : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    
+            DE_src1_use_in : IN STD_LOGIC;
+            DE_src1_use_out : OUT STD_LOGIC;
+            DE_src2_use_in : IN STD_LOGIC;
+            DE_src2_use_out : OUT STD_LOGIC;
+            DE_STD_use_in : IN STD_LOGIC;
+            DE_STD_use_out : OUT STD_LOGIC
+        );
         END COMPONENT;
 
         COMPONENT ALU IS
@@ -208,46 +208,46 @@ ARCHITECTURE ProcessorArch OF Processor IS
         END COMPONENT;
 
         COMPONENT EM_Buffer IS
-            PORT (
-                clk, RES, WE, EM_flush_PopUse,FLUSH : IN STD_LOGIC;
-        
-                -- Passing through
-                EM_OUTport_en_out : OUT STD_LOGIC;
-                EM_OUTport_en_in : IN STD_LOGIC;
-                EM_ALUorMem_in : IN STD_LOGIC;
-                EM_ALUorMem_out : OUT STD_LOGIC;
-                EM_we1_reg_in : IN STD_LOGIC;
-                EM_we1_reg_out : OUT STD_LOGIC;
-                EM_we2_reg_in : IN STD_LOGIC;
-                EM_we2_reg_out : OUT STD_LOGIC;
-                EM_Rdst1_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-                EM_Rdst1_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-                EM_Rdst2_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-                EM_Rdst2_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-                EM_ALUResult1_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-                EM_ALUResult1_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-                EM_ALUResult2_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-                EM_ALUResult2_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-        
-                --MEMORY OPERATIONS SIGNALS
-                EM_STD_VALUE_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-                EM_STD_VALUE_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-                EM_MemW_in : IN STD_LOGIC;
-                EM_MemW_out : OUT STD_LOGIC;
-                EM_MemR_in : IN STD_LOGIC;
-                EM_MemR_out : OUT STD_LOGIC;
-                EM_Push_in : IN STD_LOGIC;
-                EM_Push_out : OUT STD_LOGIC;
-                EM_Pop_in : IN STD_LOGIC;
-                EM_Pop_out : OUT STD_LOGIC;
-                EM_Protect_in : IN STD_LOGIC;
-                EM_Protect_out : OUT STD_LOGIC;
-                EM_Free_in : IN STD_LOGIC;
-                EM_Free_out : OUT STD_LOGIC
-                --END MEMORY OPERATIONS SIGNALS
-                --srcs
-                
-            );
+        PORT (
+            clk, RES, WE, FLUSH : IN STD_LOGIC;
+    
+            -- Passing through
+            EM_OUTport_en_out : OUT STD_LOGIC;
+            EM_OUTport_en_in : IN STD_LOGIC;
+            EM_ALUorMem_in : IN STD_LOGIC;
+            EM_ALUorMem_out : OUT STD_LOGIC;
+            EM_we1_reg_in : IN STD_LOGIC;
+            EM_we1_reg_out : OUT STD_LOGIC;
+            EM_we2_reg_in : IN STD_LOGIC;
+            EM_we2_reg_out : OUT STD_LOGIC;
+            EM_Rdst1_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            EM_Rdst1_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            EM_Rdst2_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            EM_Rdst2_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            EM_ALUResult1_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            EM_ALUResult1_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            EM_ALUResult2_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            EM_ALUResult2_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    
+            --MEMORY OPERATIONS SIGNALS
+            EM_STD_VALUE_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            EM_STD_VALUE_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            EM_MemW_in : IN STD_LOGIC;
+            EM_MemW_out : OUT STD_LOGIC;
+            EM_MemR_in : IN STD_LOGIC;
+            EM_MemR_out : OUT STD_LOGIC;
+            EM_Push_in : IN STD_LOGIC;
+            EM_Push_out : OUT STD_LOGIC;
+            EM_Pop_in : IN STD_LOGIC;
+            EM_Pop_out : OUT STD_LOGIC;
+            EM_Protect_in : IN STD_LOGIC;
+            EM_Protect_out : OUT STD_LOGIC;
+            EM_Free_in : IN STD_LOGIC;
+            EM_Free_out : OUT STD_LOGIC
+            --END MEMORY OPERATIONS SIGNALS
+            --srcs
+    
+        );
         END COMPONENT;
 
         COMPONENT DataMemory IS
@@ -369,16 +369,16 @@ ARCHITECTURE ProcessorArch OF Processor IS
             port (
                 RES : in std_logic;
                 DE_Ctrl_Pop_Flag : in std_logic;
-                DE_src1 : in std_logic_vector(2 downto 0);
-                DE_src2 : in std_logic_vector(2 downto 0);
-                EM_dst : in std_logic_vector(2 downto 0);
+                FD_src1 : in std_logic_vector(2 downto 0);
+                FD_src2 : in std_logic_vector(2 downto 0);
+                DE_dst : in std_logic_vector(2 downto 0);
         
-                DE_SRC1_USE : IN STD_LOGIC;
-                DE_SRC2_USE : IN STD_LOGIC;
-                EM_WE : IN STD_LOGIC;
+                FD_SRC1_USE : IN STD_LOGIC;
+                FD_SRC2_USE : IN STD_LOGIC;
+                DE_WE : IN STD_LOGIC;
         
                 stall_PopUse : out std_logic;
-                flush_EM : out std_logic
+                flush_DM : out std_logic
             );
         end component MemoryUse;
     ------------------------------------COMPONENTS END-----------------------------------
@@ -525,7 +525,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
 
         --MemoryUse signals
             SIGNAL stall_PopUse : std_logic;
-            SIGNAL flush_EM : std_logic;
+            SIGNAL flush_DM : std_logic;
         --MemoryUse signals end
     ------------------------------------SIGNALS END-----------------------------------
 
@@ -651,7 +651,7 @@ BEGIN
                 DE_STD_VALUE => DE_STD_VALUE,
 
                  -- SRCS PROPAGATION
-                 DE_stall_PopUse => stall_PopUse,
+           
                 DE_Rsrc1_address => FD_Rsrc1,
                 DE_Rsrc2_address => FD_Rsrc2,
 
@@ -665,7 +665,9 @@ BEGIN
                 DE_src2_use_out => DE_src2_use_out_signal,
                 DE_STD_use_in => DE_STD_use_in_signal,
                 DE_STD_use_out => DE_STD_use_out_signal,
-		        FLUSH =>'0'
+		        FLUSH =>'0',
+                --mem use 
+                DE_flush_PopUse => flush_DM
             );
         -- map DE buffer end
 
@@ -686,7 +688,7 @@ BEGIN
                 clk => clk,
                 RES => reset,
                 WE => we,
-                EM_flush_PopUse => flush_EM,
+                --EM_flush_PopUse => flush_DM,
                 -- Passing through
                 EM_ALUorMem_in => DE_ALUorMem_out,
                 EM_we1_reg_in => DE_we1_reg_out,
@@ -859,15 +861,15 @@ BEGIN
         -- map MemoryUse
             MemoryUse1 : MemoryUse PORT MAP(
                 RES => reset,
-                DE_Ctrl_Pop_Flag => EM_Pop_out,
-                DE_src1 => DE_ALUopd1_address_signal,
-                DE_src2 => DE_ALUopd2_address_signal,
-                EM_dst => EM_Rdst1_out,
-                stall_PopUse => stall_PopUse,
-                flush_EM => flush_EM,
-                DE_SRC1_USE => DE_src1_use_out_signal,
-                DE_SRC2_USE => DE_src2_use_out_signal,
-                EM_WE => EM_we1_reg_out
+                DE_Ctrl_Pop_Flag => DE_Pop_out,
+                FD_src1 => FD_Rsrc1,
+                FD_src2 => FD_Rsrc2,
+                DE_dst => DE_Rdst1_out, -- prolly will need to change for swap 
+                stall_PopUse => stall_PopUse, 
+                flush_DM => flush_DM,
+                FD_SRC1_USE => DE_src1_use_in_signal,
+                FD_SRC2_USE => DE_src2_use_in_signal,
+                DE_WE => DE_we1_reg_out
             );
     ------------------------------------PORTS END----------------------------------
    

@@ -8,17 +8,26 @@ vsim -gui work.processor
 mem load -infile {mem_files/TwoOperands.mem} instrCache1
 
 # Add signals to the waveform viewer
-add wave -position insertpoint  \
-sim:/processor/NumberOfCycle  \
-sim:/processor/PC_PC  \
-sim:/processor/DM_SP_signal  \
-sim:/processor/CCR_flags  \
-sim:/processor/clk  \
-sim:/processor/reset  \
-sim:/processor/INT_In  \
-sim:/processor/IN_PORT  \
-sim:/processor/OUT_PORT  \
-sim:/processor/exception  
+# Add signals to the waveform viewer
+add wave -position insertpoint -radix hexadecimal /processor/Regfile/q_registers(0)
+add wave -position insertpoint -radix hexadecimal /processor/Regfile/q_registers(1)
+add wave -position insertpoint -radix hexadecimal /processor/Regfile/q_registers(2)
+add wave -position insertpoint -radix hexadecimal /processor/Regfile/q_registers(3)
+add wave -position insertpoint -radix hexadecimal /processor/Regfile/q_registers(4)
+add wave -position insertpoint -radix hexadecimal /processor/Regfile/q_registers(5)
+add wave -position insertpoint -radix hexadecimal /processor/Regfile/q_registers(6)
+add wave -position insertpoint -radix hexadecimal /processor/Regfile/q_registers(7)
+
+add wave -position insertpoint sim:/processor/NumberOfCycle
+add wave -position insertpoint sim:/processor/clk
+add wave -position insertpoint sim:/processor/PC_PC
+add wave -position insertpoint sim:/processor/DM_SP_signal
+add wave -position insertpoint sim:/processor/CCR_flags
+add wave -position insertpoint sim:/processor/reset
+add wave -position insertpoint sim:/processor/INT_In
+add wave -position insertpoint sim:/processor/IN_PORT
+add wave -position insertpoint sim:/processor/OUT_PORT
+add wave -position insertpoint sim:/processor/exception
 
 
 
@@ -71,8 +80,15 @@ sim:/processor/DE_STD_use_out_signal  \
 
 # POP USE
 add wave -position insertpoint  \
+sim:/processor/DE_Pop_out  \
+sim:/processor/FD_Rsrc1  \
+sim:/processor/FD_Rsrc2  \
+sim:/processor/DE_Rdst1_out  \
 sim:/processor/stall_PopUse  \
-sim:/processor/flush_EM  
+sim:/processor/flush_DM  \
+sim:/processor/DE_src1_use_in_signal  \
+sim:/processor/DE_src2_use_in_signal  \
+sim:/processor/DE_we1_reg_out
 
 # Forward Unit
 add wave -position insertpoint  \
