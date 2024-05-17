@@ -27,10 +27,12 @@ ARCHITECTURE ProcessorArch OF Processor IS
             PC_Interrupt : IN STD_LOGIC;
             PC_branch : IN STD_LOGIC;
             PC_corrected : IN STD_LOGIC;
+            PC_POP_PC : IN STD_LOGIC;
             PC_JMP_EXE_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
             PC_JMP_DEC_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
             PC_InterruptPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
             PC_ResetPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+            PC_RET_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
 
             PC_PC : OUT STD_LOGIC_VECTOR(N - 1 DOWNTO 0)
         );
@@ -107,7 +109,9 @@ ARCHITECTURE ProcessorArch OF Processor IS
             ctr_opCode : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
             ctr_Func : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
             ctr_Correction : IN STD_LOGIC;
+            ctr_POP_PC_in : IN STD_LOGIC;
 
+            ctr_POP_PC_out : OUT STD_LOGIC;
             ctr_hasImm : OUT STD_LOGIC;
             ctr_ALUsel : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
             ctr_flags_en : OUT STD_LOGIC_VECTOR(0 TO 3);
@@ -145,15 +149,17 @@ ARCHITECTURE ProcessorArch OF Processor IS
             DE_OpCode : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
             DE_Predictor : IN STD_LOGIC;
             DE_PC_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-
+            
             DE_ALUopd1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             DE_ALUopd2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             DE_PC_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             DE_Correction : OUT STD_LOGIC;
-
+            
             -- Passing through
             DE_InPort_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             DE_InPort_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            DE_POP_PC_in : IN STD_LOGIC;
+            DE_POP_PC_out : OUT STD_LOGIC;
 
             -- Control signals
             DE_OUTport_en_in : IN STD_LOGIC;
@@ -224,6 +230,8 @@ ARCHITECTURE ProcessorArch OF Processor IS
             EM_ALUResult1_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             EM_ALUResult2_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             EM_ALUResult2_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            EM_POP_PC_in : IN STD_LOGIC;
+            EM_POP_PC_out : OUT STD_LOGIC;
 
             --MEMORY OPERATIONS SIGNALS
             EM_STD_VALUE_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -288,7 +296,9 @@ ARCHITECTURE ProcessorArch OF Processor IS
             MW_Rdst1_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
             MW_Rdst1_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
             MW_Rdst2_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-            MW_Rdst2_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0)
+            MW_Rdst2_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+            MW_POP_PC_in : IN STD_LOGIC;
+            MW_POP_PC_out : OUT STD_LOGIC
 
         );
     END COMPONENT MW_Buffer;
@@ -366,6 +376,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
     SIGNAL DE_Free_out : STD_LOGIC;
     SIGNAL DE_STD_VALUE : STD_LOGIC_VECTOR(31 DOWNTO 0); -- for std
     SIGNAL DE_Correction : STD_LOGIC;
+    SIGNAL DE_POP_PC_out : STD_LOGIC;
     SIGNAL DE_PC_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
     -- DE Buffer signals end
 
@@ -376,6 +387,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
     -- ALU signals end
 
     -- EM Buffer signals 
+    SIGNAL EM_POP_PC_out : STD_LOGIC;
     SIGNAL EM_ALUorMem_out : STD_LOGIC;
     SIGNAL EM_we1_reg_out : STD_LOGIC;
     SIGNAL EM_we2_reg_out : STD_LOGIC;
@@ -402,6 +414,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
     SIGNAL MW_value1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL MW_value2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
+    SIGNAL MW_POP_PC_out : STD_LOGIC;
     SIGNAL MW_we1_reg_out : STD_LOGIC;
     SIGNAL MW_we2_reg_out : STD_LOGIC;
     SIGNAL MW_OUTport_en_out : STD_LOGIC;
@@ -423,6 +436,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
     SIGNAL ctr_isInput : STD_LOGIC;
     SIGNAL ctr_OUTport_en : STD_LOGIC;
     SIGNAL ctr_Predictor : STD_LOGIC;
+    SIGNAL ctr_POP_PC_out : STD_LOGIC;
     -- Controller for memoryData
     SIGNAL ctr_MemW : STD_LOGIC;
     SIGNAL ctr_MemR : STD_LOGIC;
@@ -449,6 +463,7 @@ BEGIN
         RES => reset,
         PC_branch => ctr_JMP_DEC,
         PC_corrected => ctr_JMP_EXE,
+        PC_POP_PC => MW_POP_PC_out,
         PC_en => PC_en,
         PC_Interrupt => '0', -- PROBABLY NEED TO CHANGE THIS AND TAKE IT AS AN INPUT TO THE PROCESSOR
 
@@ -456,6 +471,7 @@ BEGIN
         PC_JMP_DEC_PC => RF_Rdata1,
         PC_InterruptPC => IC_InterruptPC,
         PC_ResetPC => IC_ResetPC,
+        PC_RET_PC => MW_value1,
 
         PC_PC => PC_PC
     );
@@ -546,6 +562,7 @@ BEGIN
         DE_Rdst2_in => FD_Rdst2,
         DE_ALUsel_in => ctr_ALUsel,
         DE_OUTport_en_in => ctr_OUTport_en,
+        DE_POP_PC_in => ctr_POP_PC_out,
 
         DE_we1_reg_out => DE_we1_reg_out,
         DE_we2_reg_out => DE_we2_reg_out,
@@ -555,6 +572,7 @@ BEGIN
         DE_Rdst2_out => DE_Rdst2_out,
         DE_ALUsel_out => DE_ALUsel_out,
         DE_OUTport_en_out => DE_OUTport_en_out,
+        DE_POP_PC_out => DE_POP_PC_out,
         --Data Memory Signals
         DE_MemW_in => ctr_MemW,
         DE_MemW_out => DE_MemW_out,
@@ -599,6 +617,7 @@ BEGIN
         EM_ALUResult1_in => ALU_Result1,
         EM_ALUResult2_in => ALU_Result2,
         EM_OUTport_en_in => DE_OUTport_en_out,
+        EM_POP_PC_in => DE_POP_PC_out,
 
         EM_ALUorMem_out => EM_ALUorMem_out,
         EM_we1_reg_out => EM_we1_reg_out,
@@ -608,6 +627,7 @@ BEGIN
         EM_ALUResult1_out => EM_ALUResult1_out,
         EM_ALUResult2_out => EM_ALUResult2_out,
         EM_OUTport_en_out => EM_OUTport_en_out,
+        EM_POP_PC_out => EM_POP_PC_out,
         --MEMORY OPERATIONS SIGNALS
         EM_MemW_in => DE_MemW_out,
         EM_MemW_out => EM_MemW_out,
@@ -664,12 +684,14 @@ BEGIN
         MW_Rdst1_in => EM_Rdst1_out,
         MW_Rdst2_in => EM_Rdst2_out,
         MW_OUTport_en_in => EM_OUTport_en_out,
+        MW_POP_PC_in => EM_POP_PC_out,
 
         MW_we1_reg_out => MW_we1_reg_out,
         MW_we2_reg_out => MW_we2_reg_out,
         MW_Rdst1_out => MW_Rdst1_out,
         MW_Rdst2_out => MW_Rdst2_out,
-        MW_OUTport_en_out => MW_OUTport_en_out
+        MW_OUTport_en_out => MW_OUTport_en_out,
+        MW_POP_PC_out => MW_POP_PC_out
     );
     -- map MW buffer end
 
@@ -681,6 +703,7 @@ BEGIN
         ctr_opCode => FD_OpCode,
         ctr_Func => FD_Func,
         ctr_Correction => DE_Correction,
+        ctr_POP_PC_in => MW_POP_PC_out,
 
         ctr_hasImm => ctr_hasImm,
         ctr_ALUsel => ctr_ALUsel,
@@ -700,7 +723,8 @@ BEGIN
         ctr_JMP_EXE => ctr_JMP_EXE,
         ctr_Flush_FD => ctr_Flush_FD,
         ctr_Flush_DE => ctr_Flush_DE,
-        ctr_Predictor => ctr_Predictor
+        ctr_Predictor => ctr_Predictor,
+        ctr_POP_PC_out => ctr_POP_PC_out
     );
     -- map controller end
 

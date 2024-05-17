@@ -23,6 +23,8 @@ ENTITY DE_Buffer IS
         -- Passing through
         DE_InPort_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         DE_InPort_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        DE_POP_PC_in : IN STD_LOGIC;
+        DE_POP_PC_out : OUT STD_LOGIC;
 
         -- Control signals
         DE_OUTport_en_in : IN STD_LOGIC;
@@ -85,6 +87,7 @@ BEGIN
             DE_MemR_out <= '0';
             DE_Push_out <= '0';
             DE_Pop_out <= '0';
+            DE_POP_PC_out <= '0';
             DE_Protect_out <= '0';
             DE_Free_out <= '0';
             DE_STD_VALUE <= (OTHERS => '0');
@@ -98,6 +101,7 @@ BEGIN
             DE_flags_en_out <= (OTHERS => '0');
             DE_OUTport_en_out <= '0';
             DE_Correction <= '0';
+            DE_POP_PC_out <= '0';
 
         ELSIF falling_edge(clk) THEN
 
@@ -115,7 +119,10 @@ BEGIN
 
                     DE_ALUopd2_var := DE_Rsrc2_Val;
                 END IF;
-                IF DE_MemW_in = '1' AND DE_isImm = '1' THEN
+                if DE_OpCode = "101" then
+                    DE_ALUopd1 <= DE_PC_in;
+                    DE_STD_VALUE <= (OTHERS => '0');
+                elsIF DE_MemW_in = '1' AND DE_isImm = '1' THEN
                     DE_ALUopd1 <= DE_Rsrc2_Val;
                     DE_STD_VALUE <= DE_Rsrc1_Val;
                 ELSE
@@ -139,7 +146,9 @@ BEGIN
                 DE_Protect_out <= DE_Protect_in;
                 DE_Free_out <= DE_Free_in;
                 --End Memory Operations
-                IF DE_Predictor = '1' THEN
+                if DE_OpCode = "101" then
+                    DE_PC_out <= DE_PC_in;
+                elsIF DE_Predictor = '1' THEN
                     DE_PC_out <= DE_PC_in;
                 ELSE
                     DE_PC_out <= DE_Rsrc1_Val;
@@ -156,6 +165,7 @@ BEGIN
                 ELSE
                     DE_Correction <= '0';
                 END IF;
+                DE_POP_PC_out <= DE_POP_PC_in;
                 DE_OpCode_out <= DE_OpCode;
                 DE_Predictor_out <= DE_Predictor;
             END IF;

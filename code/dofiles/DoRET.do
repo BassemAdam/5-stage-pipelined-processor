@@ -5,7 +5,7 @@ project compileall
 vsim -gui work.processor
 
 # Load the memory
-mem load -infile {mem_files/DoCALL.mem} instrCache1
+mem load -infile {mem_files/DoRET.mem} instrCache1
 
 add wave -position insertpoint  \
 sim:/processor/clk  \
@@ -23,7 +23,12 @@ sim:/processor/FD_Rdst1  \
 sim:/processor/FD_Rdst2  \
 sim:/processor/FD_Rsrc1  \
 sim:/processor/FD_Rsrc2  \
-sim:/processor/FD_Func  
+sim:/processor/FD_Func  \
+sim:/processor/ctr_POP_PC_out  \
+sim:/processor/DE_POP_PC_out  \
+sim:/processor/EM_POP_PC_out  \
+sim:/processor/MW_POP_PC_out  \
+sim:/processor/ctr_Flush_FD
 
 # Force data
 force -freeze sim:/processor/clk 1 0, 0 {50 ps} -r 100
@@ -33,4 +38,3 @@ force -freeze sim:/processor/reset 1 0
 run 50ps
 force -freeze sim:/processor/reset 0 0
 run 50ps
-
