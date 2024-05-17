@@ -243,7 +243,7 @@ unsigned int parser_ALU_inst(char *inst)
     if (strcmp(operation, "SWAP") == 0)
     {
         alu_inst.opcode = 1;
-        alu_inst.fn_num = 5;
+        alu_inst.fn_num = 15;
         char *destination = strtok(NULL, ", ");
         sscanf(destination, "R%u", &alu_inst.rdst);
         char *source1 = strtok(NULL, " ");
@@ -479,8 +479,8 @@ unsigned int parse_cond_jump_instruction(char *instruction)
         cond_jump_inst.opcode = 4;
         cond_jump_inst.fn_num = 0;
         char *destination = strtok(NULL, " ");
-        sscanf(destination, "R%u", &cond_jump_inst.rdst);
-        cond_jump_inst.rsrc1 = 0;
+        sscanf(destination, "R%u", &cond_jump_inst.rscr1);
+        cond_jump_inst.rdst = 0;
         cond_jump_inst.rsrc2 = 0;
         cond_jump_inst.rest = 0;
     }
@@ -503,8 +503,8 @@ unsigned int parse_uncond_jump_instruction(char *instruction)
     {
         uncond_jump_inst.opcode = 5;
         char *destination = strtok(NULL, " ");
-        sscanf(destination, "R%u", &uncond_jump_inst.rdst);
-        uncond_jump_inst.rsrc1 = 0;
+        sscanf(destination, "R%u", &uncond_jump_inst.rsrc1);
+        uncond_jump_inst.rdst = 0;
         uncond_jump_inst.rsrc2 = 0;
         uncond_jump_inst.fn_num = 0;
         uncond_jump_inst.rest = 0;
