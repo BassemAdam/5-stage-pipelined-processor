@@ -54,7 +54,25 @@ sim:/processor/DE_MemR_out  \
 sim:/processor/DE_Push_out  \
 sim:/processor/DE_Pop_out  \
 sim:/processor/DE_Protect_out  \
-sim:/processor/DE_Free_out  
+sim:/processor/DE_Free_out \
+sim:/processor/DE_STD_VALUE  \
+sim:/processor/DE_STD_address_signal  \
+sim:/processor/DE_ALUopd1_address_signal  \
+sim:/processor/DE_ALUopd2_address_signal  \
+sim:/processor/DE_src1_use_in_signal  \
+sim:/processor/DE_src1_use_out_signal  \
+sim:/processor/DE_src2_use_in_signal  \
+sim:/processor/DE_src2_use_out_signal  \
+sim:/processor/DE_STD_use_in_signal  \
+sim:/processor/DE_STD_use_out_signal  \
+
+
+
+# Forward Unit
+add wave -position insertpoint  \
+sim:/processor/FWD_ALU_OPD_1_signal \
+sim:/processor/FWD_ALU_OPD_2_signal  
+
 
 # ALU
 add wave -position insertpoint  \
@@ -121,3 +139,4 @@ force -freeze sim:/processor/reset 1 0
 run 50ps
 force -freeze sim:/processor/reset 0 0
 run 50ps
+force -freeze sim:/processor/IN_PORT 00000000000000000000000000001101 0

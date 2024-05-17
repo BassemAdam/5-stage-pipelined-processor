@@ -40,6 +40,8 @@ ENTITY EM_Buffer IS
         EM_Free_in : IN STD_LOGIC;
         EM_Free_out : OUT STD_LOGIC
         --END MEMORY OPERATIONS SIGNALS
+        --srcs
+        
     );
 END ENTITY EM_Buffer;
 
