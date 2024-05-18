@@ -5,6 +5,8 @@ USE ieee.numeric_std.ALL;
 ENTITY EM_Buffer IS
     PORT (
         clk, RES, WE : IN STD_LOGIC;
+        EM_Push_CCR : IN STD_LOGIC;
+        EM_CCR : IN STD_LOGIC_VECTOR(0 TO 3);
 
         -- Passing through
         EM_OUTport_en_out : OUT STD_LOGIC;
@@ -86,6 +88,9 @@ BEGIN
                 EM_Free_out <= EM_Free_in;
                 IF EM_MemW_in = '1' AND EM_Push_in = '0' THEN
                     EM_STD_VALUE_out <= EM_STD_VALUE_in;
+                ELSIF EM_Push_CCR = '1' THEN
+                    EM_STD_VALUE_out(31 downto 28) <= EM_CCR;
+                    EM_STD_VALUE_out(28 downto 0) <= (OTHERS => '0');
                 ELSE
                     EM_STD_VALUE_out <= EM_ALUResult1_in;
                 END IF;

@@ -14,6 +14,7 @@ ENTITY DE_Buffer IS
         DE_OpCode : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
         DE_Predictor : IN STD_LOGIC;
         DE_PC_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        DE_current_PC : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
         DE_ALUopd1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         DE_ALUopd2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -25,6 +26,10 @@ ENTITY DE_Buffer IS
         DE_InPort_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         DE_POP_PC_in : IN STD_LOGIC;
         DE_POP_PC_out : OUT STD_LOGIC;
+        DE_Push_CCR_in : IN STD_LOGIC;
+        DE_Push_CCR_out : OUT STD_LOGIC;
+        DE_Push_PC_in : IN STD_LOGIC;
+        DE_Push_PC_out : OUT STD_LOGIC;
 
         -- Control signals
         DE_OUTport_en_in : IN STD_LOGIC;
@@ -94,6 +99,8 @@ BEGIN
             DE_Correction <= '0';
             DE_Predictor_out <= '0';
             DE_PC_out <= (OTHERS => '0');
+            DE_Push_CCR_out <= '0';
+            DE_Push_PC_out <= '0';
 
         ELSIF falling_edge(clk) AND DE_Flush_DE = '1' THEN
             DE_we1_reg_out <= '0';
@@ -119,10 +126,14 @@ BEGIN
 
                     DE_ALUopd2_var := DE_Rsrc2_Val;
                 END IF;
-                if DE_OpCode = "101" then
+
+                IF DE_Push_PC_in = '1' THEN
+                    DE_ALUopd1 <= DE_Rsrc2_Val;
+                    DE_STD_VALUE <= DE_current_PC;
+                ELSIF DE_OpCode = "101" THEN
                     DE_ALUopd1 <= DE_PC_in;
                     DE_STD_VALUE <= (OTHERS => '0');
-                elsIF DE_MemW_in = '1' AND DE_isImm = '1' THEN
+                ELSIF DE_MemW_in = '1' AND DE_isImm = '1' THEN
                     DE_ALUopd1 <= DE_Rsrc2_Val;
                     DE_STD_VALUE <= DE_Rsrc1_Val;
                 ELSE
@@ -146,9 +157,9 @@ BEGIN
                 DE_Protect_out <= DE_Protect_in;
                 DE_Free_out <= DE_Free_in;
                 --End Memory Operations
-                if DE_OpCode = "101" then
+                IF DE_OpCode = "101" THEN
                     DE_PC_out <= DE_PC_in;
-                elsIF DE_Predictor = '1' THEN
+                ELSIF DE_Predictor = '1' THEN
                     DE_PC_out <= DE_PC_in;
                 ELSE
                     DE_PC_out <= DE_Rsrc1_Val;
@@ -166,6 +177,8 @@ BEGIN
                     DE_Correction <= '0';
                 END IF;
                 DE_POP_PC_out <= DE_POP_PC_in;
+                DE_Push_CCR_out <= DE_Push_CCR_in;
+                DE_Push_PC_out <= DE_Push_PC_in;
                 DE_OpCode_out <= DE_OpCode;
                 DE_Predictor_out <= DE_Predictor;
             END IF;

@@ -6,7 +6,7 @@ ENTITY Processor IS
     PORT (
         clk : IN STD_LOGIC;
         reset, we : IN STD_LOGIC;
-        INT_In : IN STD_LOGIC; -- interrupt signal
+        INT_In : IN STD_LOGIC := '0'; -- interrupt signal
         IN_PORT : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
         exception : OUT STD_LOGIC; -- exception signal
@@ -59,9 +59,11 @@ ARCHITECTURE ProcessorArch OF Processor IS
             clk : IN STD_LOGIC;
             RES : IN STD_LOGIC;
             WE : IN STD_LOGIC;
+            FD_INT : IN STD_LOGIC;
             FD_Flush_FD : IN STD_LOGIC;
             FD_Inst : IN STD_LOGIC_VECTOR(15 DOWNTO 0); -- 16 bits from instruction memory
             FD_IN_PORT : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            FD_current_PC_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
             FD_OpCode : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
             FD_Rsrc1 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -70,6 +72,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
             FD_Rdst2 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
             FD_Func : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
             FD_InputPort : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+            FD_current_PC_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 
             -- Passing through
             FD_isImm_in : IN STD_LOGIC
@@ -110,6 +113,8 @@ ARCHITECTURE ProcessorArch OF Processor IS
             ctr_Func : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
             ctr_Correction : IN STD_LOGIC;
             ctr_POP_PC_in : IN STD_LOGIC;
+            ctr_Push_PC_in : IN STD_LOGIC;
+            ctr_Push_CCR_in : IN STD_LOGIC;
 
             ctr_POP_PC_out : OUT STD_LOGIC;
             ctr_hasImm : OUT STD_LOGIC;
@@ -130,6 +135,8 @@ ARCHITECTURE ProcessorArch OF Processor IS
             ctr_Flush_FD : OUT STD_LOGIC;
             ctr_Flush_DE : OUT STD_LOGIC;
             ctr_Predictor : OUT STD_LOGIC;
+            ctr_Push_PC_out : OUT STD_LOGIC;
+            ctr_Push_CCR_out : OUT STD_LOGIC;
 
             ctr_OUTport_en : OUT STD_LOGIC
 
@@ -149,17 +156,22 @@ ARCHITECTURE ProcessorArch OF Processor IS
             DE_OpCode : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
             DE_Predictor : IN STD_LOGIC;
             DE_PC_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-            
+            DE_current_PC : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+
             DE_ALUopd1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             DE_ALUopd2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             DE_PC_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             DE_Correction : OUT STD_LOGIC;
-            
+
             -- Passing through
             DE_InPort_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             DE_InPort_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             DE_POP_PC_in : IN STD_LOGIC;
             DE_POP_PC_out : OUT STD_LOGIC;
+            DE_Push_CCR_in : IN STD_LOGIC;
+            DE_Push_CCR_out : OUT STD_LOGIC;
+            DE_Push_PC_in : IN STD_LOGIC;
+            DE_Push_PC_out : OUT STD_LOGIC;
 
             -- Control signals
             DE_OUTport_en_in : IN STD_LOGIC;
@@ -212,6 +224,8 @@ ARCHITECTURE ProcessorArch OF Processor IS
     COMPONENT EM_Buffer IS
         PORT (
             clk, RES, WE : IN STD_LOGIC;
+            EM_Push_CCR : IN STD_LOGIC;
+            EM_CCR : IN STD_LOGIC_VECTOR(0 TO 3);
 
             -- Passing through
             EM_OUTport_en_out : OUT STD_LOGIC;
@@ -348,6 +362,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
     SIGNAL FD_Rdst2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
     SIGNAL FD_Func : STD_LOGIC_VECTOR(3 DOWNTO 0);
     SIGNAL FD_InputPort : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL FD_current_PC_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
     -- FD Buffer signals end
 
@@ -378,6 +393,8 @@ ARCHITECTURE ProcessorArch OF Processor IS
     SIGNAL DE_Correction : STD_LOGIC;
     SIGNAL DE_POP_PC_out : STD_LOGIC;
     SIGNAL DE_PC_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL DE_Push_CCR_out : STD_LOGIC;
+    SIGNAL DE_Push_PC_out : STD_LOGIC;
     -- DE Buffer signals end
 
     -- ALU signals
@@ -448,6 +465,8 @@ ARCHITECTURE ProcessorArch OF Processor IS
     SIGNAL ctr_Flush_FD : STD_LOGIC;
     SIGNAL ctr_Flush_DE : STD_LOGIC;
     SIGNAL ctr_Protect : STD_LOGIC;
+    SIGNAL ctr_Push_PC_out : STD_LOGIC;
+    SIGNAL ctr_Push_CCR_out : STD_LOGIC;
     -- Controller signals end
     SIGNAL NumberOfCycle : INTEGER := 0;
     ------------------------------------SIGNALS END-----------------------------------
@@ -494,6 +513,7 @@ BEGIN
         clk => clk,
         RES => reset,
         WE => we,
+        FD_INT => INT_In,
         FD_Flush_FD => ctr_Flush_FD,
         FD_Inst => IC_Inst,
         FD_OpCode => FD_OpCode,
@@ -506,7 +526,9 @@ BEGIN
 
         -- Passing through
         FD_isImm_in => ctr_hasImm,
-        FD_InputPort => FD_InputPort
+        FD_InputPort => FD_InputPort,
+        FD_current_PC_in => PC_PC,
+        FD_current_PC_out => FD_current_PC_out
     );
     -- map FD buffer end
 
@@ -544,6 +566,7 @@ BEGIN
         DE_OpCode => FD_OpCode,
         DE_Predictor => ctr_Predictor,
         DE_PC_in => PC_PC,
+        DE_current_PC => FD_current_PC_out,
 
         DE_ALUopd1 => DE_ALUopd1,
         DE_ALUopd2 => DE_ALUopd2,
@@ -563,6 +586,10 @@ BEGIN
         DE_ALUsel_in => ctr_ALUsel,
         DE_OUTport_en_in => ctr_OUTport_en,
         DE_POP_PC_in => ctr_POP_PC_out,
+        DE_Push_PC_in => ctr_Push_PC_out,
+        DE_Push_PC_out => DE_Push_PC_out,
+        DE_Push_CCR_in => ctr_Push_CCR_out,
+        DE_Push_CCR_out => DE_Push_CCR_out,
 
         DE_we1_reg_out => DE_we1_reg_out,
         DE_we2_reg_out => DE_we2_reg_out,
@@ -607,6 +634,8 @@ BEGIN
         clk => clk,
         RES => reset,
         WE => we,
+        EM_Push_CCR => DE_Push_CCR_out,
+        EM_CCR => CCR_flags,
 
         -- Passing through
         EM_ALUorMem_in => DE_ALUorMem_out,
@@ -704,6 +733,8 @@ BEGIN
         ctr_Func => FD_Func,
         ctr_Correction => DE_Correction,
         ctr_POP_PC_in => MW_POP_PC_out,
+        ctr_Push_PC_in => DE_Push_PC_out,
+        ctr_Push_CCR_in => DE_Push_CCR_out,
 
         ctr_hasImm => ctr_hasImm,
         ctr_ALUsel => ctr_ALUsel,
@@ -724,7 +755,9 @@ BEGIN
         ctr_Flush_FD => ctr_Flush_FD,
         ctr_Flush_DE => ctr_Flush_DE,
         ctr_Predictor => ctr_Predictor,
-        ctr_POP_PC_out => ctr_POP_PC_out
+        ctr_POP_PC_out => ctr_POP_PC_out,
+        ctr_Push_PC_out => ctr_Push_PC_out,
+        ctr_Push_CCR_out => ctr_Push_CCR_out
     );
     -- map controller end
 
