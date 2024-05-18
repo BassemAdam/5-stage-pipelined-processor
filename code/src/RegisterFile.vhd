@@ -1,55 +1,51 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity RegisterFile is
-    generic (
-        w : integer := 3;
-        n : integer := 32
+ENTITY RegisterFile IS
+    GENERIC (
+        w : INTEGER := 3;
+        n : INTEGER := 32
     );
-    port (
-        clk, RES : in std_logic;
+    PORT (
+        clk, RES : IN STD_LOGIC;
 
-        RE_we1    : in std_logic;
-        RF_we2    : in std_logic;
-        RF_Rdst1   : in std_logic_vector(w - 1 downto 0);
-        RF_Rdst2   : in std_logic_vector(w - 1 downto 0);
-        RF_Wdata1 : in std_logic_vector(n - 1 downto 0);
-        RF_Wdata2 : in std_logic_vector(n - 1 downto 0);
+        RE_we1 : IN STD_LOGIC;
+        RF_we2 : IN STD_LOGIC;
+        RF_Rdst1 : IN STD_LOGIC_VECTOR(w - 1 DOWNTO 0);
+        RF_Rdst2 : IN STD_LOGIC_VECTOR(w - 1 DOWNTO 0);
+        RF_Wdata1 : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
+        RF_Wdata2 : IN STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
 
-        RF_Rsrc1 : in std_logic_vector(w - 1 downto 0);
-        RF_Rsrc2 : in std_logic_vector(w - 1 downto 0);
+        RF_Rsrc1 : IN STD_LOGIC_VECTOR(w - 1 DOWNTO 0);
+        RF_Rsrc2 : IN STD_LOGIC_VECTOR(w - 1 DOWNTO 0);
 
-        RF_Rdata1 : out std_logic_vector(n - 1 downto 0);
-        RF_Rdata2 : out std_logic_vector(n - 1 downto 0)
-
-       
+        RF_Rdata1 : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
+        RF_Rdata2 : OUT STD_LOGIC_VECTOR(n - 1 DOWNTO 0)
     );
-end entity RegisterFile;
+END ENTITY RegisterFile;
 
-architecture Behavioral of RegisterFile is
-    type register_array is array (0 to 2 ** w - 1) of std_logic_vector(n - 1 downto 0);
-    signal q_registers : register_array;
+ARCHITECTURE Behavioral OF RegisterFile IS
+    TYPE register_array IS ARRAY (0 TO 2 ** w - 1) OF STD_LOGIC_VECTOR(n - 1 DOWNTO 0);
+    SIGNAL q_registers : register_array;
 
-begin
+BEGIN
 
-    process (clk, RES)
-    begin
-        if RES = '1' then
-            q_registers <= (others => (others => '0'));
-        elsif rising_edge(clk) then
-            if RE_we1 = '1' then
+    PROCESS (clk, RES)
+    BEGIN
+        IF RES = '1' THEN
+            q_registers <= (OTHERS => (OTHERS => '0'));
+        ELSIF rising_edge(clk) THEN
+            IF RE_we1 = '1' THEN
                 q_registers(TO_INTEGER(unsigned(RF_Rdst1))) <= RF_Wdata1;
-            end if;
-            if RF_we2 = '1' then
+            END IF;
+            IF RF_we2 = '1' THEN
                 q_registers(TO_INTEGER(unsigned(RF_Rdst2))) <= RF_Wdata2;
-            end if;
-        end if;
-          
-    end process;
-    
+            END IF;
+        END IF;
 
+    END PROCESS;
     RF_Rdata1 <= q_registers(TO_INTEGER(unsigned(RF_Rsrc1)));
     RF_Rdata2 <= q_registers(TO_INTEGER(unsigned(RF_Rsrc2)));
 
-end architecture Behavioral;
+END ARCHITECTURE Behavioral;

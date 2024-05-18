@@ -1,47 +1,47 @@
 
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity CCR is
-    port (
-        clk, RES : in std_logic;
-        CCR_flags_in : in std_logic_vector (0 to 3);
-        CCR_flags_en : in std_logic_vector (0 to 3);
+ENTITY CCR IS
+    PORT (
+        clk, RES : IN STD_LOGIC;
+        CCR_flags_in : IN STD_LOGIC_VECTOR (0 TO 3);
+        CCR_flags_en : IN STD_LOGIC_VECTOR (0 TO 3);
 
-        CCR_flags_out : out std_logic_vector (0 to 3)
+        CCR_flags_out : OUT STD_LOGIC_VECTOR (0 TO 3)
     );
-end entity CCR;
+END ENTITY CCR;
 
-architecture arch1 of CCR is
+ARCHITECTURE arch1 OF CCR IS
 
-begin
+BEGIN
 
-    process (clk, RES)
-    begin
+    PROCESS (clk, RES)
+    BEGIN
 
-        if RES = '1' then
+        IF RES = '1' THEN
             CCR_flags_out <= "0000";
-        elsif rising_edge(clk) then
+        ELSIF rising_edge(clk) THEN
 
-            if CCR_flags_en(0) = '1' then
+            IF CCR_flags_en(0) = '1' THEN
                 CCR_flags_out(0) <= CCR_flags_in(0);
-            end if;
+            END IF;
 
-            if CCR_flags_en(1) = '1' then
+            IF CCR_flags_en(1) = '1' THEN
                 CCR_flags_out(1) <= CCR_flags_in(1);
-            end if;
+            END IF;
 
-            if CCR_flags_en(2) = '1' then
+            IF CCR_flags_en(2) = '1' THEN
                 CCR_flags_out(2) <= CCR_flags_in(2);
-            end if;
+            END IF;
 
-            if CCR_flags_en(3) = '1' then
+            IF CCR_flags_en(3) = '1' THEN
                 CCR_flags_out(3) <= CCR_flags_in(3);
-            end if;
+            END IF;
 
-        end if;
+        END IF;
 
-    end process;
+    END PROCESS;
 
-end architecture arch1;
+END ARCHITECTURE arch1;
