@@ -5,8 +5,10 @@ project compileall
 vsim -gui work.processor
 
 # Load the memory
-mem load -infile {mem_files/Memory.mem} instrCache1
-
+mem load -infile {mem_files/Memory2.mem} instrCache1
+add wave -position insertpoint sim:/processor/NumberOfCycle
+add wave -position insertpoint sim:/processor/clk
+add wave -position insertpoint sim:/processor/PC_PC
 # Add signals to the waveform viewer
 add wave -position insertpoint -radix hexadecimal /processor/Regfile/q_registers(0)
 add wave -position insertpoint -radix hexadecimal /processor/Regfile/q_registers(1)
@@ -17,9 +19,7 @@ add wave -position insertpoint -radix hexadecimal /processor/Regfile/q_registers
 add wave -position insertpoint -radix hexadecimal /processor/Regfile/q_registers(6)
 add wave -position insertpoint -radix hexadecimal /processor/Regfile/q_registers(7)
 
-add wave -position insertpoint sim:/processor/NumberOfCycle
-add wave -position insertpoint sim:/processor/clk
-add wave -position insertpoint sim:/processor/PC_PC
+
 add wave -position insertpoint sim:/processor/DM_SP_signal
 add wave -position insertpoint sim:/processor/CCR_flags
 add wave -position insertpoint sim:/processor/reset
@@ -205,3 +205,19 @@ run
 force -freeze sim:/processor/IN_PORT 32'h00000211  0
 run
 
+run
+run
+run
+force -freeze sim:/processor/IN_PORT 32'h00000100  0
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
+run
