@@ -26,7 +26,10 @@ ENTITY MW_Buffer IS
         MW_Rdst2_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
         MW_Rdst2_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
         MW_POP_PC_in : IN STD_LOGIC;
-        MW_POP_PC_out : OUT STD_LOGIC
+        MW_POP_PC_out : OUT STD_LOGIC;
+        MW_POP_CCR_in : IN STD_LOGIC;
+        MW_POP_CCR_out : OUT STD_LOGIC;
+        MW_flags : OUT STD_LOGIC_VECTOR(0 TO 3)
 
     );
 END ENTITY MW_Buffer;
@@ -42,13 +45,20 @@ BEGIN
             MW_value2 <= (OTHERS => '0');
             MW_Rdst1_out <= (OTHERS => '0');
             MW_Rdst2_out <= (OTHERS => '0');
+            MW_flags <= (OTHERS => '0');
             MW_OUTport_en_out <= '0';
             MW_POP_PC_out <= '0';
-        ELSIF falling_edge(clk) THEN
+            MW_POP_CCR_out <= '0';
+            ELSIF falling_edge(clk) THEN
             IF WE = '1' THEN
+                IF MW_POP_CCR_in = '1' THEN
+                    MW_flags <= MW_MemResult(31 DOWNTO 28);
+                    ELSE
+                    MW_flags <= (OTHERS => '0');
+                END IF;
                 IF (MW_ALUorMem = '1') THEN
                     MW_value1 <= MW_MemResult;
-                ELSE
+                    ELSE
                     MW_value1 <= MW_ALUResult1;
                     MW_value2 <= MW_ALUResult2;
                 END IF;
@@ -58,6 +68,7 @@ BEGIN
                 MW_Rdst1_out <= MW_Rdst1_in;
                 MW_Rdst2_out <= MW_Rdst2_in;
                 MW_POP_PC_out <= MW_POP_PC_in;
+                MW_POP_CCR_out <= MW_POP_CCR_in;
             END IF;
         END IF;
     END PROCESS;

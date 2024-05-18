@@ -28,7 +28,8 @@ ENTITY EM_Buffer IS
         EM_ALUResult2_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         EM_POP_PC_in : IN STD_LOGIC;
         EM_POP_PC_out : OUT STD_LOGIC;
-
+        EM_POP_CCR_in : IN STD_LOGIC;
+        EM_POP_CCR_out : OUT STD_LOGIC;
         --MEMORY OPERATIONS SIGNALS
         EM_STD_VALUE_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         EM_STD_VALUE_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -64,6 +65,7 @@ BEGIN
             EM_Rdst2_out <= (OTHERS => '0');
             EM_OUTport_en_out <= '0';
             EM_POP_PC_out <= '0';
+            EM_POP_CCR_out <= '0';
             --MEMORY OPERATIONS SIGNALS
             EM_MemW_out <= '0';
             EM_MemR_out <= '0';
@@ -101,6 +103,7 @@ BEGIN
                 END IF;
                 --END MEMORY OPERATIONS SIGNALS
                 EM_POP_PC_out <= EM_POP_PC_in;
+                EM_POP_CCR_out <= EM_POP_CCR_in;
             END IF;
         END IF;
     END PROCESS;

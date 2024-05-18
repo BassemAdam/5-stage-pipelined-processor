@@ -28,6 +28,8 @@ ENTITY DE_Buffer IS
 
         DE_POP_PC_in : IN STD_LOGIC;
         DE_POP_PC_out : OUT STD_LOGIC;
+        DE_POP_CCR_in : IN STD_LOGIC;
+        DE_POP_CCR_out : OUT STD_LOGIC;
         DE_Push_CCR_in : IN STD_LOGIC;
         DE_Push_CCR_out : OUT STD_LOGIC;
         DE_Push_PC_in : IN STD_LOGIC;
@@ -123,6 +125,7 @@ BEGIN
             DE_STD_address <= (OTHERS => '0');
             DE_ALUopd1_address <= (OTHERS => '0');
             DE_ALUopd2_address <= (OTHERS => '0');
+            DE_POP_CCR_out <= '0';
 
         ELSIF falling_edge(clk) AND DE_Flush_DE = '1' THEN
             DE_we1_reg_out <= '0';
@@ -131,7 +134,7 @@ BEGIN
             DE_OUTport_en_out <= '0';
             DE_Correction <= '0';
             DE_POP_PC_out <= '0';
-
+            DE_POP_CCR_out <= '0';
         ELSIF falling_edge(clk) THEN
 
             IF WE = '1' AND DE_flush_PopUse = '0' THEN
@@ -202,6 +205,7 @@ BEGIN
                     DE_Correction <= '0';
                 END IF;
                 DE_POP_PC_out <= DE_POP_PC_in;
+                DE_POP_CCR_out <= DE_POP_CCR_in;
                 DE_Push_CCR_out <= DE_Push_CCR_in;
                 DE_Push_PC_out <= DE_Push_PC_in;
                 DE_OpCode_out <= DE_OpCode;
@@ -232,6 +236,7 @@ BEGIN
                 DE_STD_address <= (OTHERS => '0');
                 DE_ALUopd1_address <= (OTHERS => '0');
                 DE_ALUopd2_address <= (OTHERS => '0');
+                DE_POP_CCR_out <= '0';
             END IF;
         END IF;
     END PROCESS;

@@ -55,14 +55,14 @@ BEGIN
             temp <= '0';
             FD_OpCode <= "111";
             FD_Func <= "1100";
-        ELSIF  FD_Inst(15 DOWNTO 13) = "111" THEN
+        ELSIF  FD_Inst(15 DOWNTO 13) = "101" THEN
             temp2 <= '1';
-            FD_OpCode <= "111";
-            FD_Func <= "0000";
+            FD_OpCode <= "101";
+            FD_Func <= "1100";
         ELSIF temp2 = '1' AND falling_edge(clk) THEN
             temp2 <= '0';
-            FD_OpCode <= "111";
-            FD_Func <= "0100";
+            FD_OpCode <= "101";
+            FD_Func <= "1110";
         ELSIF falling_edge(clk) AND FD_Flush_FD = '1' THEN
             FD_OpCode <= (OTHERS => '0');
 

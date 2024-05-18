@@ -41,6 +41,7 @@ ENTITY Controller IS
         ctr_Predictor : OUT STD_LOGIC;
         ctr_Push_PC_out : OUT STD_LOGIC;
         ctr_Push_CCR_out : OUT STD_LOGIC;
+        ctr_POP_CCR : OUT STD_LOGIC;
         ctr_INT : OUT STD_LOGIC
         -- Passing through should be none its not a buffer
     );
@@ -79,6 +80,7 @@ BEGIN
         VARIABLE ctr_POP_PC_out_var : STD_LOGIC := '0';
         VARIABLE ctr_Push_PC_out_var : STD_LOGIC := '0';
         VARIABLE ctr_Push_CCR_out_var : STD_LOGIC := '0';
+        VARIABLE ctr_POP_CCR_var : STD_LOGIC := '0';
         VARIABLE ctr_src1_use_var : STD_LOGIC := '0';
         VARIABLE ctr_src2_use_var : STD_LOGIC := '0';
         VARIABLE ctr_STD_use_var : STD_LOGIC := '0';
@@ -109,6 +111,7 @@ BEGIN
         ctr_POP_PC_out_var := '0';
         ctr_Push_PC_out_var := '0';
         ctr_Push_CCR_out_var := '0';
+        ctr_POP_CCR_var := '0';
         ctr_INT_var := '0';
 
         IF RES = '0' AND ctr_inRET_var = '1' THEN
@@ -117,7 +120,7 @@ BEGIN
             IF ctr_POP_PC_in = '0' THEN
                 ctr_next_inRET_var := '0';
             END IF;
-        ELSIF RES = '0' THEN
+            ELSIF RES = '0' THEN
             IF ctr_Correction = '1' THEN
                 ctr_Predictor_var := NOT ctr_Predictor_var;
                 ctr_JMP_EXE_var := '1';
@@ -252,7 +255,7 @@ BEGIN
                     IF ctr_Predictor_var = '1' THEN
                         ctr_JMP_DEC_var := '1';
                         ctr_Flush_FD_var := '1';
-                    ELSE
+                        ELSE
                     END IF;
                 END IF;
             END IF;
@@ -262,12 +265,27 @@ BEGIN
                     ctr_src1_use_var := '1';
                     ctr_JMP_DEC_var := '1';
                     ctr_Flush_FD_var := '1';
+
                 ELSIF ctr_Func = "0100" THEN
                     ctr_Push_var := '1';
                     ctr_ALUsel_var := "0100";
                     ctr_JMP_DEC_var := '1';
                     ctr_Flush_FD_var := '1';
+
                 ELSIF ctr_Func = "1000" THEN
+                    ctr_inRET_var := '1';
+                    ctr_next_inRET_var := '1';
+                    ctr_Flush_FD_var := '1';
+                    ctr_POP_PC_out_var := '1';
+                    ctr_Pop_var := '1';
+                    ctr_AluOrMem_var := '1';
+
+                ELSIF ctr_Func = "1100" THEN
+                    ctr_POP_CCR_var := '1';
+                    ctr_Pop_var := '1';
+                    ctr_AluOrMem_var := '1';
+
+                ELSIF ctr_Func = "1110" THEN
                     ctr_inRET_var := '1';
                     ctr_next_inRET_var := '1';
                     ctr_Flush_FD_var := '1';
@@ -301,10 +319,9 @@ BEGIN
                     ctr_Push_CCR_out_var := '1';
                     ctr_Flush_FD_var := '1';
                     ctr_INT_var := '1';
-                    -- ctr_Flush_FD_var := '1';
                 END IF;
             END IF;
-        ELSE
+            ELSE
             -- ctr_hasImm <= '0';
             -- ctr_ALUsel <= (OTHERS => '0');
             -- ctr_flags_en <= (OTHERS => '0');
@@ -339,6 +356,7 @@ BEGIN
         ctr_src2_use <= ctr_src2_use_var;
         ctr_STD_use <= ctr_STD_use_var;
         ctr_INT <= ctr_INT_var;
+        ctr_POP_CCR <= ctr_POP_CCR_var;
     END PROCESS;
 END ARCHITECTURE ControllerArch3;
 

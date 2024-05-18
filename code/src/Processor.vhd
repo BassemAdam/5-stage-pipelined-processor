@@ -67,7 +67,6 @@ ARCHITECTURE ProcessorArch OF Processor IS
             FD_Inst : IN STD_LOGIC_VECTOR(15 DOWNTO 0); -- 16 bits from instruction memory
             FD_IN_PORT : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             FD_current_PC_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-
             FD_OpCode : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
             FD_Rsrc1 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
             FD_Rsrc2 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -143,6 +142,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
             ctr_STD_use : OUT STD_LOGIC;
             ctr_Push_PC_out : OUT STD_LOGIC;
             ctr_Push_CCR_out : OUT STD_LOGIC;
+            ctr_POP_CCR : OUT STD_LOGIC;
 
             ctr_OUTport_en : OUT STD_LOGIC;
             ctr_INT : OUT STD_LOGIC
@@ -159,6 +159,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
             DE_Rsrc2_Val : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             DE_Imm : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
             DE_isImm : IN STD_LOGIC;
+
             DE_Zflag : IN STD_LOGIC;
             DE_OpCode : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
             DE_Predictor : IN STD_LOGIC;
@@ -167,19 +168,21 @@ ARCHITECTURE ProcessorArch OF Processor IS
 
             DE_ALUopd1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             DE_ALUopd2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+
             DE_PC_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             DE_Correction : OUT STD_LOGIC;
-
             -- Passing through
             DE_InPort_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             DE_InPort_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+
             DE_POP_PC_in : IN STD_LOGIC;
             DE_POP_PC_out : OUT STD_LOGIC;
+            DE_POP_CCR_in : IN STD_LOGIC;
+            DE_POP_CCR_out : OUT STD_LOGIC;
             DE_Push_CCR_in : IN STD_LOGIC;
             DE_Push_CCR_out : OUT STD_LOGIC;
             DE_Push_PC_in : IN STD_LOGIC;
             DE_Push_PC_out : OUT STD_LOGIC;
-
             -- Control signals
             DE_OUTport_en_in : IN STD_LOGIC;
             DE_OUTport_en_out : OUT STD_LOGIC;
@@ -211,7 +214,6 @@ ARCHITECTURE ProcessorArch OF Processor IS
             DE_Protect_out : OUT STD_LOGIC;
             DE_Free_in : IN STD_LOGIC;
             DE_Free_out : OUT STD_LOGIC; -- for std 
-
             --END MEMORY OPERATIONS SIGNALS
             DE_ALUsel_out : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
             --SRCS PROPAGATION
@@ -270,7 +272,8 @@ ARCHITECTURE ProcessorArch OF Processor IS
             EM_ALUResult2_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             EM_POP_PC_in : IN STD_LOGIC;
             EM_POP_PC_out : OUT STD_LOGIC;
-
+            EM_POP_CCR_in : IN STD_LOGIC;
+            EM_POP_CCR_out : OUT STD_LOGIC;
             --MEMORY OPERATIONS SIGNALS
             EM_STD_VALUE_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             EM_STD_VALUE_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -316,32 +319,35 @@ ARCHITECTURE ProcessorArch OF Processor IS
     END COMPONENT;
 
     COMPONENT MW_Buffer IS
-        PORT (
-            clk, RES, WE, FLUSH : IN STD_LOGIC;
-            MW_ALUorMem : IN STD_LOGIC;
-            MW_ALUResult1 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-            MW_ALUResult2 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-            MW_MemResult : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    PORT (
+        clk, RES, WE, FLUSH : IN STD_LOGIC;
+        MW_ALUorMem : IN STD_LOGIC;
+        MW_ALUResult1 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        MW_ALUResult2 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        MW_MemResult : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-            MW_value1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-            MW_value2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        MW_value1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        MW_value2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-            -- Passing through
+        -- Passing through
 
-            MW_OUTport_en_out : OUT STD_LOGIC;
-            MW_OUTport_en_in : IN STD_LOGIC;
-            MW_we1_reg_in : IN STD_LOGIC;
-            MW_we1_reg_out : OUT STD_LOGIC;
-            MW_we2_reg_in : IN STD_LOGIC;
-            MW_we2_reg_out : OUT STD_LOGIC;
-            MW_Rdst1_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-            MW_Rdst1_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-            MW_Rdst2_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-            MW_Rdst2_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-            MW_POP_PC_in : IN STD_LOGIC;
-            MW_POP_PC_out : OUT STD_LOGIC
+        MW_OUTport_en_out : OUT STD_LOGIC;
+        MW_OUTport_en_in : IN STD_LOGIC;
+        MW_we1_reg_in : IN STD_LOGIC;
+        MW_we1_reg_out : OUT STD_LOGIC;
+        MW_we2_reg_in : IN STD_LOGIC;
+        MW_we2_reg_out : OUT STD_LOGIC;
+        MW_Rdst1_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+        MW_Rdst1_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+        MW_Rdst2_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+        MW_Rdst2_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+        MW_POP_PC_in : IN STD_LOGIC;
+        MW_POP_PC_out : OUT STD_LOGIC;
+        MW_POP_CCR_in : IN STD_LOGIC;
+        MW_POP_CCR_out : OUT STD_LOGIC;
+        MW_flags : OUT STD_LOGIC_VECTOR(0 TO 3)
 
-        );
+    );
     END COMPONENT MW_Buffer;
 
     COMPONENT SP IS
@@ -360,8 +366,10 @@ ARCHITECTURE ProcessorArch OF Processor IS
     COMPONENT CCR IS
         PORT (
             clk, RES : IN STD_LOGIC;
+            CCR_POP_CCR : IN STD_LOGIC;
             CCR_flags_in : IN STD_LOGIC_VECTOR (0 TO 3);
             CCR_flags_en : IN STD_LOGIC_VECTOR (0 TO 3);
+            CCR_MEM_flags : in STD_LOGIC_VECTOR (0 TO 3);
 
             CCR_flags_out : OUT STD_LOGIC_VECTOR (0 TO 3)
         );
@@ -480,7 +488,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
     SIGNAL DE_PC_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL DE_Push_CCR_out : STD_LOGIC;
     SIGNAL DE_Push_PC_out : STD_LOGIC;
-
+    SIGNAL DE_POP_CCR_out : STD_LOGIC;
     -- SRCS PROPAGATION
 
     SIGNAL DE_STD_address_signal : STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -512,7 +520,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
     SIGNAL EM_Rdst2_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
     SIGNAL EM_ALUResult1_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL EM_ALUResult2_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
-
+    SIGNAL EM_POP_CCR_out : STD_LOGIC;
     -- MEMORY OPERATIONS SIGNALS
     SIGNAL EM_MemW_out : STD_LOGIC;
     SIGNAL EM_MemR_out : STD_LOGIC;
@@ -521,6 +529,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
     SIGNAL EM_Protect_out : STD_LOGIC;
     SIGNAL EM_Free_out : STD_LOGIC;
     SIGNAL EM_STD_VALUE : STD_LOGIC_VECTOR(31 DOWNTO 0); -- for std
+    SIGNAL MW_POP_CCR_out : STD_LOGIC;
     -- EM Buffer signals end
 
     -- Data Memory signals
@@ -538,6 +547,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
     SIGNAL MW_OUTport_en_out : STD_LOGIC;
     SIGNAL MW_Rdst1_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
     SIGNAL MW_Rdst2_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL MW_flags : STD_LOGIC_VECTOR(0 to 3);
     -- MW Buffer signals end
 
     -- CCR signals
@@ -568,6 +578,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
     SIGNAL ctr_Protect : STD_LOGIC;
     SIGNAL ctr_Push_PC_out : STD_LOGIC;
     SIGNAL ctr_Push_CCR_out : STD_LOGIC;
+    SIGNAL ctr_POP_CCR : STD_LOGIC;
     SIGNAL ctr_INT : STD_LOGIC;
     -- Controller signals end
     SIGNAL NumberOfCycle : INTEGER := 0;
@@ -649,6 +660,7 @@ BEGIN
         FLUSH => '0',
         FD_current_PC_in => PC_PC,
         FD_current_PC_out => FD_current_PC_out
+
     );
     -- map FD buffer end
 
@@ -752,7 +764,9 @@ BEGIN
         DE_STD_use_out => DE_STD_use_out_signal,
         FLUSH => '0',
         --mem use 
-        DE_flush_PopUse => flush_DM
+        DE_flush_PopUse => flush_DM,
+        DE_POP_CCR_in => ctr_POP_CCR,
+        DE_POP_CCR_out => DE_POP_CCR_out
     );
     -- map DE buffer end
 
@@ -813,7 +827,9 @@ BEGIN
         EM_Free_out => EM_Free_out,
         EM_STD_VALUE_in => DE_STD_Data_Final,
         EM_STD_VALUE_out => EM_STD_VALUE,
-        FLUSH => '0'
+        FLUSH => '0',
+        EM_POP_CCR_in => DE_POP_CCR_out,
+        EM_POP_CCR_out => EM_POP_CCR_out
     );
     -- map EM buffer end
 
@@ -865,7 +881,10 @@ BEGIN
         MW_Rdst2_out => MW_Rdst2_out,
         MW_OUTport_en_out => MW_OUTport_en_out,
         MW_POP_PC_out => MW_POP_PC_out,
-        FLUSH => '0'
+        FLUSH => '0',
+        MW_POP_CCR_in => EM_POP_CCR_out,
+        MW_POP_CCR_out => MW_POP_CCR_out,
+        MW_flags => MW_flags
     );
     -- map MW buffer end
 
@@ -903,6 +922,7 @@ BEGIN
         ctr_POP_PC_out => ctr_POP_PC_out,
         ctr_Push_PC_out => ctr_Push_PC_out,
         ctr_Push_CCR_out => ctr_Push_CCR_out,
+        ctr_POP_CCR => ctr_POP_CCR,
         ctr_INT => ctr_INT,
         -- Passing through
         ctr_src1_use => DE_src1_use_in_signal,
@@ -918,7 +938,8 @@ BEGIN
         RES => reset,
         CCR_flags_in => ALU_flags,
         CCR_flags_en => DE_flags_en_out,
-
+        CCR_POP_CCR =>MW_POP_CCR_out,
+        CCR_MEM_flags => MW_flags,
         CCR_flags_out => CCR_flags
     );
     -- map CCR end
@@ -987,8 +1008,8 @@ BEGIN
         END IF;
         IF MW_OUTport_en_out = '1' THEN
             OUT_PORT <= MW_value1;
-        else
-            OUT_PORT <= (others => '0');
+        ELSE
+            OUT_PORT <= (OTHERS => '0');
         END IF;
     END PROCESS;
 
