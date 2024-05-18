@@ -6,6 +6,7 @@ ENTITY EM_Buffer IS
     PORT (
         clk, RES, WE, FLUSH : IN STD_LOGIC;
         EM_Push_CCR : IN STD_LOGIC;
+        EM_Push_PC : IN STD_LOGIC;
         EM_CCR : IN STD_LOGIC_VECTOR(0 TO 3);
 
         -- Passing through
@@ -89,6 +90,8 @@ BEGIN
                 EM_Protect_out <= EM_Protect_in;
                 EM_Free_out <= EM_Free_in;
                 IF EM_MemW_in = '1' AND EM_Push_in = '0' THEN
+                    EM_STD_VALUE_out <= EM_STD_VALUE_in;
+                ELSIF EM_Push_PC = '1' THEN
                     EM_STD_VALUE_out <= EM_STD_VALUE_in;
                 ELSIF EM_Push_CCR = '1' THEN
                     EM_STD_VALUE_out(31 DOWNTO 28) <= EM_CCR;

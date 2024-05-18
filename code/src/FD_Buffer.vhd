@@ -31,7 +31,8 @@ ENTITY FD_Buffer IS
 END ENTITY FD_Buffer;
 
 ARCHITECTURE Behavioral OF FD_Buffer IS
-
+    SIGNAL temp : STD_LOGIC;
+    SIGNAL temp2 : STD_LOGIC;
 BEGIN
     PROCESS (CLK, RES)
     BEGIN
@@ -44,10 +45,24 @@ BEGIN
             FD_Rdst2 <= (OTHERS => '0');
             FD_Func <= (OTHERS => '0');
             FD_current_PC_out <= (OTHERS => '0');
+            temp <= '0';
 
         ELSIF FD_INT = '1' THEN
+            temp <= '1';
             FD_OpCode <= "111";
             FD_Func <= "1000";
+        ELSIF temp = '1' AND falling_edge(clk) THEN
+            temp <= '0';
+            FD_OpCode <= "111";
+            FD_Func <= "1100";
+        ELSIF  FD_Inst(15 DOWNTO 13) = "111" THEN
+            temp2 <= '1';
+            FD_OpCode <= "111";
+            FD_Func <= "0000";
+        ELSIF temp2 = '1' AND falling_edge(clk) THEN
+            temp2 <= '0';
+            FD_OpCode <= "111";
+            FD_Func <= "0100";
         ELSIF falling_edge(clk) AND FD_Flush_FD = '1' THEN
             FD_OpCode <= (OTHERS => '0');
 

@@ -153,7 +153,8 @@ sim:/processor/ctr_Flush_FD \
 sim:/processor/ctr_Flush_DE \
 sim:/processor/ctr_Protect  \
 sim:/processor/ctr_Push_PC_out  \
-sim:/processor/ctr_Push_CCR_out 
+sim:/processor/ctr_Push_CCR_out \
+sim:/processor/ctr_INT 
 # Controller signals end 
 
 

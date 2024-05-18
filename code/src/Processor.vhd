@@ -144,7 +144,8 @@ ARCHITECTURE ProcessorArch OF Processor IS
             ctr_Push_PC_out : OUT STD_LOGIC;
             ctr_Push_CCR_out : OUT STD_LOGIC;
 
-            ctr_OUTport_en : OUT STD_LOGIC
+            ctr_OUTport_en : OUT STD_LOGIC;
+            ctr_INT : OUT STD_LOGIC
 
             -- Passing through should be none its not a buffer
         );
@@ -247,6 +248,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
         PORT (
             clk, RES, WE, FLUSH : IN STD_LOGIC;
             EM_Push_CCR : IN STD_LOGIC;
+            EM_Push_PC : IN STD_LOGIC;
             EM_CCR : IN STD_LOGIC_VECTOR(0 TO 3);
 
             -- Passing through
@@ -566,6 +568,7 @@ ARCHITECTURE ProcessorArch OF Processor IS
     SIGNAL ctr_Protect : STD_LOGIC;
     SIGNAL ctr_Push_PC_out : STD_LOGIC;
     SIGNAL ctr_Push_CCR_out : STD_LOGIC;
+    SIGNAL ctr_INT : STD_LOGIC;
     -- Controller signals end
     SIGNAL NumberOfCycle : INTEGER := 0;
 
@@ -600,7 +603,7 @@ BEGIN
         PC_corrected => ctr_JMP_EXE,
         PC_POP_PC => MW_POP_PC_out,
         PC_en => PC_en,
-        PC_Interrupt => '0', -- PROBABLY NEED TO CHANGE THIS AND TAKE IT AS AN INPUT TO THE PROCESSOR
+        PC_Interrupt => ctr_INT, -- PROBABLY NEED TO CHANGE THIS AND TAKE IT AS AN INPUT TO THE PROCESSOR
         PC_stall_PopUse => stall_PopUse,
         PC_JMP_EXE_PC => DE_PC_out,
         PC_JMP_DEC_PC => RF_Rdata1,
@@ -772,6 +775,7 @@ BEGIN
         WE => we,
         --EM_flush_PopUse => flush_DM,
         EM_Push_CCR => DE_Push_CCR_out,
+        EM_Push_PC => DE_Push_PC_out,
         EM_CCR => CCR_flags,
 
         -- Passing through
@@ -899,6 +903,7 @@ BEGIN
         ctr_POP_PC_out => ctr_POP_PC_out,
         ctr_Push_PC_out => ctr_Push_PC_out,
         ctr_Push_CCR_out => ctr_Push_CCR_out,
+        ctr_INT => ctr_INT,
         -- Passing through
         ctr_src1_use => DE_src1_use_in_signal,
         ctr_src2_use => DE_src2_use_in_signal,
