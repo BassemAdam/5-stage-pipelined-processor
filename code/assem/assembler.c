@@ -513,8 +513,8 @@ unsigned int parse_uncond_jump_instruction(char *instruction)
     {
         uncond_jump_inst.opcode = 5;
         char *destination = strtok(NULL, " ");
-        sscanf(destination, "R%u", &uncond_jump_inst.rdst);
-        uncond_jump_inst.rsrc1 = 0;
+        sscanf(destination, "R%u", &uncond_jump_inst.rsrc1);
+        uncond_jump_inst.rdst = 0;
         uncond_jump_inst.rsrc2 = 0;
         uncond_jump_inst.fn_num = 1;
         uncond_jump_inst.rest = 0;

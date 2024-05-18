@@ -4,7 +4,9 @@ USE ieee.numeric_std.ALL;
 
 ENTITY EM_Buffer IS
     PORT (
-        clk, RES, WE, FLUSH : IN STD_LOGIC;
+        clk, RES, WE,FLUSH : IN STD_LOGIC;
+        EM_Push_CCR : IN STD_LOGIC;
+        EM_CCR : IN STD_LOGIC_VECTOR(0 TO 3);
 
         -- Passing through
         EM_OUTport_en_out : OUT STD_LOGIC;
@@ -23,6 +25,8 @@ ENTITY EM_Buffer IS
         EM_ALUResult1_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         EM_ALUResult2_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         EM_ALUResult2_out : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        EM_POP_PC_in : IN STD_LOGIC;
+        EM_POP_PC_out : OUT STD_LOGIC;
 
         --MEMORY OPERATIONS SIGNALS
         EM_STD_VALUE_in : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -58,6 +62,7 @@ BEGIN
             EM_Rdst1_out <= (OTHERS => '0');
             EM_Rdst2_out <= (OTHERS => '0');
             EM_OUTport_en_out <= '0';
+            EM_POP_PC_out <= '0';
             --MEMORY OPERATIONS SIGNALS
             EM_MemW_out <= '0';
             EM_MemR_out <= '0';
@@ -85,11 +90,14 @@ BEGIN
                 EM_Free_out <= EM_Free_in;
                 IF EM_MemW_in = '1' AND EM_Push_in = '0' THEN
                     EM_STD_VALUE_out <= EM_STD_VALUE_in;
+                ELSIF EM_Push_CCR = '1' THEN
+                    EM_STD_VALUE_out(31 downto 28) <= EM_CCR;
+                    EM_STD_VALUE_out(28 downto 0) <= (OTHERS => '0');
                 ELSE
                     EM_STD_VALUE_out <= EM_ALUResult1_in;
                 END IF;
                 --END MEMORY OPERATIONS SIGNALS
-                --END MEMORY OPERATIONS SIGNALS
+                EM_POP_PC_out <= EM_POP_PC_in;
             END IF;
         END IF;
     END PROCESS;

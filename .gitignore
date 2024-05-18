@@ -14,6 +14,7 @@ code/*.hb_info
 code/*.hdb
 code/*.sig
 code/*.kpt
+code/*.bak
 code/*.summary
 code/transcript
 code/simulation

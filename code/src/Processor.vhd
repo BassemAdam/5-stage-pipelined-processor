@@ -6,7 +6,7 @@ ENTITY Processor IS
     PORT (
         clk : IN STD_LOGIC;
         reset, we : IN STD_LOGIC;
-        INT_In : IN STD_LOGIC; -- interrupt signal
+        INT_In : IN STD_LOGIC := '0'; -- interrupt signal
         IN_PORT : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
         exception : OUT STD_LOGIC; -- exception signal
@@ -403,8 +403,28 @@ ARCHITECTURE ProcessorArch OF Processor IS
             SIGNAL FD_Rdst2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
             SIGNAL FD_Func : STD_LOGIC_VECTOR(3 DOWNTO 0);
             SIGNAL FD_InputPort : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    -- PC signals
+    SIGNAL PC_en : STD_LOGIC;
+    SIGNAL PC_PC : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    -- PC signals end
 
-        -- FD Buffer signals end
+    -- Instruction Cache signals
+    SIGNAL IC_Inst : STD_LOGIC_VECTOR(15 DOWNTO 0);
+    SIGNAL IC_InterruptPC : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL IC_ResetPC : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    -- Instruction Cache signals end
+
+    -- FD Buffer signals
+    SIGNAL FD_OpCode : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL FD_Rsrc1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL FD_Rsrc2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL FD_Rdst1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL FD_Rdst2 : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL FD_Func : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    SIGNAL FD_InputPort : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL FD_current_PC_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+    -- FD Buffer signals end
 
         -- Register File signals
             SIGNAL RF_Rdata1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -476,17 +496,78 @@ ARCHITECTURE ProcessorArch OF Processor IS
             SIGNAL DM_RData : STD_LOGIC_VECTOR(31 DOWNTO 0);
             signal DM_SP_signal : integer range 0 to 2**12 - 1 := 0;
         -- Data Memory signals end
+    -- Register File signals
+    SIGNAL RF_Rdata1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL RF_Rdata2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    -- Register File signals end
 
-        -- MW Buffer signals
-            SIGNAL MW_value1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
-            SIGNAL MW_value2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    -- DE Buffer signals
+    SIGNAL DE_ALUopd1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL DE_ALUopd2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL DE_InPort_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL DE_we1_reg_out : STD_LOGIC;
+    SIGNAL DE_we2_reg_out : STD_LOGIC;
+    SIGNAL DE_ALUorMem_out : STD_LOGIC;
+    SIGNAL DE_OUTport_en_out : STD_LOGIC;
+    SIGNAL DE_flags_en_out : STD_LOGIC_VECTOR (0 TO 3);
+    SIGNAL DE_Rdst1_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL DE_Rdst2_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL DE_ALUsel_out : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    SIGNAL DE_MemW_out : STD_LOGIC;
+    SIGNAL DE_MemR_out : STD_LOGIC;
+    SIGNAL DE_Push_out : STD_LOGIC;
+    SIGNAL DE_Pop_out : STD_LOGIC;
+    SIGNAL DE_Protect_out : STD_LOGIC;
+    SIGNAL DE_Free_out : STD_LOGIC;
+    SIGNAL DE_STD_VALUE : STD_LOGIC_VECTOR(31 DOWNTO 0); -- for std
+    SIGNAL DE_Correction : STD_LOGIC;
+    SIGNAL DE_POP_PC_out : STD_LOGIC;
+    SIGNAL DE_PC_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL DE_Push_CCR_out : STD_LOGIC;
+    SIGNAL DE_Push_PC_out : STD_LOGIC;
+    -- DE Buffer signals end
 
-            SIGNAL MW_we1_reg_out : STD_LOGIC;
-            SIGNAL MW_we2_reg_out : STD_LOGIC;
-            SIGNAL MW_OUTport_en_out : STD_LOGIC;
-            SIGNAL MW_Rdst1_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
-            SIGNAL MW_Rdst2_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
-        -- MW Buffer signals end
+    -- ALU signals
+    SIGNAL ALU_Result1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL ALU_Result2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL ALU_flags : STD_LOGIC_VECTOR(0 TO 3);
+    -- ALU signals end
+
+    -- EM Buffer signals 
+    SIGNAL EM_POP_PC_out : STD_LOGIC;
+    SIGNAL EM_ALUorMem_out : STD_LOGIC;
+    SIGNAL EM_we1_reg_out : STD_LOGIC;
+    SIGNAL EM_we2_reg_out : STD_LOGIC;
+    SIGNAL EM_OUTport_en_out : STD_LOGIC;
+    SIGNAL EM_Rdst1_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL EM_Rdst2_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL EM_ALUResult1_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL EM_ALUResult2_out : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    -- MEMORY OPERATIONS SIGNALS
+    SIGNAL EM_MemW_out : STD_LOGIC;
+    SIGNAL EM_MemR_out : STD_LOGIC;
+    SIGNAL EM_Push_out : STD_LOGIC;
+    SIGNAL EM_Pop_out : STD_LOGIC;
+    SIGNAL EM_Protect_out : STD_LOGIC;
+    SIGNAL EM_Free_out : STD_LOGIC;
+    SIGNAL EM_STD_VALUE : STD_LOGIC_VECTOR(31 DOWNTO 0); -- for std
+    -- EM Buffer signals end
+
+    -- Data Memory signals
+    SIGNAL DM_RData : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    -- Data Memory signals end
+
+    -- MW Buffer signals
+    SIGNAL MW_value1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL MW_value2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+    SIGNAL MW_POP_PC_out : STD_LOGIC;
+    SIGNAL MW_we1_reg_out : STD_LOGIC;
+    SIGNAL MW_we2_reg_out : STD_LOGIC;
+    SIGNAL MW_OUTport_en_out : STD_LOGIC;
+    SIGNAL MW_Rdst1_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL MW_Rdst2_out : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    -- MW Buffer signals end
 
         -- CCR signals
             SIGNAL CCR_flags : STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -527,28 +608,61 @@ ARCHITECTURE ProcessorArch OF Processor IS
             SIGNAL stall_PopUse : std_logic;
             SIGNAL flush_DM : std_logic;
         --MemoryUse signals end
+    -- CCR signals
+    SIGNAL CCR_flags : STD_LOGIC_VECTOR(0 TO 3);
+    -- CCR signals end
+
+    -- Controller Signals (most of the are not connected)
+    SIGNAL ctr_hasImm : STD_LOGIC;
+    SIGNAL ctr_ALUsel : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    SIGNAL ctr_flags_en : STD_LOGIC_VECTOR(0 TO 3);
+    SIGNAL ctr_we1_reg : STD_LOGIC;
+    SIGNAL ctr_we2_reg : STD_LOGIC;
+    SIGNAL ctr_ALUorMem : STD_LOGIC;
+    SIGNAL ctr_isInput : STD_LOGIC;
+    SIGNAL ctr_OUTport_en : STD_LOGIC;
+    SIGNAL ctr_Predictor : STD_LOGIC;
+    SIGNAL ctr_POP_PC_out : STD_LOGIC;
+    -- Controller for memoryData
+    SIGNAL ctr_MemW : STD_LOGIC;
+    SIGNAL ctr_MemR : STD_LOGIC;
+    SIGNAL ctr_Push : STD_LOGIC;
+    SIGNAL ctr_Pop : STD_LOGIC;
+    SIGNAL ctr_Free : STD_LOGIC;
+    SIGNAL ctr_JMP_DEC : STD_LOGIC;
+    SIGNAL ctr_JMP_EXE : STD_LOGIC;
+    SIGNAL ctr_Flush_FD : STD_LOGIC;
+    SIGNAL ctr_Flush_DE : STD_LOGIC;
+    SIGNAL ctr_Protect : STD_LOGIC;
+    SIGNAL ctr_Push_PC_out : STD_LOGIC;
+    SIGNAL ctr_Push_CCR_out : STD_LOGIC;
+    -- Controller signals end
+    SIGNAL NumberOfCycle : INTEGER := 0;
     ------------------------------------SIGNALS END-----------------------------------
 
 BEGIN
 
     ------------------------------------PORTS------------------------------------
 
-        -- map PC
-            pc1 : PC PORT MAP(
-                clk => clk,
-                --from control signals 
-                RES => reset,
-                PC_branch => '0',
-                PC_en => PC_en,
-                PC_Interrupt => '0', -- PROBABLY NEED TO CHANGE THIS AND TAKE IT AS AN INPUT TO THE PROCESSOR
-                PC_stall_PopUse => stall_PopUse,
-                PC_branchPC => (OTHERS => '0'),
-                PC_InterruptPC => IC_InterruptPC,
-                PC_ResetPC => IC_ResetPC,
+    -- map PC
+    pc1 : PC PORT MAP(
+        clk => clk,
+        --from control signals 
+        RES => reset,
+        PC_branch => ctr_JMP_DEC,
+        PC_corrected => ctr_JMP_EXE,
+        PC_POP_PC => MW_POP_PC_out,
+        PC_en => PC_en,
+        PC_Interrupt => '0', -- PROBABLY NEED TO CHANGE THIS AND TAKE IT AS AN INPUT TO THE PROCESSOR
 
-                PC_PC => PC_PC
-            );
-        -- map PC end
+        PC_stall_PopUse => stall_PopUse,
+        
+        PC_JMP_EXE_PC => DE_PC_out,
+        PC_JMP_DEC_PC => RF_Rdata1,
+        PC_InterruptPC => IC_InterruptPC,
+        PC_ResetPC => IC_ResetPC,
+        PC_RET_PC => MW_value1,
+        PC_PC => PC_PC
 
         -- map instruction cache
             instrCache1 : InstrCache PORT MAP(
@@ -566,6 +680,8 @@ BEGIN
                 clk => clk,
                 RES => reset,
                 WE => we,
+                FD_INT => INT_In,
+                FD_Flush_FD => ctr_Flush_FD,
                 FD_Inst => IC_Inst,
                 FD_OpCode => FD_OpCode,
                 FD_Rsrc1 => FD_Rsrc1,
@@ -578,6 +694,8 @@ BEGIN
                 -- Passing through
                 FD_isImm_in => ctr_hasImm,
                 FD_InputPort => FD_InputPort,
+                FD_current_PC_in => PC_PC,
+                FD_current_PC_out => FD_current_PC_out
 		        FLUSH =>'0'
             );
         -- map FD buffer end
@@ -607,14 +725,20 @@ BEGIN
                 clk => clk,
                 RES => reset,
                 WE => we,
+                DE_Flush_DE => ctr_Flush_DE,
                 DE_Rsrc1_Val => RF_Rdata1,
                 DE_Rsrc2_Val => RF_Rdata2,
                 DE_Imm => IC_Inst,
                 DE_isImm => ctr_hasImm,
-
+                DE_Zflag => CCR_flags(0),
+                DE_OpCode => FD_OpCode,
+                DE_Predictor => ctr_Predictor,
+                DE_PC_in => PC_PC,
+                DE_current_PC => FD_current_PC_out,
                 DE_ALUopd1 => DE_ALUopd1,
                 DE_ALUopd2 => DE_ALUopd2,
-
+                DE_PC_out => DE_PC_out,
+                DE_Correction => DE_Correction,
                 -- Passing through
                 DE_InPort_in => FD_InputPort,
                 DE_InPort_out => DE_InPort_out,
@@ -627,6 +751,11 @@ BEGIN
                 DE_Rdst2_in => FD_Rdst2,
                 DE_ALUsel_in => ctr_ALUsel,
                 DE_OUTport_en_in => ctr_OUTport_en,
+                DE_POP_PC_in => ctr_POP_PC_out,
+                DE_Push_PC_in => ctr_Push_PC_out,
+                DE_Push_PC_out => DE_Push_PC_out,
+                DE_Push_CCR_in => ctr_Push_CCR_out,
+                DE_Push_CCR_out => DE_Push_CCR_out,
                 DE_we1_reg_out => DE_we1_reg_out,
                 DE_we2_reg_out => DE_we2_reg_out,
                 DE_ALUorMem_out => DE_ALUorMem_out,
@@ -635,6 +764,7 @@ BEGIN
                 DE_Rdst2_out => DE_Rdst2_out,
                 DE_ALUsel_out => DE_ALUsel_out,
                 DE_OUTport_en_out => DE_OUTport_en_out,
+                DE_POP_PC_out => DE_POP_PC_out,
                 --Data Memory Signals
                 DE_MemW_in => ctr_MemW,
                 DE_MemW_out => DE_MemW_out,
@@ -688,6 +818,8 @@ BEGIN
                 clk => clk,
                 RES => reset,
                 WE => we,
+                EM_Push_CCR => DE_Push_CCR_out,
+                EM_CCR => CCR_flags,
                 --EM_flush_PopUse => flush_DM,
                 -- Passing through
                 EM_ALUorMem_in => DE_ALUorMem_out,
@@ -698,7 +830,7 @@ BEGIN
                 EM_ALUResult1_in => ALU_Result1,
                 EM_ALUResult2_in => ALU_Result2,
                 EM_OUTport_en_in => DE_OUTport_en_out,
-
+                EM_POP_PC_in => DE_POP_PC_out,
                 EM_ALUorMem_out => EM_ALUorMem_out,
                 EM_we1_reg_out => EM_we1_reg_out,
                 EM_we2_reg_out => EM_we2_reg_out,
@@ -766,12 +898,13 @@ BEGIN
                 MW_Rdst1_in => EM_Rdst1_out,
                 MW_Rdst2_in => EM_Rdst2_out,
                 MW_OUTport_en_in => EM_OUTport_en_out,
-
+                MW_POP_PC_in => EM_POP_PC_out,
                 MW_we1_reg_out => MW_we1_reg_out,
                 MW_we2_reg_out => MW_we2_reg_out,
                 MW_Rdst1_out => MW_Rdst1_out,
                 MW_Rdst2_out => MW_Rdst2_out,
                 MW_OUTport_en_out => MW_OUTport_en_out,
+                MW_POP_PC_out => MW_POP_PC_out
                 FLUSH=>'0'
             );
         -- map MW buffer end
@@ -783,7 +916,10 @@ BEGIN
                 RES => reset,
                 ctr_opCode => FD_OpCode,
                 ctr_Func => FD_Func,
-
+                ctr_Correction => DE_Correction,
+                ctr_POP_PC_in => MW_POP_PC_out,
+                ctr_Push_PC_in => DE_Push_PC_out,
+                ctr_Push_CCR_in => DE_Push_CCR_out,
                 ctr_hasImm => ctr_hasImm,
                 ctr_ALUsel => ctr_ALUsel,
                 ctr_flags_en => ctr_flags_en,
@@ -798,6 +934,15 @@ BEGIN
                 ctr_Pop => ctr_Pop,
                 ctr_Free => ctr_Free,
                 ctr_Protect => ctr_Protect,
+
+                ctr_JMP_DEC => ctr_JMP_DEC,
+                ctr_JMP_EXE => ctr_JMP_EXE,
+                ctr_Flush_FD => ctr_Flush_FD,
+                ctr_Flush_DE => ctr_Flush_DE,
+                ctr_Predictor => ctr_Predictor,
+                ctr_POP_PC_out => ctr_POP_PC_out,
+                ctr_Push_PC_out => ctr_Push_PC_out,
+                ctr_Push_CCR_out => ctr_Push_CCR_out
                 -- Passing through
                 ctr_src1_use => DE_src1_use_in_signal,
                 ctr_src2_use => DE_src2_use_in_signal,
