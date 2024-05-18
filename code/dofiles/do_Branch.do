@@ -40,7 +40,17 @@ sim:/processor/FD_Rdst2  \
 sim:/processor/FD_Rsrc1  \
 sim:/processor/FD_Rsrc2  \
 sim:/processor/FD_Func  \
-sim:/processor/FD_InputPort  
+sim:/processor/FD_InputPort  \
+sim:/processor/DE_Correction \
+sim:/processor/CCR_flags \
+sim:/processor/ctr_Predictor \
+sim:/processor/ctr_JMP_DEC \
+sim:/processor/ctr_Flush_FD \
+sim:/processor/ctr_Flush_DE \
+sim:/processor/RF_Rdata1 \
+sim:/processor/ctr_zReset \
+sim:/processor/DE_PC_FWD \
+sim:/processor/FWD_PC_FWD
 
 # Register File
 add wave -position insertpoint  \
@@ -136,6 +146,7 @@ sim:/processor/MW_Rdst2_out
 
 # Controller 
 add wave -position insertpoint  \
+sim:/processor/ctr_Predictor \
 sim:/processor/ctr_hasImm  \
 sim:/processor/ctr_ALUsel  \
 sim:/processor/ctr_flags_en  \
@@ -162,4 +173,26 @@ force -freeze sim:/processor/reset 1 0
 run 50ps
 force -freeze sim:/processor/reset 0 0
 run 50ps
+force -freeze sim:/processor/IN_PORT 32'h0030 0
+run 100 ps
+force -freeze sim:/processor/IN_PORT 32'h0050 0
+run 100 ps
+force -freeze sim:/processor/IN_PORT 32'h0100 0
+run 100 ps
+force -freeze sim:/processor/IN_PORT 32'h0300 0
+run 100 ps
+run 100 ps
+run 100 ps
+run 100 ps
+run 100 ps
+force -freeze sim:/processor/IN_PORT 32'h0090 0
+run 100 ps
+run 100 ps
+run 100 ps
+run 100 ps
+force -freeze sim:/processor/IN_PORT 32'h0070 0
+run 100 ps
+run 100 ps
+force -freeze sim:/processor/IN_PORT 32'h0060 0
+
 

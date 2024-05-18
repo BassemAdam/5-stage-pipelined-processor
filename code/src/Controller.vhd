@@ -15,6 +15,7 @@ ENTITY Controller IS
         ctr_POP_PC_in : IN STD_LOGIC;
         ctr_Push_PC_in : IN STD_LOGIC;
         ctr_Push_CCR_in : IN STD_LOGIC;
+        ctr_PC_FWD : IN STD_LOGIC;
 
         ctr_POP_PC_out : OUT STD_LOGIC;
         ctr_hasImm : OUT STD_LOGIC;
@@ -42,7 +43,8 @@ ENTITY Controller IS
         ctr_Push_PC_out : OUT STD_LOGIC;
         ctr_Push_CCR_out : OUT STD_LOGIC;
         ctr_POP_CCR : OUT STD_LOGIC;
-        ctr_INT : OUT STD_LOGIC
+        ctr_INT : OUT STD_LOGIC;
+        ctr_zReset : OUT STD_LOGIC
         -- Passing through should be none its not a buffer
     );
 END ENTITY Controller;
@@ -84,6 +86,7 @@ BEGIN
         VARIABLE ctr_src1_use_var : STD_LOGIC := '0';
         VARIABLE ctr_src2_use_var : STD_LOGIC := '0';
         VARIABLE ctr_STD_use_var : STD_LOGIC := '0';
+        VARIABLE ctr_zReset_var : STD_LOGIC := '0';
     BEGIN
         ctr_hasImm_var := '0';
         ctr_ALUsel_var := (OTHERS => '0');
@@ -113,6 +116,7 @@ BEGIN
         ctr_Push_CCR_out_var := '0';
         ctr_POP_CCR_var := '0';
         ctr_INT_var := '0';
+        ctr_zReset_var := '0';
 
         IF RES = '0' AND ctr_inRET_var = '1' THEN
             ctr_Flush_FD_var := '1';
@@ -124,6 +128,9 @@ BEGIN
             IF ctr_Correction = '1' THEN
                 ctr_Predictor_var := NOT ctr_Predictor_var;
                 ctr_JMP_EXE_var := '1';
+                ctr_Flush_FD_var := '1';
+                ctr_Flush_DE_var := '1';
+            elsif ctr_PC_FWD = '1' then
                 ctr_Flush_FD_var := '1';
                 ctr_Flush_DE_var := '1';
             END IF;
@@ -252,6 +259,7 @@ BEGIN
             IF ctr_opCode = "100" THEN -- Conditional Jump
                 IF ctr_Func = "0000" THEN
                     ctr_src1_use_var := '1';
+                    ctr_zReset_var := '1';
                     IF ctr_Predictor_var = '1' THEN
                         ctr_JMP_DEC_var := '1';
                         ctr_Flush_FD_var := '1';
@@ -357,6 +365,7 @@ BEGIN
         ctr_STD_use <= ctr_STD_use_var;
         ctr_INT <= ctr_INT_var;
         ctr_POP_CCR <= ctr_POP_CCR_var;
+        ctr_zReset <= ctr_zReset_var;
     END PROCESS;
 END ARCHITECTURE ControllerArch3;
 

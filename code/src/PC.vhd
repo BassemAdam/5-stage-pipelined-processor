@@ -9,6 +9,7 @@ ENTITY PC IS
     PORT (
         clk, RES : IN STD_LOGIC;
         PC_en : IN STD_LOGIC;
+        PC_FWD : IN STD_LOGIC;
         PC_stall_PopUse : IN STD_LOGIC;
         PC_Interrupt : IN STD_LOGIC;
         PC_branch : IN STD_LOGIC;
@@ -16,6 +17,7 @@ ENTITY PC IS
         PC_POP_PC : IN STD_LOGIC;
         PC_JMP_EXE_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
         PC_JMP_DEC_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+        PC_FWD_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
         PC_InterruptPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
         PC_ResetPC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
         PC_RET_PC : IN STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
@@ -34,13 +36,17 @@ BEGIN
     BEGIN
         IF RES = '1' THEN
             pcNext <= (PC_ResetPC);
-        ELSIF PC_Interrupt = '1' THEN
+            ELSIF PC_Interrupt = '1' THEN
             pcNext <= PC_InterruptPC;
-        ELSIF falling_edge(clk) THEN
+            ELSIF falling_edge(clk) THEN
             IF PC_POP_PC = '1' THEN
                 pcNext <= PC_RET_PC;
-            ELSIF PC_corrected = '1' THEN
-                pcNext <= PC_JMP_EXE_PC;
+                -- ELSIF PC_corrected = '1' and PC_FWD = '0' THEN
+                --     pcNext <= PC_FWD_PC;
+            ELSIF PC_corrected = '1' or PC_JMP_EXE_PC /= PC_FWD_PC THEN
+                pcNext <= PC_FWD_PC;
+                -- ELSIF PC_FWD = '1' THEN
+                --     pcNext <= PC_FWD_PC;
             ELSIF PC_branch = '1' THEN
                 pcNext <= PC_JMP_DEC_PC;
             ELSIF PC_en = '1' AND NOT PC_stall_PopUse = '1' THEN

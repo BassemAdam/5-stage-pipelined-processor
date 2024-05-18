@@ -47,26 +47,26 @@ BEGIN
             FD_current_PC_out <= (OTHERS => '0');
             temp <= '0';
 
-        ELSIF FD_INT = '1' THEN
+            ELSIF FD_INT = '1' THEN
             temp <= '1';
             FD_OpCode <= "111";
             FD_Func <= "1000";
-        ELSIF temp = '1' AND falling_edge(clk) THEN
+            ELSIF temp = '1' AND falling_edge(clk) THEN
             temp <= '0';
             FD_OpCode <= "111";
             FD_Func <= "1100";
-        ELSIF  FD_Inst(15 DOWNTO 13) = "101" THEN
+            ELSIF FD_Inst(15 DOWNTO 13) = "101" AND FD_Inst(3 DOWNTO 0) = "1100" THEN
             temp2 <= '1';
             FD_OpCode <= "101";
             FD_Func <= "1100";
-        ELSIF temp2 = '1' AND falling_edge(clk) THEN
+            ELSIF temp2 = '1' AND falling_edge(clk) THEN
             temp2 <= '0';
             FD_OpCode <= "101";
             FD_Func <= "1110";
-        ELSIF falling_edge(clk) AND FD_Flush_FD = '1' THEN
+            ELSIF falling_edge(clk) AND FD_Flush_FD = '1' THEN
             FD_OpCode <= (OTHERS => '0');
 
-        ELSIF falling_edge(clk) AND WE = '1' AND NOT FD_stall_PopUse = '1' THEN
+            ELSIF falling_edge(clk) AND WE = '1' AND NOT FD_stall_PopUse = '1' THEN
 
             FD_Rdst1 <= FD_Inst(12 DOWNTO 10);
             -- FD_Rdst2 <= FD_Inst(9 DOWNTO 7);
@@ -77,7 +77,7 @@ BEGIN
             FD_InputPort <= FD_IN_PORT;
             IF FD_isImm_in = '1' THEN
                 FD_OpCode <= "000";
-            ELSE
+                ELSE
                 FD_OpCode <= FD_Inst(15 DOWNTO 13);
             END IF;
 

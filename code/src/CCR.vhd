@@ -7,6 +7,7 @@ ENTITY CCR IS
     PORT (
         clk, RES : IN STD_LOGIC;
         CCR_POP_CCR : IN STD_LOGIC;
+        CCR_zReset : IN STD_LOGIC;
         CCR_flags_in : IN STD_LOGIC_VECTOR (0 TO 3);
         CCR_flags_en : IN STD_LOGIC_VECTOR (0 TO 3);
         CCR_MEM_flags : IN STD_LOGIC_VECTOR (0 TO 3);
@@ -29,7 +30,9 @@ BEGIN
             IF CCR_POP_CCR = '1' THEN
                 CCR_flags_out <= CCR_MEM_flags;
                 ELSE
-                IF CCR_flags_en(0) = '1' THEN
+                IF CCR_zReset = '1' THEN
+                    CCR_flags_out(0) <= '0';
+                    ELSIF CCR_flags_en(0) = '1' THEN
                     CCR_flags_out(0) <= CCR_flags_in(0);
                 END IF;
 
