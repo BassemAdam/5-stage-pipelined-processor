@@ -36,17 +36,19 @@ BEGIN
     BEGIN
         IF RES = '1' THEN
             pcNext <= (PC_ResetPC);
-            ELSIF PC_Interrupt = '1' THEN
+        ELSIF PC_Interrupt = '1' THEN
             pcNext <= PC_InterruptPC;
-            ELSIF falling_edge(clk) THEN
+        ELSIF falling_edge(clk) THEN
             IF PC_POP_PC = '1' THEN
                 pcNext <= PC_RET_PC;
                 -- ELSIF PC_corrected = '1' and PC_FWD = '0' THEN
                 --     pcNext <= PC_FWD_PC;
-            ELSIF PC_corrected = '1' or PC_JMP_EXE_PC /= PC_FWD_PC THEN
+            ELSIF PC_corrected = '1' THEN
                 pcNext <= PC_FWD_PC;
                 -- ELSIF PC_FWD = '1' THEN
                 --     pcNext <= PC_FWD_PC;
+            ELSIF PC_JMP_EXE_PC /= PC_FWD_PC THEN
+                pcNext <= PC_FWD_PC;
             ELSIF PC_branch = '1' THEN
                 pcNext <= PC_JMP_DEC_PC;
             ELSIF PC_en = '1' AND NOT PC_stall_PopUse = '1' THEN

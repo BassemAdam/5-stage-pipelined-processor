@@ -50,7 +50,7 @@ sim:/processor/ctr_Flush_DE \
 sim:/processor/RF_Rdata1 \
 sim:/processor/ctr_zReset \
 sim:/processor/DE_PC_FWD \
-sim:/processor/FWD_PC_FWD
+sim:/processor/FWD_PC_FWD \
 
 # Register File
 add wave -position insertpoint  \
@@ -61,6 +61,7 @@ sim:/processor/RF_Rdata2
 add wave -position insertpoint  \
 sim:/processor/DE_ALUopd1 \
 sim:/processor/DE_ALUopd2  \
+sim:/processor/DE_OpCode_out  \
 sim:/processor/DE_InPort_out  \
 sim:/processor/DE_we1_reg_out  \
 sim:/processor/DE_we2_reg_out  \
@@ -194,5 +195,16 @@ force -freeze sim:/processor/IN_PORT 32'h0070 0
 run 100 ps
 run 100 ps
 force -freeze sim:/processor/IN_PORT 32'h0060 0
+run
+run
+run
+run
+run 50ps
+force -freeze sim:/processor/ctr_Flush_FD 0 0
+force -freeze sim:/processor/ctr_Flush_DE 0 0
+run 50ps
+run
+force -freeze sim:/processor/IN_PORT 32'h0070 0
+run
 
 

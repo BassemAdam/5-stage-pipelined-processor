@@ -51,37 +51,38 @@ ARCHITECTURE FWD_Arch OF FWDUnit IS
 BEGIN
 
     FWD_ALU_OPD_1 <=
-    FWD_Data1Exec WHEN (FWD_dst1Exec = FWD_src1 AND FWD_wb1Exec = '1' AND ctr_src1_use = '1') ELSE
-    FWD_Data2Exec WHEN (FWD_dst2Exec = FWD_src1 AND FWD_wb2Exec = '1' AND ctr_src1_use = '1') ELSE
-    FWD_Data1Mem WHEN (FWD_dst1Mem = FWD_src1 AND FWD_wb1Mem = '1' AND ctr_src1_use = '1') ELSE
-    FWD_Data2Mem WHEN (FWD_dst2Mem = FWD_src1 AND FWD_wb2Mem = '1' AND ctr_src1_use = '1') ELSE
-    FWD_src1_Data;
+        FWD_Data1Exec WHEN (FWD_dst1Exec = FWD_src1 AND FWD_wb1Exec = '1' AND ctr_src1_use = '1') ELSE
+        FWD_Data2Exec WHEN (FWD_dst2Exec = FWD_src1 AND FWD_wb2Exec = '1' AND ctr_src1_use = '1') ELSE
+        FWD_Data1Mem WHEN (FWD_dst1Mem = FWD_src1 AND FWD_wb1Mem = '1' AND ctr_src1_use = '1') ELSE
+        FWD_Data2Mem WHEN (FWD_dst2Mem = FWD_src1 AND FWD_wb2Mem = '1' AND ctr_src1_use = '1') ELSE
+        FWD_src1_Data;
 
     FWD_ALU_OPD_2 <=
-    FWD_Data1Exec WHEN (FWD_dst1Exec = FWD_src2 AND FWD_wb1Exec = '1' AND ctr_src2_use = '1') ELSE
-    FWD_Data2Exec WHEN (FWD_dst2Exec = FWD_src2 AND FWD_wb2Exec = '1' AND ctr_src2_use = '1') ELSE
-    FWD_Data1Mem WHEN (FWD_dst1Mem = FWD_src2 AND FWD_wb1Mem = '1' AND ctr_src2_use = '1') ELSE
-    FWD_Data2Mem WHEN (FWD_dst2Mem = FWD_src2 AND FWD_wb2Mem = '1' AND ctr_src2_use = '1') ELSE
-    FWD_src2_Data;
+        FWD_Data1Exec WHEN (FWD_dst1Exec = FWD_src2 AND FWD_wb1Exec = '1' AND ctr_src2_use = '1') ELSE
+        FWD_Data2Exec WHEN (FWD_dst2Exec = FWD_src2 AND FWD_wb2Exec = '1' AND ctr_src2_use = '1') ELSE
+        FWD_Data1Mem WHEN (FWD_dst1Mem = FWD_src2 AND FWD_wb1Mem = '1' AND ctr_src2_use = '1') ELSE
+        FWD_Data2Mem WHEN (FWD_dst2Mem = FWD_src2 AND FWD_wb2Mem = '1' AND ctr_src2_use = '1') ELSE
+        FWD_src2_Data;
 
     FWD_PC_OUT <=
-    FWD_Data1Exec WHEN (FWD_dst1Exec = FWD_src1 AND (op_code = "100" OR op_code = "101") AND ctr_src1_use = '1') ELSE
-    FWD_Data2Exec WHEN (FWD_dst2Exec = FWD_src1 AND (op_code = "100" OR op_code = "101") AND ctr_src1_use = '1') ELSE
-    FWD_Data1Mem WHEN (FWD_dst1Mem = FWD_src1 AND (op_code = "100" OR op_code = "101") AND ctr_src1_use = '1') ELSE
-    FWD_Data2Mem WHEN (FWD_dst2Mem = FWD_src1 AND (op_code = "100" OR op_code = "101") AND ctr_src1_use = '1') ELSE
-    FWD_PC_OUT_Data;
-    FWD_PC_FWD <= 
-    '1' WHEN (FWD_dst1Exec = FWD_src1 AND (op_code = "100" OR op_code = "101") AND ctr_src1_use = '1') OR
-    (FWD_dst2Exec = FWD_src1 AND (op_code = "100" OR op_code = "101") AND ctr_src1_use = '1') OR
-    (FWD_dst1Mem = FWD_src1 AND (op_code = "100" OR op_code = "101") AND ctr_src1_use = '1') OR
-    (FWD_dst2Mem = FWD_src1 AND (op_code = "100" OR op_code = "101") AND ctr_src1_use = '1')
-    ELSE
-    '0';
+        FWD_Data1Exec WHEN (FWD_dst1Exec = FWD_src1 AND (op_code = "100" OR op_code = "101") AND ctr_src1_use = '1') ELSE
+        FWD_Data2Exec WHEN (FWD_dst2Exec = FWD_src1 AND (op_code = "100" OR op_code = "101") AND ctr_src1_use = '1') ELSE
+        FWD_Data1Mem WHEN (FWD_dst1Mem = FWD_src1 AND (op_code = "100" OR op_code = "101") AND ctr_src1_use = '1') ELSE
+        FWD_Data2Mem WHEN (FWD_dst2Mem = FWD_src1 AND (op_code = "100" OR op_code = "101") AND ctr_src1_use = '1') ELSE
+        FWD_PC_OUT_Data;
+
+    FWD_PC_FWD <=
+        '1' WHEN (FWD_dst1Exec = FWD_src1 AND (op_code = "100" OR op_code = "101") AND ctr_src1_use = '1') OR
+        (FWD_dst2Exec = FWD_src1 AND (op_code = "100" OR op_code = "101") AND ctr_src1_use = '1') OR
+        (FWD_dst1Mem = FWD_src1 AND (op_code = "100" OR op_code = "101") AND ctr_src1_use = '1') OR
+        (FWD_dst2Mem = FWD_src1 AND (op_code = "100" OR op_code = "101") AND ctr_src1_use = '1')
+        ELSE
+        '0';
 
     FWD_STD_Data <=
-    FWD_Data1Exec WHEN (FWD_dst1Exec = FWD_STD_src AND FWD_wb1Exec = '1' AND ctr_STD_use = '1') ELSE
-    FWD_Data2Exec WHEN (FWD_dst2Exec = FWD_STD_src AND FWD_wb2Exec = '1' AND ctr_STD_use = '1') ELSE
-    FWD_Data1Mem WHEN (FWD_dst1Mem = FWD_STD_src AND FWD_wb1Mem = '1' AND ctr_STD_use = '1') ELSE
-    FWD_Data2Mem WHEN (FWD_dst2Mem = FWD_STD_src AND FWD_wb2Mem = '1' AND ctr_STD_use = '1') ELSE
-    FWD_STD_val;
+        FWD_Data1Exec WHEN (FWD_dst1Exec = FWD_STD_src AND FWD_wb1Exec = '1' AND ctr_STD_use = '1') ELSE
+        FWD_Data2Exec WHEN (FWD_dst2Exec = FWD_STD_src AND FWD_wb2Exec = '1' AND ctr_STD_use = '1') ELSE
+        FWD_Data1Mem WHEN (FWD_dst1Mem = FWD_STD_src AND FWD_wb1Mem = '1' AND ctr_STD_use = '1') ELSE
+        FWD_Data2Mem WHEN (FWD_dst2Mem = FWD_STD_src AND FWD_wb2Mem = '1' AND ctr_STD_use = '1') ELSE
+        FWD_STD_val;
 END ARCHITECTURE FWD_Arch;
